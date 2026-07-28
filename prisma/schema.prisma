@@ -1,0 +1,419 @@
+// Prisma schema — CBT Community Platform
+// Schema version: 1.0 (matches db-schema-en.md)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Users
+// id matches Supabase Auth user id (auth.users.id) — set on registration.
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  user
+  expert
+  admin
+}
+
+model User {
+  id         String   @id @db.Uuid
+  full_name  String
+  title      String?
+  role       UserRole @default(user)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  materials                         Material[]
+  expert_approvals_as_expert        ExpertApproval[]              @relation("ExpertReferralApprovals")
+  expert_approvals_as_user          ExpertApproval[]              @relation("UserReferralApprovals")
+  material_requests                 MaterialRequest[]
+  material_responses                MaterialResponse[]
+  forum_questions                   ForumQuestion[]
+  forum_answers                     ForumAnswer[]
+  recommendations                   Recommendation[]
+  recommendation_comments           RecommendationComment[]
+  events                            Event[]
+  event_comments                    EventComment[]
+  professional_requests             ProfessionalRequest[]
+  professional_request_comments     ProfessionalRequestComment[]
+  material_ratings                  MaterialRating[]
+  forum_likes                       ForumLike[]
+  notifications                     Notification[]
+  reports                           Report[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// ExpertApprovals
+// ---------------------------------------------------------------------------
+
+enum ExpertApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+model ExpertApproval {
+  id         String               @id @default(uuid()) @db.Uuid
+  expert_id  String               @db.Uuid
+  user_id    String               @db.Uuid
+  status     ExpertApprovalStatus
+  created_at DateTime             @default(now()) @db.Timestamptz(6)
+
+  expert User @relation("ExpertReferralApprovals", fields: [expert_id], references: [id])
+  user   User @relation("UserReferralApprovals", fields: [user_id], references: [id])
+
+  @@unique([expert_id, user_id])
+  @@map("expert_approvals")
+}
+
+// ---------------------------------------------------------------------------
+// MaterialTypes & Materials
+// ---------------------------------------------------------------------------
+
+enum MaterialTypeKey {
+  game
+  reading
+  worksheet
+  treatment_plan
+  presentation
+  video
+}
+
+model MaterialType {
+  id     String          @id @default(uuid()) @db.Uuid
+  key    MaterialTypeKey @unique
+  label  String
+  icon   String?
+
+  materials Material[]
+
+  @@map("material_types")
+}
+
+model Material {
+  id               String   @id @default(uuid()) @db.Uuid
+  user_id          String   @db.Uuid
+  title            String
+  description      String
+  file_url         String
+  material_type_id String   @db.Uuid
+  is_hidden        Boolean  @default(false)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  user          User             @relation(fields: [user_id], references: [id])
+  material_type MaterialType     @relation(fields: [material_type_id], references: [id])
+  ratings       MaterialRating[]
+
+  @@map("materials")
+}
+
+// ---------------------------------------------------------------------------
+// MaterialRequests & MaterialResponses
+// ---------------------------------------------------------------------------
+
+model MaterialRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  title       String
+  description String
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  user      User               @relation(fields: [user_id], references: [id])
+  responses MaterialResponse[]
+
+  @@map("material_requests")
+}
+
+model MaterialResponse {
+  id         String   @id @default(uuid()) @db.Uuid
+  request_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  text       String?
+  file_url   String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  request MaterialRequest @relation(fields: [request_id], references: [id])
+  user    User            @relation(fields: [user_id], references: [id])
+
+  @@map("material_responses")
+}
+
+// ---------------------------------------------------------------------------
+// Forum Q&A
+// ---------------------------------------------------------------------------
+
+model ForumQuestion {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  title      String
+  content    String
+  is_hidden  Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  user    User          @relation(fields: [user_id], references: [id])
+  answers ForumAnswer[]
+
+  @@map("forum_questions")
+}
+
+model ForumAnswer {
+  id                String   @id @default(uuid()) @db.Uuid
+  question_id       String   @db.Uuid
+  user_id           String   @db.Uuid
+  content           String
+  parent_answer_id  String?  @db.Uuid
+  is_hidden         Boolean  @default(false)
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  question ForumQuestion @relation(fields: [question_id], references: [id])
+  user     User          @relation(fields: [user_id], references: [id])
+  parent   ForumAnswer?  @relation("ForumAnswerThread", fields: [parent_answer_id], references: [id])
+  replies  ForumAnswer[] @relation("ForumAnswerThread")
+
+  @@map("forum_answers")
+}
+
+enum ForumLikeTargetType {
+  question
+  answer
+}
+
+model ForumLike {
+  id          String              @id @default(uuid()) @db.Uuid
+  user_id     String              @db.Uuid
+  target_type ForumLikeTargetType
+  target_id   String              @db.Uuid
+  created_at  DateTime            @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, target_type, target_id])
+  @@map("forum_likes")
+}
+
+// ---------------------------------------------------------------------------
+// Recommendations
+// ---------------------------------------------------------------------------
+
+enum RecommendationType {
+  book
+  game
+  workshop
+}
+
+model Recommendation {
+  id         String              @id @default(uuid()) @db.Uuid
+  user_id    String              @db.Uuid
+  type       RecommendationType?
+  content    String
+  is_hidden  Boolean             @default(false)
+  created_at DateTime            @default(now()) @db.Timestamptz(6)
+
+  user     User                    @relation(fields: [user_id], references: [id])
+  comments RecommendationComment[]
+
+  @@map("recommendations")
+}
+
+model RecommendationComment {
+  id                 String   @id @default(uuid()) @db.Uuid
+  recommendation_id  String   @db.Uuid
+  user_id            String   @db.Uuid
+  content            String
+  parent_comment_id  String?  @db.Uuid
+  depth              Int      @default(0)
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+
+  recommendation Recommendation           @relation(fields: [recommendation_id], references: [id])
+  user           User                     @relation(fields: [user_id], references: [id])
+  parent         RecommendationComment?   @relation("RecommendationCommentThread", fields: [parent_comment_id], references: [id])
+  replies        RecommendationComment[]  @relation("RecommendationCommentThread")
+
+  @@map("recommendation_comments")
+}
+
+// ---------------------------------------------------------------------------
+// Events & Workshops
+// ---------------------------------------------------------------------------
+
+model Event {
+  id           String    @id @default(uuid()) @db.Uuid
+  user_id      String    @db.Uuid
+  title        String
+  description  String
+  event_date   DateTime? @db.Date
+  event_time   DateTime? @db.Time(6)
+  is_cancelled Boolean   @default(false)
+  is_hidden    Boolean   @default(false)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  user     User           @relation(fields: [user_id], references: [id])
+  comments EventComment[]
+
+  @@map("events")
+}
+
+model EventComment {
+  id         String   @id @default(uuid()) @db.Uuid
+  event_id   String   @db.Uuid
+  user_id    String   @db.Uuid
+  content    String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  event Event @relation(fields: [event_id], references: [id])
+  user  User  @relation(fields: [user_id], references: [id])
+
+  @@map("event_comments")
+}
+
+// ---------------------------------------------------------------------------
+// Professional Requests
+// ---------------------------------------------------------------------------
+
+model ProfessionalRequest {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  title       String
+  description String
+  is_hidden   Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  user     User                         @relation(fields: [user_id], references: [id])
+  comments ProfessionalRequestComment[]
+
+  @@map("professional_requests")
+}
+
+model ProfessionalRequestComment {
+  id                String   @id @default(uuid()) @db.Uuid
+  request_id        String   @db.Uuid
+  user_id           String   @db.Uuid
+  content           String
+  parent_comment_id String?  @db.Uuid
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  request ProfessionalRequest          @relation(fields: [request_id], references: [id])
+  user    User                         @relation(fields: [user_id], references: [id])
+  parent  ProfessionalRequestComment?  @relation("ProfessionalRequestCommentThread", fields: [parent_comment_id], references: [id])
+  replies ProfessionalRequestComment[] @relation("ProfessionalRequestCommentThread")
+
+  @@map("professional_request_comments")
+}
+
+// ---------------------------------------------------------------------------
+// Tags
+// ---------------------------------------------------------------------------
+
+enum EntityType {
+  material
+  forum
+  recommendation
+  event
+  professional_request
+}
+
+model Tag {
+  id    String @id @default(uuid()) @db.Uuid
+  name  String @unique
+  color String @default("#6366f1")
+
+  entity_tags EntityTag[]
+
+  @@map("tags")
+}
+
+model EntityTag {
+  id          String     @id @default(uuid()) @db.Uuid
+  tag_id      String     @db.Uuid
+  entity_type EntityType
+  entity_id   String     @db.Uuid
+
+  tag Tag @relation(fields: [tag_id], references: [id])
+
+  @@unique([tag_id, entity_type, entity_id])
+  @@map("entity_tags")
+}
+
+// ---------------------------------------------------------------------------
+// Material Ratings
+// ---------------------------------------------------------------------------
+
+model MaterialRating {
+  id          String   @id @default(uuid()) @db.Uuid
+  material_id String   @db.Uuid
+  user_id     String   @db.Uuid
+  rating      Int
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  material Material @relation(fields: [material_id], references: [id])
+  user     User     @relation(fields: [user_id], references: [id])
+
+  @@unique([material_id, user_id])
+  @@map("materials_ratings")
+}
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+enum NotificationType {
+  comment_on_content
+  comment_on_recommendation
+  forum_answer
+  material_request_response
+}
+
+model Notification {
+  id             String           @id @default(uuid()) @db.Uuid
+  user_id        String           @db.Uuid
+  type           NotificationType
+  reference_type String?
+  reference_id   String?          @db.Uuid
+  is_read        Boolean          @default(false)
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------------------------
+// Reports
+// ---------------------------------------------------------------------------
+
+enum ReportTargetType {
+  material
+  forum_question
+  forum_answer
+  recommendation
+  event
+  professional_request
+}
+
+enum ReportStatus {
+  open
+  reviewing
+  resolved
+}
+
+model Report {
+  id          String           @id @default(uuid()) @db.Uuid
+  user_id     String           @db.Uuid
+  target_type ReportTargetType
+  target_id   String           @db.Uuid
+  reason      String
+  status      ReportStatus     @default(open)
+  created_at  DateTime         @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("reports")
+}
