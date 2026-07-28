@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="80" viewBox="0 0 320 80" role="img" aria-label="����� ����� CBT">
+  <rect width="320" height="80" rx="12" fill="#fdfcf8"/>
+  <circle cx="40" cy="40" r="22" fill="#a43c28"/>
+  <path d="M32 40c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 32v16M34 40h12" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="76" y="36" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="#0d1c2f">����� ����� CBT</text>
+  <text x="76" y="56" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="500" fill="#57423d">�������� �������</text>
+</svg>
