@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NEXT_PUBLIC_SUPABASE_URL=https://ywdxabrpljigkmczkgrw.supabase.co NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
+    "dev": "next dev",
+    "dev:insecure-tls": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -24,7 +27,9 @@
     "@supabase/supabase-js": "^2.50.0",
     "next": "^16.2.9",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.5"
   },
   "overrides": {
     "postcss": "^8.5.10"
@@ -38,6 +43,7 @@
     "eslint-config-next": "^16.2.9",
     "prisma": "^6.9.0",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^5.0.3"
   }
 }
