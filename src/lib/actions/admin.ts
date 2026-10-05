@@ -3,7 +3,13 @@
 import type { ReportTargetType, UserRole } from "@prisma/client";
 import type { UpdateReportStatusInput } from "@/lib/models/report";
 import type { CreateTagInput } from "@/lib/models/tag";
-import type { UpdateUserInput } from "@/lib/models/user";
+import { isUserRole, type UpdateUserInput } from "@/lib/models/user";
+import { prisma } from "@/lib/db";
+import {
+  approvalDecisionSchema,
+  parseInput,
+  reportStatusSchema,
+} from "@/lib/validation/schemas";
 import { updateReportStatus } from "@/lib/repositories/report.repository";
 import {
   deleteReportedContent,
@@ -27,7 +33,7 @@ import { requireRole } from "@/lib/auth";
 
 export async function resolveReport(id: string, input: UpdateReportStatusInput) {
   await requireRole("admin");
-  return updateReportStatus(id, input);
+  return updateReportStatus(id, parseInput(reportStatusSchema, input));
 }
 
 export async function adminHideReportedContent(
@@ -56,6 +62,26 @@ export async function adminDeleteReportedContent(
 
 export async function adminUpdateUserRole(user_id: string, role: UserRole) {
   await requireRole("admin");
+
+  if (typeof role !== "string" || !isUserRole(role)) {
+    throw new Error("Invalid role.");
+  }
+
+  if (role !== "admin") {
+    const target = await prisma.user.findUnique({
+      where: { id: user_id },
+      select: { role: true },
+    });
+    if (target?.role === "admin") {
+      const otherAdmins = await prisma.user.count({
+        where: { role: "admin", id: { not: user_id } },
+      });
+      if (otherAdmins === 0) {
+        throw new Error("לא ניתן להסיר את מנהל המערכת האחרון.");
+      }
+    }
+  }
+
   const input: UpdateUserInput = { role };
   return updateUser(user_id, input);
 }
@@ -97,5 +123,9 @@ export async function adminDecideExpertApproval(
   input: UpdateExpertApprovalStatusInput,
 ) {
   await requireRole("admin");
-  return updateExpertApprovalStatus(expert_id, user_id, input);
+  return updateExpertApprovalStatus(
+    expert_id,
+    user_id,
+    parseInput(approvalDecisionSchema, input),
+  );
 }
