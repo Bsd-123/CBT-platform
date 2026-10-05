@@ -6,11 +6,17 @@ import { r2Config } from "@/lib/r2/config";
 let client: S3Client | undefined;
 let clientConfigKey: string | undefined;
 
+/** Local-dev only: for networks that intercept TLS. Never allowed in production. */
 function shouldUseInsecureSsl(): boolean {
-  return (
+  const requested =
     process.env.NODE_TLS_REJECT_UNAUTHORIZED === "0" ||
-    process.env.NODE_ENV === "development"
-  );
+    process.env.ALLOW_INSECURE_TLS === "true";
+
+  if (requested && process.env.NODE_ENV === "production") {
+    throw new Error("Insecure TLS is not allowed in production.");
+  }
+
+  return requested;
 }
 
 function getClientConfigKey(): string {
