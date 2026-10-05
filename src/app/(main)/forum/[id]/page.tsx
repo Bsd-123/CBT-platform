@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchEntityTags, fetchForumQuestionById } from "@/lib/actions";
+import { fetchEntityTags, fetchForumQuestionById } from "@/lib/data";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { ForumAnswerForm } from "@/components/forum/ForumAnswerForm";
 import { ForumAnswerThread } from "@/components/forum/ForumAnswerThread";

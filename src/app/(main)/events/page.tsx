@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchEvents } from "@/lib/actions";
+import { fetchEvents } from "@/lib/data";
 import { CreateEventForm } from "@/components/events/CreateEventForm";
 import { EventsViewNav } from "@/components/events/EventsViewNav";
 

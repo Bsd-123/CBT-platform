@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { ForumSearchForm } from "@/components/forum/ForumSearchForm";
 import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
 import { PostForumQuestionForm } from "@/components/forum/PostForumQuestionForm";
-import { searchForum } from "@/lib/actions";
+import { searchForum } from "@/lib/data";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { enrichForumQuestionsWithLikes } from "@/lib/services/forum-likes";
 

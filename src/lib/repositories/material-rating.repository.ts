@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateMaterialRatingInput,
   PublicMaterialRating,
@@ -48,8 +49,20 @@ export async function createMaterialRating(
     throw new Error("Rating must be an integer between 1 and 5.");
   }
 
-  const rating = await prisma.materialRating.create({
-    data: input,
+  const material = await prisma.material.findFirst({
+    where: { id: input.material_id, is_hidden: false },
+    select: { id: true },
+  });
+  if (!material) {
+    throw new Error("Material not found.");
+  }
+
+  const rating = await prisma.materialRating.upsert({
+    where: {
+      material_id_user_id: { material_id: input.material_id, user_id: input.user_id },
+    },
+    create: input,
+    update: { rating: input.rating },
     include: { user: true },
   });
   return pickPublicMaterialRatingFields(rating);

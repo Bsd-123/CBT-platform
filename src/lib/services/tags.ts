@@ -1,3 +1,4 @@
+import "server-only";
 import type { EntityType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import {

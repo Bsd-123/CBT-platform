@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchMaterialTypes, fetchTags } from "@/lib/actions";
+import { fetchMaterialTypes, fetchTags } from "@/lib/data";
 import { UploadMaterialForm } from "@/components/materials/UploadMaterialForm";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 

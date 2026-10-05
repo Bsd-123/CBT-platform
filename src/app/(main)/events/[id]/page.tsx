@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchEventById, fetchEventComments } from "@/lib/actions";
+import { fetchEventById, fetchEventComments } from "@/lib/data";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { EventCommentForm } from "@/components/events/EventCommentForm";
 import { EditEventForm, buildEditEventInitial } from "@/components/events/EditEventForm";

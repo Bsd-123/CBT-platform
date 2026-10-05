@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateEventCommentInput,
   CreateEventInput,
@@ -75,8 +76,8 @@ export async function updateEvent(
 export async function createEventComment(
   input: CreateEventCommentInput,
 ): Promise<PublicEventComment> {
-  const event = await prisma.event.findUnique({
-    where: { id: input.event_id },
+  const event = await prisma.event.findFirst({
+    where: { id: input.event_id, ...visibleContentWhere() },
   });
 
   if (!event) {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchMaterialRequestById } from "@/lib/actions";
+import { fetchMaterialRequestById } from "@/lib/data";
 import { MaterialResponseForm } from "@/components/materials/MaterialResponseForm";
 import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";
 

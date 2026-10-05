@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import {
   fetchProfessionalRequestById,
   fetchProfessionalRequestComments,
-} from "@/lib/actions";
+} from "@/lib/data";
 import { ProfessionalRequestCommentForm } from "@/components/professional-requests/ProfessionalRequestCommentForm";
 import { ProfessionalRequestCommentThread } from "@/components/professional-requests/ProfessionalRequestCommentThread";
 import { ReportForm } from "@/components/shared/ReportForm";
