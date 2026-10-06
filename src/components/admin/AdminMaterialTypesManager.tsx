@@ -8,15 +8,17 @@ import {
   adminDeleteMaterialType,
   adminUpdateMaterialType,
 } from "@/lib/actions/admin";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { useUi } from "@/components/ui/UiProvider";
 import type { PublicMaterialType } from "@/lib/models/material-type";
 
 const KEY_LABELS: Record<MaterialTypeKey, string> = {
-  game: "game",
-  reading: "reading",
-  worksheet: "worksheet",
-  treatment_plan: "treatment_plan",
-  presentation: "presentation",
-  video: "video",
+  game: "משחק (game)",
+  reading: "קריאה (reading)",
+  worksheet: "דף עבודה (worksheet)",
+  treatment_plan: "תוכנית טיפול (treatment_plan)",
+  presentation: "מצגת (presentation)",
+  video: "וידאו (video)",
 };
 
 type AdminMaterialTypesManagerProps = {
@@ -29,7 +31,7 @@ export function AdminMaterialTypesManager({
   availableKeys,
 }: AdminMaterialTypesManagerProps) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const { toast, confirm } = useUi();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [newKey, setNewKey] = useState<MaterialTypeKey | "">(availableKeys[0] ?? "");
   const [newLabel, setNewLabel] = useState("");
@@ -44,24 +46,19 @@ export function AdminMaterialTypesManager({
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
     if (!newKey) {
-      setError("יש לבחור מפתח לקטגוריה.");
+      toast("יש לבחור מפתח לקטגוריה.", "error");
       return;
     }
 
-    setError(null);
     setCreating(true);
-
     try {
-      await adminCreateMaterialType({
-        key: newKey,
-        label: newLabel,
-        icon: newIcon || null,
-      });
+      await adminCreateMaterialType({ key: newKey, label: newLabel, icon: newIcon || null });
       setNewLabel("");
       setNewIcon("");
+      toast("הקטגוריה נוצרה");
       router.refresh();
-    } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "יצירת הקטגוריה נכשלה");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "יצירת הקטגוריה נכשלה", "error");
     } finally {
       setCreating(false);
     }
@@ -71,142 +68,159 @@ export function AdminMaterialTypesManager({
     const edit = edits[type.id];
     if (!edit) return;
 
-    setError(null);
     setLoadingId(type.id);
-
     try {
-      await adminUpdateMaterialType(type.id, {
-        label: edit.label,
-        icon: edit.icon || null,
-      });
+      await adminUpdateMaterialType(type.id, { label: edit.label, icon: edit.icon || null });
+      toast("הקטגוריה עודכנה");
       router.refresh();
-    } catch (updateError) {
-      setError(updateError instanceof Error ? updateError.message : "העדכון נכשל");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "העדכון נכשל", "error");
     } finally {
       setLoadingId(null);
     }
   }
 
-  async function handleDelete(id: string) {
-    setError(null);
-    setLoadingId(id);
+  async function handleDelete(type: PublicMaterialType) {
+    const approved = await confirm({
+      title: `מחיקת הקטגוריה "${type.label}"`,
+      message: "לא ניתן למחוק קטגוריה שיש בה חומרים.",
+      confirmLabel: "מחיקה",
+      danger: true,
+    });
+    if (!approved) return;
 
+    setLoadingId(type.id);
     try {
-      await adminDeleteMaterialType(id);
+      await adminDeleteMaterialType(type.id);
+      toast("הקטגוריה נמחקה");
       router.refresh();
-    } catch (deleteError) {
-      setError(deleteError instanceof Error ? deleteError.message : "המחיקה נכשלה");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "המחיקה נכשלה", "error");
     } finally {
       setLoadingId(null);
     }
+  }
+
+  function setEdit(type: PublicMaterialType, patch: Partial<{ label: string; icon: string }>) {
+    setEdits((current) => ({
+      ...current,
+      [type.id]: {
+        label: current[type.id]?.label ?? type.label,
+        icon: current[type.id]?.icon ?? type.icon ?? "",
+        ...patch,
+      },
+    }));
   }
 
   return (
-    <div className="stack">
+    <>
       {availableKeys.length > 0 && (
-        <form className="stack card" onSubmit={handleCreate}>
+        <section className="ui-section">
           <h2>קטגוריית חומר חדשה</h2>
-          <div className="form-field">
-            <label htmlFor="material-type-key">מפתח (enum)</label>
-            <select
-              id="material-type-key"
-              required
-              value={newKey}
-              onChange={(event) => setNewKey(event.target.value as MaterialTypeKey)}
-            >
-              {availableKeys.map((key) => (
-                <option key={key} value={key}>
-                  {KEY_LABELS[key]}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-field">
-            <label htmlFor="material-type-label">תווית תצוגה</label>
-            <input
-              id="material-type-label"
-              required
-              value={newLabel}
-              onChange={(event) => setNewLabel(event.target.value)}
-            />
-          </div>
-          <div className="form-field">
-            <label htmlFor="material-type-icon">אייקון (אופציונלי)</label>
-            <input
-              id="material-type-icon"
-              value={newIcon}
-              onChange={(event) => setNewIcon(event.target.value)}
-            />
-          </div>
-          <button type="submit" className="button" disabled={creating}>
-            {creating ? "שומר..." : "הוספת קטגוריה"}
-          </button>
-        </form>
+          <form className="ui-inline-form" onSubmit={handleCreate}>
+            <div className="form-field">
+              <label htmlFor="material-type-key">מפתח</label>
+              <select
+                id="material-type-key"
+                required
+                value={newKey}
+                onChange={(event) => setNewKey(event.target.value as MaterialTypeKey)}
+              >
+                {availableKeys.map((key) => (
+                  <option key={key} value={key}>
+                    {KEY_LABELS[key]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-field">
+              <label htmlFor="material-type-label">תווית תצוגה</label>
+              <input
+                id="material-type-label"
+                required
+                value={newLabel}
+                onChange={(event) => setNewLabel(event.target.value)}
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="material-type-icon">אייקון (אופציונלי)</label>
+              <input
+                id="material-type-icon"
+                value={newIcon}
+                onChange={(event) => setNewIcon(event.target.value)}
+              />
+            </div>
+            <button type="submit" className="materials-btn-primary" disabled={creating}>
+              {creating ? "שומר..." : "הוספה"}
+            </button>
+          </form>
+        </section>
       )}
 
-      {error && <p className="error">{error}</p>}
-
-      <section className="stack">
+      <section className="ui-section">
         <h2>קטגוריות קיימות ({materialTypes.length})</h2>
         {materialTypes.length === 0 ? (
-          <p className="muted">אין קטגוריות.</p>
+          <EmptyState icon="category" title="אין קטגוריות" />
         ) : (
-          <ul className="list-plain">
-            {materialTypes.map((type) => {
-              const edit = edits[type.id] ?? { label: type.label, icon: type.icon ?? "" };
-              return (
-                <li key={type.id} className="card stack">
-                  <p className="muted">מפתח: {type.key}</p>
-                  <div className="form-field">
-                    <label htmlFor={`label-${type.id}`}>תווית</label>
-                    <input
-                      id={`label-${type.id}`}
-                      value={edit.label}
-                      onChange={(event) =>
-                        setEdits((current) => ({
-                          ...current,
-                          [type.id]: { ...edit, label: event.target.value },
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="form-field">
-                    <label htmlFor={`icon-${type.id}`}>אייקון</label>
-                    <input
-                      id={`icon-${type.id}`}
-                      value={edit.icon}
-                      onChange={(event) =>
-                        setEdits((current) => ({
-                          ...current,
-                          [type.id]: { ...edit, icon: event.target.value },
-                        }))
-                      }
-                    />
-                  </div>
-                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                    <button
-                      type="button"
-                      className="button secondary"
-                      disabled={loadingId === type.id}
-                      onClick={() => void handleUpdate(type)}
-                    >
-                      שמירה
-                    </button>
-                    <button
-                      type="button"
-                      className="button secondary"
-                      disabled={loadingId === type.id}
-                      onClick={() => void handleDelete(type.id)}
-                    >
-                      מחיקה
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <div className="ui-table-wrap">
+            <table className="ui-table">
+              <thead>
+                <tr>
+                  <th>מפתח</th>
+                  <th>תווית</th>
+                  <th>אייקון</th>
+                  <th>פעולות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {materialTypes.map((type) => {
+                  const edit = edits[type.id] ?? { label: type.label, icon: type.icon ?? "" };
+                  return (
+                    <tr key={type.id}>
+                      <td>{KEY_LABELS[type.key]}</td>
+                      <td>
+                        <input
+                          aria-label={`תווית עבור ${type.key}`}
+                          value={edit.label}
+                          onChange={(event) => setEdit(type, { label: event.target.value })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          aria-label={`אייקון עבור ${type.key}`}
+                          value={edit.icon}
+                          onChange={(event) => setEdit(type, { icon: event.target.value })}
+                        />
+                      </td>
+                      <td>
+                        <div className="ui-table-actions">
+                          <button
+                            type="button"
+                            className="materials-btn-secondary"
+                            disabled={loadingId === type.id}
+                            onClick={() => void handleUpdate(type)}
+                          >
+                            שמירה
+                          </button>
+                          <button
+                            type="button"
+                            className="materials-btn-primary"
+                            data-danger="true"
+                            disabled={loadingId === type.id}
+                            onClick={() => void handleDelete(type)}
+                          >
+                            מחיקה
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
-    </div>
+    </>
   );
 }

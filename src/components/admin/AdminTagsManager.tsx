@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { adminCreateTag, adminDeleteTag } from "@/lib/actions/admin";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { useUi } from "@/components/ui/UiProvider";
 import type { PublicTag } from "@/lib/models/tag";
 import { TAG_COLOR_PRESETS, getTagBadgeStyle } from "@/lib/utils/tag-colors";
 
@@ -12,101 +14,112 @@ type AdminTagsManagerProps = {
 
 export function AdminTagsManager({ tags }: AdminTagsManagerProps) {
   const router = useRouter();
+  const { toast, confirm } = useUi();
   const [name, setName] = useState("");
   const [color, setColor] = useState<string>(TAG_COLOR_PRESETS[0]);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
-    setError(null);
     setLoading(true);
 
     try {
       await adminCreateTag({ name: name.trim(), color });
       setName("");
       setColor(TAG_COLOR_PRESETS[0]);
+      toast("התגית נוצרה");
       router.refresh();
-    } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "יצירת התגית נכשלה");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "יצירת התגית נכשלה", "error");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleDelete(tagId: string) {
-    setError(null);
-    setDeletingId(tagId);
+  async function handleDelete(tag: PublicTag) {
+    const approved = await confirm({
+      title: `מחיקת התגית "${tag.name}"`,
+      message: "התגית תוסר מכל התכנים שמסומנים בה.",
+      confirmLabel: "מחיקה",
+      danger: true,
+    });
+    if (!approved) return;
 
+    setDeletingId(tag.id);
     try {
-      await adminDeleteTag(tagId);
+      await adminDeleteTag(tag.id);
+      toast("התגית נמחקה");
       router.refresh();
-    } catch (deleteError) {
-      setError(deleteError instanceof Error ? deleteError.message : "מחיקת התגית נכשלה");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "מחיקת התגית נכשלה", "error");
     } finally {
       setDeletingId(null);
     }
   }
 
   return (
-    <div className="stack">
-      <form className="stack" onSubmit={handleCreate}>
+    <>
+      <section className="ui-section">
         <h2>תגית חדשה</h2>
-        <div className="form-field">
-          <label htmlFor="tag-name">שם תגית</label>
-          <input
-            id="tag-name"
-            required
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </div>
-        <div className="form-field">
-          <label htmlFor="tag-color">צבע</label>
-          <select
-            id="tag-color"
-            value={color}
-            onChange={(event) => setColor(event.target.value)}
-          >
-            {TAG_COLOR_PRESETS.map((preset) => (
-              <option key={preset} value={preset}>
-                {preset}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button type="submit" className="button" disabled={loading}>
-          {loading ? "שומר..." : "הוספת תגית"}
-        </button>
-      </form>
+        <form className="ui-inline-form" onSubmit={handleCreate}>
+          <div className="form-field">
+            <label htmlFor="tag-name">שם תגית</label>
+            <input
+              id="tag-name"
+              required
+              maxLength={40}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="tag-color">צבע</label>
+            <select
+              id="tag-color"
+              value={color}
+              onChange={(event) => setColor(event.target.value)}
+            >
+              {TAG_COLOR_PRESETS.map((preset) => (
+                <option key={preset} value={preset}>
+                  {preset}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className="materials-btn-primary" disabled={loading}>
+            {loading ? "שומר..." : "הוספת תגית"}
+          </button>
+        </form>
+      </section>
 
-      {error && <p className="error">{error}</p>}
-
-      <section className="stack">
+      <section className="ui-section">
         <h2>תגיות קיימות ({tags.length})</h2>
         {tags.length === 0 ? (
-          <p className="muted">אין תגיות.</p>
+          <EmptyState icon="sell" title="אין תגיות" description="צרו את התגית הראשונה." />
         ) : (
-          <ul className="list-plain">
+          <ul className="ui-chip-list">
             {tags.map((tag) => (
-              <li key={tag.id} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <li key={tag.id} className="ui-chip">
                 <span className="badge tag-badge" style={getTagBadgeStyle(tag.color)}>
                   {tag.name}
                 </span>
                 <button
                   type="button"
-                  className="button secondary"
+                  className="ui-icon-btn"
+                  aria-label={`מחיקת התגית ${tag.name}`}
                   disabled={deletingId === tag.id}
-                  onClick={() => void handleDelete(tag.id)}
+                  onClick={() => void handleDelete(tag)}
                 >
-                  מחיקה
+                  <span className="material-symbol" aria-hidden="true">
+                    delete
+                  </span>
                 </button>
               </li>
             ))}
           </ul>
         )}
       </section>
-    </div>
+    </>
   );
 }
