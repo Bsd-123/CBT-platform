@@ -76,6 +76,7 @@ import {
   getTagById,
   getUserById,
   listEntityTags,
+  listEntityTagsForEntities,
   listEventComments,
   listEvents,
   listForumAnswersByQuestion,
@@ -325,6 +326,13 @@ export async function tagEntity(input: AttachEntityTagInput) {
 
 export async function untagEntity(id: string) {
   return detachEntityTag(id);
+}
+
+export async function fetchEntityTagsForEntities(
+  entity_type: EntityType,
+  entity_ids: string[],
+) {
+  return listEntityTagsForEntities(entity_type, entity_ids);
 }
 
 export async function fetchEntityTags(entity_type: EntityType, entity_id: string) {

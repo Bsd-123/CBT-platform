@@ -31,6 +31,7 @@ export function ModalButton({
   useEffect(() => {
     if (!open) return;
 
+    const trigger = triggerRef.current;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
     document.body.style.overflow = "hidden";
@@ -43,7 +44,7 @@ export function ModalButton({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
-      (previouslyFocused ?? triggerRef.current)?.focus();
+      (previouslyFocused ?? trigger)?.focus();
     };
   }, [open]);
 

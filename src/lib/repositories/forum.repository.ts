@@ -65,7 +65,10 @@ export async function searchForumQuestions(
 ): Promise<PublicForumQuestion[]> {
   const questions = await prisma.forumQuestion.findMany({
     where: buildForumSearchWhere(filter),
-    include: { user: true },
+    include: {
+      user: true,
+      _count: { select: { answers: { where: visibleContentWhere() } } },
+    },
     orderBy: { created_at: "desc" },
   });
   return questions.map(pickPublicForumQuestionFields);

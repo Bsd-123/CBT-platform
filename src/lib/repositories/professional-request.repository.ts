@@ -46,7 +46,7 @@ export async function listProfessionalRequests(
 ): Promise<PublicProfessionalRequest[]> {
   const requests = await prisma.professionalRequest.findMany({
     where: visibleContentWhere(include_hidden),
-    include: { user: true },
+    include: { user: true, _count: { select: { comments: true } } },
     orderBy: { created_at: "desc" },
   });
   return requests.map(pickPublicProfessionalRequestFields);
