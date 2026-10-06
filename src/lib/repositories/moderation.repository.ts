@@ -1,35 +1,9 @@
 import "server-only";
-import type { ReportTargetType } from "@prisma/client";
+import type { Prisma, ReportTargetType } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { deleteObjectFromR2 } from "@/lib/r2";
 
-async function deleteForumAnswerTree(answer_id: string): Promise<void> {
-  const replies = await prisma.forumAnswer.findMany({
-    where: { parent_answer_id: answer_id },
-    select: { id: true },
-  });
-
-  for (const reply of replies) {
-    await deleteForumAnswerTree(reply.id);
-  }
-
-  await prisma.forumLike.deleteMany({
-    where: { target_type: "answer", target_id: answer_id },
-  });
-  await prisma.forumAnswer.delete({ where: { id: answer_id } });
-}
-
-async function deleteProfessionalRequestCommentTree(comment_id: string): Promise<void> {
-  const replies = await prisma.professionalRequestComment.findMany({
-    where: { parent_comment_id: comment_id },
-    select: { id: true },
-  });
-
-  for (const reply of replies) {
-    await deleteProfessionalRequestCommentTree(reply.id);
-  }
-
-  await prisma.professionalRequestComment.delete({ where: { id: comment_id } });
-}
+type Tx = Prisma.TransactionClient;
 
 export async function setReportedContentHidden(
   target_type: ReportTargetType,
@@ -63,70 +37,114 @@ export async function setReportedContentHidden(
   }
 }
 
+/** The answer and all of its nested replies, found level by level (no N+1 per row). */
+async function collectAnswerTreeIds(tx: Tx, rootId: string): Promise<string[]> {
+  const ids = [rootId];
+  let frontier = [rootId];
+  while (frontier.length > 0) {
+    const children = await tx.forumAnswer.findMany({
+      where: { parent_answer_id: { in: frontier } },
+      select: { id: true },
+    });
+    frontier = children.map((child) => child.id);
+    ids.push(...frontier);
+  }
+  return ids;
+}
+
+async function deleteAnswers(tx: Tx, answerIds: string[]): Promise<void> {
+  if (answerIds.length === 0) return;
+  await tx.forumLike.deleteMany({
+    where: { target_type: "answer", target_id: { in: answerIds } },
+  });
+  // One statement: the self-referencing FK is checked at statement end.
+  await tx.forumAnswer.deleteMany({ where: { id: { in: answerIds } } });
+}
+
+/**
+ * Deletes reported content and its dependants atomically. Returns the storage
+ * key of an attached file, which the caller removes after the transaction commits.
+ */
+async function deleteInTransaction(
+  target_type: ReportTargetType,
+  target_id: string,
+): Promise<string | null> {
+  return prisma.$transaction(async (tx) => {
+    switch (target_type) {
+      case "material": {
+        const material = await tx.material.findUnique({
+          where: { id: target_id },
+          select: { file_url: true },
+        });
+        await tx.materialRating.deleteMany({ where: { material_id: target_id } });
+        await tx.entityTag.deleteMany({
+          where: { entity_type: "material", entity_id: target_id },
+        });
+        await tx.material.delete({ where: { id: target_id } });
+        return material?.file_url ?? null;
+      }
+      case "forum_question": {
+        const answers = await tx.forumAnswer.findMany({
+          where: { question_id: target_id },
+          select: { id: true },
+        });
+        await deleteAnswers(tx, answers.map((answer) => answer.id));
+        await tx.forumLike.deleteMany({
+          where: { target_type: "question", target_id },
+        });
+        await tx.entityTag.deleteMany({
+          where: { entity_type: "forum", entity_id: target_id },
+        });
+        await tx.forumQuestion.delete({ where: { id: target_id } });
+        return null;
+      }
+      case "forum_answer":
+        await deleteAnswers(tx, await collectAnswerTreeIds(tx, target_id));
+        return null;
+      case "recommendation":
+        await tx.recommendationComment.deleteMany({
+          where: { recommendation_id: target_id },
+        });
+        await tx.entityTag.deleteMany({
+          where: { entity_type: "recommendation", entity_id: target_id },
+        });
+        await tx.recommendation.delete({ where: { id: target_id } });
+        return null;
+      case "event":
+        await tx.eventComment.deleteMany({ where: { event_id: target_id } });
+        await tx.entityTag.deleteMany({
+          where: { entity_type: "event", entity_id: target_id },
+        });
+        await tx.event.delete({ where: { id: target_id } });
+        return null;
+      case "professional_request":
+        await tx.professionalRequestComment.deleteMany({
+          where: { request_id: target_id },
+        });
+        await tx.entityTag.deleteMany({
+          where: { entity_type: "professional_request", entity_id: target_id },
+        });
+        await tx.professionalRequest.delete({ where: { id: target_id } });
+        return null;
+      default:
+        throw new Error("Unsupported report target type.");
+    }
+  });
+}
+
 export async function deleteReportedContent(
   target_type: ReportTargetType,
   target_id: string,
 ): Promise<void> {
-  switch (target_type) {
-    case "material":
-      await prisma.materialRating.deleteMany({ where: { material_id: target_id } });
-      await prisma.entityTag.deleteMany({
-        where: { entity_type: "material", entity_id: target_id },
-      });
-      await prisma.material.delete({ where: { id: target_id } });
-      return;
-    case "forum_question": {
-      const answers = await prisma.forumAnswer.findMany({
-        where: { question_id: target_id },
-        select: { id: true },
-      });
-      for (const answer of answers) {
-        await deleteForumAnswerTree(answer.id);
-      }
-      await prisma.forumLike.deleteMany({
-        where: { target_type: "question", target_id },
-      });
-      await prisma.entityTag.deleteMany({
-        where: { entity_type: "forum", entity_id: target_id },
-      });
-      await prisma.forumQuestion.delete({ where: { id: target_id } });
-      return;
+  const fileKey = await deleteInTransaction(target_type, target_id);
+
+  if (fileKey) {
+    try {
+      await deleteObjectFromR2(fileKey);
+    } catch (error) {
+      // The database is already consistent; an orphaned object is harmless to users.
+      console.error("[moderation] failed to delete stored file", fileKey, error);
     }
-    case "forum_answer":
-      await deleteForumAnswerTree(target_id);
-      return;
-    case "recommendation":
-      await prisma.recommendationComment.deleteMany({
-        where: { recommendation_id: target_id },
-      });
-      await prisma.entityTag.deleteMany({
-        where: { entity_type: "recommendation", entity_id: target_id },
-      });
-      await prisma.recommendation.delete({ where: { id: target_id } });
-      return;
-    case "event":
-      await prisma.eventComment.deleteMany({ where: { event_id: target_id } });
-      await prisma.entityTag.deleteMany({
-        where: { entity_type: "event", entity_id: target_id },
-      });
-      await prisma.event.delete({ where: { id: target_id } });
-      return;
-    case "professional_request": {
-      const comments = await prisma.professionalRequestComment.findMany({
-        where: { request_id: target_id, parent_comment_id: null },
-        select: { id: true },
-      });
-      for (const comment of comments) {
-        await deleteProfessionalRequestCommentTree(comment.id);
-      }
-      await prisma.entityTag.deleteMany({
-        where: { entity_type: "professional_request", entity_id: target_id },
-      });
-      await prisma.professionalRequest.delete({ where: { id: target_id } });
-      return;
-    }
-    default:
-      throw new Error("Unsupported report target type.");
   }
 }
 
