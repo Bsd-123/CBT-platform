@@ -95,6 +95,7 @@ export {
   attachEntityTag,
   detachEntityTag,
   listEntityTags,
+  listEntityTagsForEntities,
 } from "./tag.repository";
 
 export {
