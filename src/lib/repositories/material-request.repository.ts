@@ -27,10 +27,17 @@ export async function getMaterialRequestById(
   return request ? pickPublicMaterialRequestFields(request) : null;
 }
 
-export async function listMaterialRequests(): Promise<PublicMaterialRequest[]> {
+export async function countMaterialRequests(): Promise<number> {
+  return prisma.materialRequest.count();
+}
+
+export async function listMaterialRequests(
+  options: { skip?: number; take?: number } = {},
+): Promise<PublicMaterialRequest[]> {
   const requests = await prisma.materialRequest.findMany({
     include: requestInclude,
     orderBy: { created_at: "desc" },
+    ...(options.take !== undefined && { skip: options.skip ?? 0, take: options.take }),
   });
   return requests.map(pickPublicMaterialRequestFields);
 }

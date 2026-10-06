@@ -4,9 +4,11 @@ import { ContentCard } from "@/components/ui/ContentCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ModalButton } from "@/components/ui/Modal";
 import { PageHero } from "@/components/ui/PageHero";
-import { fetchEvents } from "@/lib/data";
+import { Pagination } from "@/components/ui/Pagination";
+import { fetchEventCount, fetchEvents } from "@/lib/data";
 import { formatEventTimeValue } from "@/lib/utils/calendar";
 import { countLabel } from "@/lib/utils/format";
+import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
 function DateBadge({ value }: { value: Date | string }) {
   const date = new Date(value);
@@ -19,8 +21,17 @@ function DateBadge({ value }: { value: Date | string }) {
   );
 }
 
-export default async function EventsPage() {
-  const events = await fetchEvents();
+type EventsPageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function EventsPage({ searchParams }: EventsPageProps) {
+  const { page: pageParam } = await searchParams;
+  const page = parsePage(pageParam);
+  const [events, total] = await Promise.all([
+    fetchEvents(pageWindow(page)),
+    fetchEventCount(),
+  ]);
 
   return (
     <>
@@ -73,6 +84,8 @@ export default async function EventsPage() {
           ))}
         </ul>
       )}
+
+      <Pagination basePath="/events" page={page} totalPages={totalPages(total)} />
     </>
   );
 }
