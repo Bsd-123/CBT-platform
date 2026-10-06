@@ -1,5 +1,7 @@
 "use server";
 
+import { UserFacingError } from "@/lib/errors";
+import { runAction } from "@/lib/actions/result";
 import type { ReportTargetType, UserRole } from "@prisma/client";
 import type { UpdateReportStatusInput } from "@/lib/models/report";
 import type { CreateTagInput } from "@/lib/models/tag";
@@ -32,89 +34,119 @@ import { updateExpertApprovalStatus } from "@/lib/repositories/expert-approval.r
 import { requireRole } from "@/lib/auth";
 
 export async function resolveReport(id: string, input: UpdateReportStatusInput) {
-  await requireRole("admin");
-  return updateReportStatus(id, parseInput(reportStatusSchema, input));
+  return runAction(async () => {
+    await requireRole("admin");
+    return updateReportStatus(id, parseInput(reportStatusSchema, input));
+
+  });
 }
 
 export async function adminHideReportedContent(
   target_type: ReportTargetType,
   target_id: string,
 ) {
-  await requireRole("admin");
-  await hideReportedContent(target_type, target_id);
+  return runAction(async () => {
+    await requireRole("admin");
+    await hideReportedContent(target_type, target_id);
+
+  });
 }
 
 export async function adminRestoreReportedContent(
   target_type: ReportTargetType,
   target_id: string,
 ) {
-  await requireRole("admin");
-  await restoreReportedContent(target_type, target_id);
+  return runAction(async () => {
+    await requireRole("admin");
+    await restoreReportedContent(target_type, target_id);
+
+  });
 }
 
 export async function adminDeleteReportedContent(
   target_type: ReportTargetType,
   target_id: string,
 ) {
-  await requireRole("admin");
-  await deleteReportedContent(target_type, target_id);
+  return runAction(async () => {
+    await requireRole("admin");
+    await deleteReportedContent(target_type, target_id);
+
+  });
 }
 
 export async function adminUpdateUserRole(user_id: string, role: UserRole) {
-  await requireRole("admin");
+  return runAction(async () => {
+    await requireRole("admin");
 
-  if (typeof role !== "string" || !isUserRole(role)) {
-    throw new Error("Invalid role.");
-  }
+    if (typeof role !== "string" || !isUserRole(role)) {
+      throw new Error("Invalid role.");
+    }
 
-  if (role !== "admin") {
-    const target = await prisma.user.findUnique({
-      where: { id: user_id },
-      select: { role: true },
-    });
-    if (target?.role === "admin") {
-      const otherAdmins = await prisma.user.count({
-        where: { role: "admin", id: { not: user_id } },
+    if (role !== "admin") {
+      const target = await prisma.user.findUnique({
+        where: { id: user_id },
+        select: { role: true },
       });
-      if (otherAdmins === 0) {
-        throw new Error("לא ניתן להסיר את מנהל המערכת האחרון.");
+      if (target?.role === "admin") {
+        const otherAdmins = await prisma.user.count({
+          where: { role: "admin", id: { not: user_id } },
+        });
+        if (otherAdmins === 0) {
+          throw new UserFacingError("לא ניתן להסיר את מנהל המערכת האחרון.");
+        }
       }
     }
-  }
 
-  const input: UpdateUserInput = { role };
-  return updateUser(user_id, input);
+    const input: UpdateUserInput = { role };
+    return updateUser(user_id, input);
+
+  });
 }
 
 export async function adminCreateTag(input: CreateTagInput) {
-  await requireRole("admin");
-  return createTag(input);
+  return runAction(async () => {
+    await requireRole("admin");
+    return createTag(input);
+
+  });
 }
 
 export async function adminDeleteTag(tag_id: string) {
-  await requireRole("admin");
-  await deleteTag(tag_id);
+  return runAction(async () => {
+    await requireRole("admin");
+    await deleteTag(tag_id);
+
+  });
 }
 
 export async function adminCreateMaterialType(input: CreateMaterialTypeInput) {
-  await requireRole("admin");
-  if (!input.label.trim()) {
-    throw new Error("Label is required.");
-  }
-  return createMaterialType(input);
+  return runAction(async () => {
+    await requireRole("admin");
+    if (!input.label.trim()) {
+      throw new Error("Label is required.");
+    }
+    return createMaterialType(input);
+
+  });
 }
 
 export async function adminUpdateMaterialType(id: string, input: UpdateMaterialTypeInput) {
-  await requireRole("admin");
-  if (input.label !== undefined && !input.label.trim()) {
-    throw new Error("Label is required.");
-  }
-  return updateMaterialType(id, input);
+  return runAction(async () => {
+    await requireRole("admin");
+    if (input.label !== undefined && !input.label.trim()) {
+      throw new Error("Label is required.");
+    }
+    return updateMaterialType(id, input);
+
+  });
 }
 
 export async function adminDeleteMaterialType(id: string) {
-  await requireRole("admin");
-  await deleteMaterialType(id);
+  return runAction(async () => {
+    await requireRole("admin");
+    await deleteMaterialType(id);
+
+  });
 }
 
 export async function adminDecideExpertApproval(
@@ -122,10 +154,13 @@ export async function adminDecideExpertApproval(
   user_id: string,
   input: UpdateExpertApprovalStatusInput,
 ) {
-  await requireRole("admin");
-  return updateExpertApprovalStatus(
-    expert_id,
-    user_id,
-    parseInput(approvalDecisionSchema, input),
-  );
+  return runAction(async () => {
+    await requireRole("admin");
+    return updateExpertApprovalStatus(
+      expert_id,
+      user_id,
+      parseInput(approvalDecisionSchema, input),
+    );
+
+  });
 }
