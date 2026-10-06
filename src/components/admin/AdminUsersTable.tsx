@@ -333,9 +333,9 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                 chevron_right
               </span>
             </button>
-            <button type="button" className="admin-users-page-btn" data-active="true">
+            <span className="admin-users-page-btn" data-active="true" aria-current="page">
               {currentPage}
-            </button>
+            </span>
             <button
               type="button"
               className="admin-users-page-btn"

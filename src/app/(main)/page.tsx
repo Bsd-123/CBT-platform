@@ -54,15 +54,12 @@ const TRUST_POINTS = [
   },
 ] as const;
 
-const GALLERY_IMAGES = [
-  "https://images.unsplash.com/photo-1573497019940-598c8125889b?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80",
+const TRUST_TILES = [
+  { icon: "library_books", label: "חומרים וכלים" },
+  { icon: "forum", label: "שאלות ותשובות" },
+  { icon: "verified", label: "המלצות" },
+  { icon: "event", label: "אירועים" },
 ] as const;
-
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80";
 
 export default function HomePage() {
   return (
@@ -92,21 +89,14 @@ export default function HomePage() {
 
           <div className="home-hero-visual">
             <div className="home-hero-glow" aria-hidden="true" />
-            <div className="home-hero-image-wrap">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={HERO_IMAGE}
-                alt="מטפלים משתפים ידע מקצועי"
-                className="home-hero-image"
-              />
-              <div className="home-hero-image-overlay" aria-hidden="true" />
+            <div className="home-hero-image-wrap home-hero-panel">
+              <div className="home-hero-panel-icons" aria-hidden="true">
+                <MaterialIcon name="library_books" />
+                <MaterialIcon name="forum" />
+                <MaterialIcon name="event" />
+              </div>
               <div className="home-hero-glass">
-                <div className="home-hero-avatars" aria-hidden="true">
-                  <span className="home-hero-avatar" />
-                  <span className="home-hero-avatar" />
-                  <span className="home-hero-avatar" />
-                </div>
-                <p className="home-hero-glass-text">קהילה פעילה של מטפלים</p>
+                <p className="home-hero-glass-text">מרחב מקצועי לשיתוף ידע בין מטפלי CBT</p>
               </div>
             </div>
           </div>
@@ -153,10 +143,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="home-trust-gallery">
-            {GALLERY_IMAGES.map((src) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={src} src={src} alt="" loading="lazy" />
+          <div className="home-trust-tiles" aria-hidden="true">
+            {TRUST_TILES.map((tile) => (
+              <div key={tile.icon} className="home-trust-tile">
+                <MaterialIcon name={tile.icon} />
+                <span>{tile.label}</span>
+              </div>
             ))}
           </div>
         </div>

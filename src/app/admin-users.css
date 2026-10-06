@@ -440,3 +440,10 @@
   text-align: center;
   color: var(--au-on-surface-variant);
 }
+
+span.admin-users-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
