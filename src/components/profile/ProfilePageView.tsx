@@ -384,9 +384,9 @@ export function ProfilePageView({
                 events.map((event) => {
                   const eventDate = event.event_date ? new Date(event.event_date) : null;
                   const monthLabel = eventDate
-                    ? eventDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
+                    ? eventDate.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase()
                     : "—";
-                  const dayLabel = eventDate ? String(eventDate.getDate()) : "—";
+                  const dayLabel = eventDate ? String(eventDate.getUTCDate()) : "—";
                   const participantCount = event.comments?.length ?? 0;
 
                   return (

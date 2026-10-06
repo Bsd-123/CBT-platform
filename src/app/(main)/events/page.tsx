@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { fetchEvents } from "@/lib/data";
 import { CreateEventForm } from "@/components/events/CreateEventForm";
+import { formatEventDate } from "@/lib/utils/calendar";
 import { EventsViewNav } from "@/components/events/EventsViewNav";
 
 export default async function EventsPage() {
@@ -59,7 +60,7 @@ export default async function EventsPage() {
                 {event.event_date && (
                   <span className="muted">
                     {" "}
-                    — {new Date(event.event_date).toLocaleDateString("he-IL")}
+                    — {formatEventDate(event.event_date)}
                   </span>
                 )}
               </li>

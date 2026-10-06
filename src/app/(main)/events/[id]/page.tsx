@@ -4,6 +4,7 @@ import { fetchEventById, fetchEventComments } from "@/lib/data";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { EventCommentForm } from "@/components/events/EventCommentForm";
 import { EditEventForm, buildEditEventInitial } from "@/components/events/EditEventForm";
+import { formatEventDate, formatEventTimeValue } from "@/lib/utils/calendar";
 import { ReportForm } from "@/components/shared/ReportForm";
 
 type EventDetailPageProps = {
@@ -33,12 +34,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         <p>{event.description}</p>
         {event.event_date && (
           <p className="muted">
-            {new Date(event.event_date).toLocaleDateString("he-IL")}
-            {event.event_time &&
-              ` · ${new Date(event.event_time).toLocaleTimeString("he-IL", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}`}
+            {formatEventDate(event.event_date)}
+            {event.event_time && ` · ${formatEventTimeValue(event.event_time)}`}
           </p>
         )}
         <ReportForm targetType="event" targetId={event.id} />
