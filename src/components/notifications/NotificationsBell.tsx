@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import {
@@ -9,6 +10,7 @@ import {
   readNotification,
 } from "@/lib/actions/notifications";
 import type { PublicNotification } from "@/lib/models/notification";
+import { getNotificationHref } from "@/lib/utils/notification-links";
 
 type NotificationsBellProps = {
   userId: string;
@@ -18,6 +20,7 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<PublicNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     const notifications = await fetchNotifications(userId);
@@ -50,6 +53,24 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
     };
   }, [userId, load]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!wrapRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
   async function handleMarkRead(id: string) {
     await readNotification(id, userId);
     await load();
@@ -60,16 +81,24 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
     await load();
   }
 
+  async function handleOpenItem(item: PublicNotification) {
+    setOpen(false);
+    if (!item.is_read) {
+      await handleMarkRead(item.id);
+    }
+  }
+
   const tooltipLabel =
     unreadCount > 0 ? `התראות (${unreadCount})` : "התראות";
 
   return (
-    <div className="notifications-wrap">
+    <div className="notifications-wrap" ref={wrapRef}>
       <button
         type="button"
         className="nav-icon-btn"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
+        aria-haspopup="true"
         aria-label={tooltipLabel}
         data-tooltip={tooltipLabel}
       >
@@ -83,14 +112,7 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
 
       {open && (
         <div className="notifications-panel card">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "0.75rem",
-            }}
-          >
+          <div className="notifications-header">
             <strong>התראות</strong>
             {unreadCount > 0 && (
               <button
@@ -107,10 +129,27 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
             <p className="muted">אין התראות חדשות</p>
           ) : (
             <ul className="list-plain">
-              {items.map((item) => (
-                <li key={item.id}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem" }}>
-                    <span>{formatNotificationLabel(item.type)}</span>
+              {items.map((item) => {
+                const href = getNotificationHref(item.reference_type, item.reference_id);
+                const label = formatNotificationLabel(item.type);
+
+                return (
+                  <li
+                    key={item.id}
+                    className="notifications-item"
+                    data-unread={!item.is_read}
+                  >
+                    {href ? (
+                      <Link
+                        href={href}
+                        className="notifications-item-link"
+                        onClick={() => void handleOpenItem(item)}
+                      >
+                        {label}
+                      </Link>
+                    ) : (
+                      <span>{label}</span>
+                    )}
                     {!item.is_read && (
                       <button
                         type="button"
@@ -120,9 +159,9 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
                         סמן כנקרא
                       </button>
                     )}
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
