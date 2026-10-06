@@ -123,6 +123,7 @@ export async function getRegistrationStatus(
 ): Promise<RegistrationStatus> {
   const approval = await prisma.expertApproval.findFirst({
     where: { user_id },
+    orderBy: { created_at: "desc" },
   });
 
   if (!approval) {
