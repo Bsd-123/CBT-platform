@@ -1,6 +1,6 @@
 /* Clinical Clarity — Materials Library */
 
-.materials-space {
+:root {
   --cc-surface: #f7f6f2;
   --cc-surface-low: #f3f2ec;
   --cc-surface-container: #eeede7;
