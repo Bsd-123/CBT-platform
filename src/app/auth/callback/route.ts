@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isSafeRedirectPath } from "@/lib/auth/safe-redirect";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
@@ -17,6 +18,6 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/forgot-password?error=invalid_link`);
   }
 
-  const safeNext = next.startsWith("/") ? next : "/";
+  const safeNext = isSafeRedirectPath(next) ? next : "/";
   return NextResponse.redirect(`${origin}${safeNext}`);
 }

@@ -1,4 +1,8 @@
-import { HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getR2Client } from "@/lib/r2/client";
 import { r2Config } from "@/lib/r2/config";
 import { createSignedUploadUrl } from "@/lib/r2/signed-url";
@@ -82,4 +86,10 @@ export async function uploadObjectToR2(
   }
 
   throw new Error("שגיאה בהעלאה ל-R2: לא ניתן לאמת שהקובץ נשמר.");
+}
+
+export async function deleteObjectFromR2(key: string): Promise<void> {
+  await getR2Client().send(
+    new DeleteObjectCommand({ Bucket: r2Config.bucketName, Key: key }),
+  );
 }
