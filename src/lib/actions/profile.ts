@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction } from "@/lib/actions/result";
 
 
 import { requireApprovedRegistration } from "@/lib/auth";
@@ -37,12 +38,15 @@ export async function fetchMyEvents() {
 
 
 export async function updateMyProfile(raw: Pick<UpdateUserInput, "full_name" | "title">) {
-  const auth = await requireApprovedRegistration();
-  enforceRateLimit("write", auth.userId);
-  const input = parseInput(profileSchema, raw);
+  return runAction(async () => {
+    const auth = await requireApprovedRegistration();
+    enforceRateLimit("write", auth.userId);
+    const input = parseInput(profileSchema, raw);
 
-  return updateUser(auth.userId, {
-    full_name: input.full_name,
-    title: input.title?.trim() || null,
+    return updateUser(auth.userId, {
+      full_name: input.full_name,
+      title: input.title?.trim() || null,
+    });
+
   });
 }

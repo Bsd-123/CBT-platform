@@ -1,5 +1,7 @@
 "use server";
 
+import { UserFacingError } from "@/lib/errors";
+import { runAction } from "@/lib/actions/result";
 import {
   getAuthenticatedProfile,
   getAuthSession,
@@ -35,14 +37,17 @@ export async function fetchPostLoginPath() {
 }
 
 export async function completeRegistration(raw: RegisterProfileInput) {
-  const session = await requireAuthSession();
-  enforceRateLimit("register", session.userId);
-  const input = parseInput(registerSchema, raw);
-  if (session.userId !== input.id) {
-    throw new AuthError("אין הרשאה לשמור פרופיל זה.");
-  }
+  return runAction(async () => {
+    const session = await requireAuthSession();
+    enforceRateLimit("register", session.userId);
+    const input = parseInput(registerSchema, raw);
+    if (session.userId !== input.id) {
+      throw new AuthError("אין הרשאה לשמור פרופיל זה.");
+    }
 
-  return registerProfile(input);
+    return registerProfile(input);
+
+  });
 }
 
 export async function checkRegistrationApproved() {
@@ -67,29 +72,32 @@ export async function requireExpert() {
 }
 
 export async function requestFileDownloadUrl(key: string) {
-  const auth = await requireApprovedRegistration();
-  enforceRateLimit("download", auth.userId);
+  return runAction(async () => {
+    const auth = await requireApprovedRegistration();
+    enforceRateLimit("download", auth.userId);
 
-  if (typeof key !== "string" || !isValidFileKey(key)) {
-    throw new Error("מפתח קובץ לא תקין.");
-  }
-
-  if (auth.profile.role !== "admin") {
-    const [material, response] = await Promise.all([
-      prisma.material.findFirst({
-        where: { file_url: key, is_hidden: false },
-        select: { id: true },
-      }),
-      prisma.materialResponse.findFirst({
-        where: { file_url: key },
-        select: { id: true },
-      }),
-    ]);
-
-    if (!material && !response) {
-      throw new Error("הקובץ לא נמצא.");
+    if (typeof key !== "string" || !isValidFileKey(key)) {
+      throw new UserFacingError("מפתח קובץ לא תקין.");
     }
-  }
 
-  return createSignedDownloadUrl({ key });
+    if (auth.profile.role !== "admin") {
+      const [material, response] = await Promise.all([
+        prisma.material.findFirst({
+          where: { file_url: key, is_hidden: false },
+          select: { id: true },
+        }),
+        prisma.materialResponse.findFirst({
+          where: { file_url: key },
+          select: { id: true },
+        }),
+      ]);
+
+      if (!material && !response) {
+        throw new UserFacingError("הקובץ לא נמצא.");
+      }
+    }
+
+    return createSignedDownloadUrl({ key });
+
+  });
 }

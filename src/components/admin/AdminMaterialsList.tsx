@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { AdminMaterialItem } from "@/lib/repositories/material.repository";
 import { formatDate } from "@/lib/utils/format";
+import { unwrap } from "@/lib/actions/result";
 
 type Props = {
   materials: AdminMaterialItem[];
@@ -40,9 +41,9 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
 
     setLoadingId(id);
     try {
-      if (action === "hide") await adminHideReportedContent("material", id);
-      if (action === "restore") await adminRestoreReportedContent("material", id);
-      if (action === "delete") await adminDeleteReportedContent("material", id);
+      if (action === "hide") unwrap(await adminHideReportedContent("material", id));
+      if (action === "restore") unwrap(await adminRestoreReportedContent("material", id));
+      if (action === "delete") unwrap(await adminDeleteReportedContent("material", id));
       toast(
         action === "delete" ? "החומר נמחק" : action === "hide" ? "החומר הוסתר" : "החומר שוחזר",
       );

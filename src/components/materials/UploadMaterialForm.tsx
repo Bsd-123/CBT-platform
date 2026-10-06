@@ -7,6 +7,7 @@ import type { PublicTag } from "@/lib/models/tag";
 import { TagSelect } from "@/components/shared/TagSelect";
 import { uploadMaterialFileResilient } from "@/lib/client/upload-api";
 import { submitMaterialUpload } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type UploadMaterialFormProps = {
   materialTypes: PublicMaterialType[];
@@ -44,13 +45,13 @@ export function UploadMaterialForm({ materialTypes, tags }: UploadMaterialFormPr
     try {
       const fileUrl = await uploadMaterialFileResilient(file);
 
-      const material = await submitMaterialUpload({
+      const material = unwrap(await submitMaterialUpload({
         title,
         description,
         material_type_id: materialTypeId,
         file_url: fileUrl,
         tag_ids: selectedTagIds,
-      });
+      }));
 
       router.push(`/materials/${material.id}`);
       router.refresh();

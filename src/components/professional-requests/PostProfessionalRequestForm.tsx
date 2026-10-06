@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitProfessionalRequest } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 export function PostProfessionalRequestForm() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export function PostProfessionalRequestForm() {
     setLoading(true);
 
     try {
-      const item = await submitProfessionalRequest({ title, description });
+      const item = unwrap(await submitProfessionalRequest({ title, description }));
       setTitle("");
       setDescription("");
       router.push(`/professional-requests/${item.id}`);

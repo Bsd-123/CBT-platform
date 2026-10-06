@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MAX_MATERIAL_RATING, MIN_MATERIAL_RATING } from "@/lib/models/material-rating";
 import { submitMaterialRating } from "@/lib/actions/submit";
 import { StarRating } from "@/components/shared/StarRating";
+import { unwrap } from "@/lib/actions/result";
 
 type MaterialRatingFormProps = {
   materialId: string;
@@ -25,7 +26,7 @@ export function MaterialRatingForm({ materialId, currentRating }: MaterialRating
     setLoading(true);
 
     try {
-      await submitMaterialRating(materialId, nextRating);
+      unwrap(await submitMaterialRating(materialId, nextRating));
       router.refresh();
     } catch (submitError) {
       setRating(currentRating ?? 0);

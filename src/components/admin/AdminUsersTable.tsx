@@ -12,6 +12,7 @@ import type {
 } from "@/lib/models/user";
 import { USER_ROLES } from "@/lib/models/user";
 import { getInitials } from "@/lib/utils/expert-approval-ui";
+import { unwrap } from "@/lib/actions/result";
 
 const PAGE_SIZE = 10;
 
@@ -103,7 +104,7 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
     setLoadingId(userId);
 
     try {
-      await adminUpdateUserRole(userId, role);
+      unwrap(await adminUpdateUserRole(userId, role));
       router.refresh();
     } catch (roleError) {
       setError(roleError instanceof Error ? roleError.message : "העדכון נכשל");
@@ -333,9 +334,9 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                 chevron_right
               </span>
             </button>
-            <button type="button" className="admin-users-page-btn" data-active="true">
+            <span className="admin-users-page-btn" data-active="true" aria-current="page">
               {currentPage}
-            </button>
+            </span>
             <button
               type="button"
               className="admin-users-page-btn"

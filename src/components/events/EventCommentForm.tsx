@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitEventComment } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type EventCommentFormProps = {
   eventId: string;
@@ -20,7 +21,7 @@ export function EventCommentForm({ eventId }: EventCommentFormProps) {
     setLoading(true);
 
     try {
-      await submitEventComment({ event_id: eventId, content });
+      unwrap(await submitEventComment({ event_id: eventId, content }));
       setContent("");
       router.refresh();
     } catch (submitError) {

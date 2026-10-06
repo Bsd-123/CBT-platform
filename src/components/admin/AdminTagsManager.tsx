@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { PublicTag } from "@/lib/models/tag";
 import { TAG_COLOR_PRESETS, getTagBadgeStyle } from "@/lib/utils/tag-colors";
+import { unwrap } from "@/lib/actions/result";
 
 type AdminTagsManagerProps = {
   tags: PublicTag[];
@@ -25,7 +26,7 @@ export function AdminTagsManager({ tags }: AdminTagsManagerProps) {
     setLoading(true);
 
     try {
-      await adminCreateTag({ name: name.trim(), color });
+      unwrap(await adminCreateTag({ name: name.trim(), color }));
       setName("");
       setColor(TAG_COLOR_PRESETS[0]);
       toast("התגית נוצרה");
@@ -48,7 +49,7 @@ export function AdminTagsManager({ tags }: AdminTagsManagerProps) {
 
     setDeletingId(tag.id);
     try {
-      await adminDeleteTag(tag.id);
+      unwrap(await adminDeleteTag(tag.id));
       toast("התגית נמחקה");
       router.refresh();
     } catch (error) {
