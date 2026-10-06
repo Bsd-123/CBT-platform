@@ -81,7 +81,7 @@ function RejectMaterialForm({ materialId }: { materialId: string }) {
   return (
     <form className="stack" onSubmit={handleSubmit}>
       <div className="form-field">
-        <label htmlFor={`reject-reason-${materialId}`}>סיבת הדחייה (תוצג למעלה)</label>
+        <label htmlFor={`reject-reason-${materialId}`}>סיבת הדחייה (תוצג למי שהעלה את החומר)</label>
         <textarea
           id={`reject-reason-${materialId}`}
           rows={4}
