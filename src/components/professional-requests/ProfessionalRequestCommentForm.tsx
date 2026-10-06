@@ -42,7 +42,7 @@ export function ProfessionalRequestCommentForm({
 
   return (
     <form className="stack thread-form" onSubmit={handleSubmit}>
-      <h4>{label}</h4>
+      {!parentCommentId && <h4>{label}</h4>}
       <div className="form-field">
         <label htmlFor={`pro-comment-${parentCommentId ?? "root"}`}>תוכן</label>
         <textarea
