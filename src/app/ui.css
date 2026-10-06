@@ -531,3 +531,76 @@
   margin: 0 0 1rem;
   font-size: 1.125rem;
 }
+
+/* ---------- Admin / form helpers ---------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ui-tabs-scroll {
+  overflow-x: auto;
+}
+
+.ui-tabs-scroll .ui-tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.ui-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.ui-inline-form .form-field {
+  min-width: 12rem;
+}
+
+.ui-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  border: 1px solid var(--cc-outline-variant);
+  border-radius: 999px;
+  background: var(--cc-surface-lowest);
+}
+
+.ui-table input,
+.ui-table select {
+  width: 100%;
+  min-width: 7rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--cc-outline-variant);
+  border-radius: var(--cc-radius-sm);
+  background: var(--cc-surface-lowest);
+  font: inherit;
+}
+
+a.ui-stat {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.ui-stat:hover {
+  border-color: var(--cc-primary);
+}

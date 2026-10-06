@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -8,8 +9,15 @@ import {
   adminRestoreReportedContent,
   resolveReport,
 } from "@/lib/actions/admin";
-import type { PublicReport } from "@/lib/models/report";
-import type { ReportStatus } from "@/lib/models/report";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { useUi } from "@/components/ui/UiProvider";
+import type { PublicReport, ReportStatus } from "@/lib/models/report";
+import {
+  REPORT_STATUS_LABELS,
+  REPORT_TARGET_LABELS,
+  getReportTargetHref,
+} from "@/lib/utils/admin-labels";
+import { formatDate } from "@/lib/utils/format";
 
 type AdminReportsListProps = {
   reports: PublicReport[];
@@ -17,108 +25,147 @@ type AdminReportsListProps = {
 
 export function AdminReportsList({ reports }: AdminReportsListProps) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const { toast, confirm } = useUi();
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  async function handleModeration(
-    report: PublicReport,
-    action: "hide" | "restore" | "delete",
-  ) {
-    setError(null);
-    setLoadingId(report.id);
-
+  async function run(reportId: string, task: () => Promise<unknown>, success: string) {
+    setLoadingId(reportId);
     try {
-      if (action === "hide") {
-        await adminHideReportedContent(report.target_type, report.target_id);
-      } else if (action === "restore") {
-        await adminRestoreReportedContent(report.target_type, report.target_id);
-      } else {
-        await adminDeleteReportedContent(report.target_type, report.target_id);
-      }
+      await task();
+      toast(success);
       router.refresh();
-    } catch (moderationError) {
-      setError(moderationError instanceof Error ? moderationError.message : "הפעולה נכשלה");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "הפעולה נכשלה", "error");
     } finally {
       setLoadingId(null);
     }
   }
 
-  async function handleStatusChange(id: string, status: ReportStatus) {
-    setError(null);
-    setLoadingId(id);
+  async function handleDelete(report: PublicReport) {
+    const approved = await confirm({
+      title: "מחיקת התוכן המדווח",
+      message: "התוכן וכל מה שמשויך אליו יימחקו לצמיתות. לא ניתן לבטל פעולה זו.",
+      confirmLabel: "מחיקה",
+      danger: true,
+    });
+    if (!approved) return;
 
-    try {
-      await resolveReport(id, { status });
-      router.refresh();
-    } catch (statusError) {
-      setError(statusError instanceof Error ? statusError.message : "הפעולה נכשלה");
-    } finally {
-      setLoadingId(null);
-    }
+    await run(
+      report.id,
+      () => adminDeleteReportedContent(report.target_type, report.target_id),
+      "התוכן נמחק",
+    );
   }
 
   if (reports.length === 0) {
-    return <p className="muted">אין דיווחים פתוחים.</p>;
+    return (
+      <EmptyState
+        icon="flag"
+        title="אין דיווחים"
+        description="כשמשתמשים ידווחו על תוכן, הדיווחים יופיעו כאן."
+      />
+    );
   }
 
   return (
-    <div className="stack">
-      {error && <p className="error">{error}</p>}
-      <ul className="list-plain">
-        {reports.map((report) => (
-          <li key={report.id}>
-            <div className="stack">
-              <div>
-                <span className="badge">{report.status}</span>{" "}
-                <span className="badge">{report.target_type}</span>
-              </div>
-              <p>{report.reason}</p>
-              <p className="muted">
-                דווח על ידי: {report.user?.full_name ?? "משתמש"}
-              </p>
-              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                <button
-                  type="button"
-                  className="button secondary"
-                  disabled={loadingId === report.id}
-                  onClick={() => void handleModeration(report, "hide")}
-                >
-                  הסתרת תוכן
-                </button>
-                <button
-                  type="button"
-                  className="button secondary"
-                  disabled={loadingId === report.id}
-                  onClick={() => void handleModeration(report, "restore")}
-                >
-                  שחזור תוכן
-                </button>
-                <button
-                  type="button"
-                  className="button secondary"
-                  disabled={loadingId === report.id}
-                  onClick={() => void handleModeration(report, "delete")}
-                >
-                  מחיקת תוכן
-                </button>
-              </div>
-              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                {(["open", "reviewing", "resolved"] as const).map((status) => (
-                  <button
-                    key={status}
-                    type="button"
-                    className="button secondary"
-                    disabled={loadingId === report.id || report.status === status}
-                    onClick={() => void handleStatusChange(report.id, status)}
+    <div className="ui-table-wrap">
+      <table className="ui-table">
+        <thead>
+          <tr>
+            <th>סוג תוכן</th>
+            <th>סיבה</th>
+            <th>דווח על ידי</th>
+            <th>תאריך</th>
+            <th>סטטוס</th>
+            <th>פעולות</th>
+          </tr>
+        </thead>
+        <tbody>
+          {reports.map((report) => {
+            const href = getReportTargetHref(report.target_type, report.target_id);
+            const busy = loadingId === report.id;
+
+            return (
+              <tr key={report.id}>
+                <td>
+                  {href ? (
+                    <Link href={href}>{REPORT_TARGET_LABELS[report.target_type]}</Link>
+                  ) : (
+                    REPORT_TARGET_LABELS[report.target_type]
+                  )}
+                </td>
+                <td>{report.reason}</td>
+                <td>{report.user?.full_name ?? "משתמש"}</td>
+                <td>{formatDate(report.created_at)}</td>
+                <td>
+                  <label className="visually-hidden" htmlFor={`status-${report.id}`}>
+                    סטטוס דיווח
+                  </label>
+                  <select
+                    id={`status-${report.id}`}
+                    value={report.status}
+                    disabled={busy}
+                    onChange={(event) =>
+                      void run(
+                        report.id,
+                        () => resolveReport(report.id, { status: event.target.value as ReportStatus }),
+                        "הסטטוס עודכן",
+                      )
+                    }
                   >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+                    {(Object.keys(REPORT_STATUS_LABELS) as ReportStatus[]).map((status) => (
+                      <option key={status} value={status}>
+                        {REPORT_STATUS_LABELS[status]}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <div className="ui-table-actions">
+                    <button
+                      type="button"
+                      className="materials-btn-secondary"
+                      disabled={busy}
+                      onClick={() =>
+                        void run(
+                          report.id,
+                          () => adminHideReportedContent(report.target_type, report.target_id),
+                          "התוכן הוסתר",
+                        )
+                      }
+                    >
+                      הסתרה
+                    </button>
+                    <button
+                      type="button"
+                      className="materials-btn-secondary"
+                      disabled={busy}
+                      onClick={() =>
+                        void run(
+                          report.id,
+                          () => adminRestoreReportedContent(report.target_type, report.target_id),
+                          "התוכן שוחזר",
+                        )
+                      }
+                    >
+                      שחזור
+                    </button>
+                    <button
+                      type="button"
+                      className="materials-btn-primary"
+                      data-danger="true"
+                      disabled={busy}
+                      onClick={() => void handleDelete(report)}
+                    >
+                      מחיקה
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
