@@ -42,7 +42,7 @@ export function ForumAnswerForm({
 
   return (
     <form className="stack thread-form" onSubmit={handleSubmit}>
-      <h4>{label}</h4>
+      {!parentAnswerId && <h4>{label}</h4>}
       <div className="form-field">
         <label htmlFor={`answer-${parentAnswerId ?? "root"}`}>תוכן</label>
         <textarea
