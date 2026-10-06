@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { PublicUser } from "@/lib/models/user";
 import { NotificationsBell } from "@/components/notifications/NotificationsBell";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { MaterialIcon } from "@/components/shared/MaterialIcon";
 
 const SPACE_LINKS = [
   { href: "/materials", label: "ספריית חומרים" },
@@ -20,6 +22,20 @@ type AppNavProps = {
 
 export function AppNav({ profile }: AppNavProps) {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen]);
 
   return (
     <header className="site-header">
@@ -28,7 +44,12 @@ export function AppNav({ profile }: AppNavProps) {
           קהילת מטפלי CBT
         </Link>
 
-        <nav className="nav-links" aria-label="ניווט ראשי">
+        <nav
+          id="main-nav"
+          className="nav-links"
+          aria-label="ניווט ראשי"
+          data-open={menuOpen}
+        >
           {SPACE_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -50,15 +71,26 @@ export function AppNav({ profile }: AppNavProps) {
             </Link>
           )}
           {profile.role === "admin" && (
-            <>
-              <Link href="/admin/reports" data-active={pathname.startsWith("/admin")}>
-                ניהול
-              </Link>
-            </>
+            <Link href="/admin/reports" data-active={pathname.startsWith("/admin")}>
+              ניהול
+            </Link>
           )}
+        </nav>
+
+        <div className="nav-actions">
           <NotificationsBell userId={profile.id} />
           <LogoutButton />
-        </nav>
+          <button
+            type="button"
+            className="nav-icon-btn nav-menu-toggle"
+            onClick={() => setMenuOpen((value) => !value)}
+            aria-expanded={menuOpen}
+            aria-controls="main-nav"
+            aria-label={menuOpen ? "סגירת תפריט" : "פתיחת תפריט"}
+          >
+            <MaterialIcon name={menuOpen ? "close" : "menu"} />
+          </button>
+        </div>
       </div>
     </header>
   );

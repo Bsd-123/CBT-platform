@@ -97,6 +97,57 @@ main {
   align-items: center;
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .site-header-inner {
+    height: auto;
+    min-height: 4rem;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-actions {
+    margin-inline-start: auto;
+  }
+
+  .nav-menu-toggle {
+    display: inline-flex;
+  }
+
+  .site-header .nav-links {
+    display: none;
+    order: 3;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding-bottom: 0.5rem;
+  }
+
+  .site-header .nav-links[data-open="true"] {
+    display: flex;
+  }
+
+  .site-header .nav-links a {
+    padding: 0.75rem 0.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .site-header .nav-links a[data-active="true"] {
+    border-bottom: 0;
+    padding-bottom: 0.75rem;
+  }
+}
+
 .nav-links a {
   color: var(--muted);
   font-size: 0.95rem;
