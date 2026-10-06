@@ -5,7 +5,7 @@ import {
   fetchMaterialAverageRating,
   fetchMaterialById,
   fetchUserMaterialRating,
-} from "@/lib/actions";
+} from "@/lib/data";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { MaterialRatingForm } from "@/components/materials/MaterialRatingForm";
 import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";

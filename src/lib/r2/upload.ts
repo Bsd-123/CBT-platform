@@ -41,7 +41,7 @@ async function uploadViaSignedUrl(
   try {
     const response = await fetch(uploadUrl, {
       method: "PUT",
-      body,
+      body: new Blob([new Uint8Array(body)], { type: contentType }),
       headers: { "Content-Type": contentType },
     });
     return response.ok;

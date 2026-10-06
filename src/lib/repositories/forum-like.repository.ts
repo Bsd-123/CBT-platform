@@ -1,3 +1,4 @@
+import "server-only";
 import type { ForumLikeTargetType } from "@prisma/client";
 import type {
   CreateForumLikeInput,
@@ -12,12 +13,16 @@ async function assertLikeTargetExists(
   target_id: string,
 ): Promise<void> {
   if (target_type === "question") {
-    const question = await prisma.forumQuestion.findUnique({ where: { id: target_id } });
+    const question = await prisma.forumQuestion.findFirst({
+      where: { id: target_id, is_hidden: false },
+    });
     if (!question) throw new Error("Forum question not found.");
     return;
   }
 
-  const answer = await prisma.forumAnswer.findUnique({ where: { id: target_id } });
+  const answer = await prisma.forumAnswer.findFirst({
+    where: { id: target_id, is_hidden: false },
+  });
   if (!answer) throw new Error("Forum answer not found.");
 }
 
@@ -118,11 +123,16 @@ export async function toggleForumLike(
   });
 
   if (existing) {
-    await prisma.forumLike.delete({ where: { id: existing.id } });
+    await prisma.forumLike.deleteMany({ where: { id: existing.id } });
   } else {
-    await prisma.forumLike.create({
-      data: { user_id, target_type, target_id },
-    });
+    try {
+      await prisma.forumLike.create({
+        data: { user_id, target_type, target_id },
+      });
+    } catch (error) {
+      // A concurrent request already created the like (unique violation).
+      if ((error as { code?: string }).code !== "P2002") throw error;
+    }
   }
 
   const summaries = await getForumLikeSummaries(

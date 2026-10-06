@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateForumAnswerInput,
   CreateForumQuestionInput,
@@ -83,12 +84,26 @@ export async function createForumQuestion(
 export async function createForumAnswer(
   input: CreateForumAnswerInput,
 ): Promise<PublicForumAnswer> {
-  const question = await prisma.forumQuestion.findUnique({
-    where: { id: input.question_id },
+  const question = await prisma.forumQuestion.findFirst({
+    where: { id: input.question_id, ...visibleContentWhere() },
   });
 
   if (!question) {
     throw new Error("Forum question not found.");
+  }
+
+  if (input.parent_answer_id) {
+    const parent = await prisma.forumAnswer.findFirst({
+      where: { id: input.parent_answer_id, ...visibleContentWhere() },
+      include: { parent: { select: { parent_answer_id: true } } },
+    });
+    if (!parent || parent.question_id !== input.question_id) {
+      throw new Error("Invalid parent answer.");
+    }
+    // Reads render three levels (answer, reply, reply-to-reply).
+    if (parent.parent?.parent_answer_id) {
+      throw new Error("Maximum reply depth reached.");
+    }
   }
 
   const answer = await prisma.forumAnswer.create({

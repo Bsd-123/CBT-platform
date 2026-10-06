@@ -5,6 +5,8 @@ export {
   buildMaterialResponseFileKey,
   createSignedUploadUrl,
   createSignedDownloadUrl,
+  isFileKeyOwnedBy,
+  isValidFileKey,
   type SignedUploadUrlInput,
   type SignedDownloadUrlInput,
 } from "./signed-url";

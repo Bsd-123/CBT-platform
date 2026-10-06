@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import type { CreateMaterialInput, ListMaterialsFilter } from "@/lib/models/material";
 import type {

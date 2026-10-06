@@ -8,7 +8,7 @@ import {
   fetchMaterialRequests,
   fetchMaterialTypes,
   fetchTags,
-} from "@/lib/actions";
+} from "@/lib/data";
 import { MaterialCard } from "@/components/materials/MaterialCard";
 import { MaterialRequestListItem } from "@/components/materials/MaterialRequestListItem";
 import { MaterialsActiveTagFilters } from "@/components/materials/MaterialsActiveTagFilters";

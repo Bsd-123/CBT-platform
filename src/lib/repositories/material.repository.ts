@@ -1,4 +1,4 @@
-import type { EntityType } from "@prisma/client";
+import "server-only";
 import type {
   CreateMaterialInput,
   ListMaterialsFilter,
@@ -132,19 +132,29 @@ export async function listMaterialsForAdmin(
       orderBy: { created_at: "desc" },
       include: {
         user: { select: { id: true, full_name: true } },
-        tags: { select: { id: true, name: true } },
       },
     }),
     prisma.material.count({ where }),
   ]);
 
-  const normalized: AdminMaterialItem[] = items.map((m: any) => ({
+  const tagLinks = await prisma.entityTag.findMany({
+    where: { entity_type: "material", entity_id: { in: items.map((m) => m.id) } },
+    include: { tag: { select: { id: true, name: true } } },
+  });
+  const tagsByMaterial = new Map<string, { id: string; name: string }[]>();
+  for (const link of tagLinks) {
+    const list = tagsByMaterial.get(link.entity_id) ?? [];
+    list.push(link.tag);
+    tagsByMaterial.set(link.entity_id, list);
+  }
+
+  const normalized: AdminMaterialItem[] = items.map((m) => ({
     id: m.id,
     title: m.title,
     createdAt: m.created_at,
-    isHidden: (m.is_hidden ?? false) as boolean,
+    isHidden: m.is_hidden,
     uploader: m.user ? { id: m.user.id, full_name: m.user.full_name } : null,
-    tags: m.tags ?? [],
+    tags: tagsByMaterial.get(m.id) ?? [],
   }));
 
   return { items: normalized, total };

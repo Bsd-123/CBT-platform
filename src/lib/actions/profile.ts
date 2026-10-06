@@ -10,6 +10,8 @@ import { getUserActivity } from "@/lib/repositories/profile.repository";
 
 import { listEvents } from "@/lib/repositories/event.repository";
 
+import { enforceRateLimit } from "@/lib/security/rate-limit";
+import { parseInput, profileSchema } from "@/lib/validation/schemas";
 import { updateUser } from "@/lib/repositories/user.repository";
 
 
@@ -34,28 +36,13 @@ export async function fetchMyEvents() {
 
 
 
-export async function updateMyProfile(input: UpdateUserInput) {
-
+export async function updateMyProfile(raw: Pick<UpdateUserInput, "full_name" | "title">) {
   const auth = await requireApprovedRegistration();
-
-
-
-  if (!input.full_name?.trim()) {
-
-    throw new Error("יש להזין שם מלא.");
-
-  }
-
-
+  enforceRateLimit("write", auth.userId);
+  const input = parseInput(profileSchema, raw);
 
   return updateUser(auth.userId, {
-
-    full_name: input.full_name.trim(),
-
+    full_name: input.full_name,
     title: input.title?.trim() || null,
-
   });
-
 }
-
-

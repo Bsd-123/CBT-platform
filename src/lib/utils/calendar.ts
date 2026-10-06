@@ -64,6 +64,20 @@ export function formatEventTime(iso: string | null): string {
   return `${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
 }
 
+/**
+ * event_date (@db.Date) and event_time (@db.Time) are wall-clock values that
+ * Prisma returns as UTC Dates. Always format them in UTC so the viewer's
+ * time zone cannot shift them (e.g. 09:00 showing as 12:00 in Israel).
+ */
+export function formatEventDate(value: Date | string): string {
+  return new Date(value).toLocaleDateString("he-IL", { timeZone: "UTC" });
+}
+
+export function formatEventTimeValue(value: Date | string): string {
+  const iso = typeof value === "string" ? toEventTimeIso(value) : value.toISOString();
+  return formatEventTime(iso);
+}
+
 export function formatMonthLabel(year: number, month: number): string {
   return new Date(Date.UTC(year, month - 1, 1)).toLocaleDateString("he-IL", {
     month: "long",

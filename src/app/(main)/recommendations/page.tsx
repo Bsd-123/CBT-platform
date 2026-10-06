@@ -1,4 +1,4 @@
-import { fetchRecommendationsFeed } from "@/lib/actions";
+import { fetchRecommendationsFeed } from "@/lib/data";
 import { RecommendationsChat } from "@/components/recommendations/RecommendationsChat";
 import "@/app/recommendations.css";
 

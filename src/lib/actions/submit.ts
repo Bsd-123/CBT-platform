@@ -1,15 +1,36 @@
 "use server";
 
-import type { ReportTargetType } from "@prisma/client";
-import type { RecommendationType } from "@prisma/client";
-import type { ForumLikeTargetType } from "@prisma/client";
+import type {
+  ForumLikeTargetType,
+  RecommendationType,
+  ReportTargetType,
+} from "@prisma/client";
 import { requireApprovedRegistration } from "@/lib/auth";
+import { UserFacingError } from "@/lib/errors";
+import { isFileKeyOwnedBy } from "@/lib/r2";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
 import { parseTagNames, syncEntityTags, syncEntityTagsByIds } from "@/lib/services/tags";
 import {
+  eventCommentSchema,
+  eventSchema,
+  eventUpdateSchema,
+  forumAnswerSchema,
+  forumLikeSchema,
+  forumQuestionSchema,
+  materialRatingSchema,
+  materialRequestSchema,
+  materialResponseSchema,
+  materialUploadSchema,
+  parseInput,
+  professionalCommentSchema,
+  professionalRequestSchema,
+  recommendationCommentSchema,
+  recommendationSchema,
+  reportSchema,
+} from "@/lib/validation/schemas";
+import {
   editEvent,
-  editMaterialRating,
   fetchEventById,
-  fetchUserMaterialRating,
   postEvent,
   postEventComment,
   postForumAnswer,
@@ -24,23 +45,27 @@ import {
   submitReport,
   toggleForumLike,
   uploadMaterial,
-} from "@/lib/actions";
+} from "@/lib/data";
 
-export async function submitMaterialUpload(input: {
+/** Authenticates, then throttles. Every mutating action starts with this. */
+async function authorizeWrite(bucket: "write" | "report" = "write") {
+  const auth = await requireApprovedRegistration();
+  enforceRateLimit(bucket, auth.userId);
+  return auth;
+}
+
+export async function submitMaterialUpload(raw: {
   title: string;
   description: string;
   material_type_id: string;
   file_url: string;
   tag_ids: string[];
 }) {
-  const auth = await requireApprovedRegistration();
+  const auth = await authorizeWrite();
+  const input = parseInput(materialUploadSchema, raw);
 
-  if (!input.material_type_id) {
-    throw new Error("יש לבחור סוג חומר.");
-  }
-
-  if (!input.tag_ids.length) {
-    throw new Error("יש לבחור לפחות תגית אחת.");
+  if (!isFileKeyOwnedBy(input.file_url, auth.userId, "materials")) {
+    throw new UserFacingError("קובץ לא תקין. יש להעלות את הקובץ מחדש.");
   }
 
   const material = await uploadMaterial({
@@ -55,61 +80,62 @@ export async function submitMaterialUpload(input: {
   return material;
 }
 
-export async function submitMaterialRequest(input: {
+export async function submitMaterialRequest(raw: {
   title: string;
   description: string;
 }) {
-  const auth = await requireApprovedRegistration();
-  return postMaterialRequest({
-    user_id: auth.userId,
-    title: input.title,
-    description: input.description,
-  });
+  const auth = await authorizeWrite();
+  const input = parseInput(materialRequestSchema, raw);
+  return postMaterialRequest({ user_id: auth.userId, ...input });
 }
 
-export async function submitMaterialResponse(input: {
+export async function submitMaterialResponse(raw: {
   request_id: string;
   text?: string;
   file_url?: string;
 }) {
-  const auth = await requireApprovedRegistration();
+  const auth = await authorizeWrite();
+  const input = parseInput(materialResponseSchema, raw);
 
-  if (!input.text?.trim() && !input.file_url) {
-    throw new Error("יש לכלול טקסט, קובץ, או שניהם.");
+  if (!input.text && !input.file_url) {
+    throw new UserFacingError("יש לכלול טקסט, קובץ, או שניהם.");
+  }
+
+  if (
+    input.file_url &&
+    !isFileKeyOwnedBy(input.file_url, auth.userId, "material-responses")
+  ) {
+    throw new UserFacingError("קובץ לא תקין. יש להעלות את הקובץ מחדש.");
   }
 
   return respondToMaterialRequest({
     request_id: input.request_id,
     user_id: auth.userId,
-    text: input.text?.trim() || null,
+    text: input.text || null,
     file_url: input.file_url || null,
   });
 }
 
 export async function submitMaterialRating(material_id: string, rating: number) {
-  const auth = await requireApprovedRegistration();
-  const existing = await fetchUserMaterialRating(material_id, auth.userId);
-
-  if (existing) {
-    return editMaterialRating(material_id, auth.userId, { rating });
-  }
-
-  return rateMaterial({
-    material_id,
-    user_id: auth.userId,
-    rating,
-  });
+  const auth = await authorizeWrite();
+  const input = parseInput(materialRatingSchema, { material_id, rating });
+  return rateMaterial({ ...input, user_id: auth.userId });
 }
 
-export async function submitForumQuestion(input: {
+export async function submitForumQuestion(raw: {
   title: string;
   content: string;
   tags: string;
 }) {
-  const auth = await requireApprovedRegistration();
+  const auth = await authorizeWrite();
+  const input = parseInput(forumQuestionSchema, raw);
 
-  if (!parseTagNames(input.tags).length) {
-    throw new Error("יש להוסיף לפחות תגית אחת.");
+  const tagNames = parseTagNames(input.tags);
+  if (!tagNames.length) {
+    throw new UserFacingError("יש להוסיף לפחות תגית אחת.");
+  }
+  if (tagNames.length > 10 || tagNames.some((name) => name.length > 40)) {
+    throw new UserFacingError("עד 10 תגיות, עד 40 תווים לכל תגית.");
   }
 
   const question = await postForumQuestion({
@@ -118,16 +144,17 @@ export async function submitForumQuestion(input: {
     content: input.content,
   });
 
-  await syncEntityTags("forum", question.id, parseTagNames(input.tags));
+  await syncEntityTags("forum", question.id, tagNames);
   return question;
 }
 
-export async function submitForumAnswer(input: {
+export async function submitForumAnswer(raw: {
   question_id: string;
   content: string;
   parent_answer_id?: string | null;
 }) {
-  const auth = await requireApprovedRegistration();
+  const auth = await authorizeWrite();
+  const input = parseInput(forumAnswerSchema, raw);
   return postForumAnswer({
     question_id: input.question_id,
     user_id: auth.userId,
@@ -140,20 +167,18 @@ export async function submitForumLikeToggle(
   target_type: ForumLikeTargetType,
   target_id: string,
 ) {
-  const auth = await requireApprovedRegistration();
-  return toggleForumLike(auth.userId, target_type, target_id);
+  const auth = await authorizeWrite();
+  const input = parseInput(forumLikeSchema, { target_type, target_id });
+  return toggleForumLike(auth.userId, input.target_type, input.target_id);
 }
 
-export async function submitRecommendation(input: {
+export async function submitRecommendation(raw: {
   type?: RecommendationType | null;
   content: string;
   tag_ids: string[];
 }) {
-  const auth = await requireApprovedRegistration();
-
-  if (!input.tag_ids.length) {
-    throw new Error("יש לבחור לפחות תגית אחת.");
-  }
+  const auth = await authorizeWrite();
+  const input = parseInput(recommendationSchema, raw);
 
   const recommendation = await postRecommendation({
     user_id: auth.userId,
@@ -165,12 +190,13 @@ export async function submitRecommendation(input: {
   return recommendation;
 }
 
-export async function submitRecommendationComment(input: {
+export async function submitRecommendationComment(raw: {
   recommendation_id: string;
   content: string;
   parent_comment_id?: string | null;
 }) {
-  const auth = await requireApprovedRegistration();
+  const auth = await authorizeWrite();
+  const input = parseInput(recommendationCommentSchema, raw);
   return postRecommendationComment({
     recommendation_id: input.recommendation_id,
     user_id: auth.userId,
@@ -179,17 +205,14 @@ export async function submitRecommendationComment(input: {
   });
 }
 
-export async function submitEvent(input: {
+export async function submitEvent(raw: {
   title: string;
   description: string;
   event_date: string;
   event_time?: string;
 }) {
-  const auth = await requireApprovedRegistration();
-
-  if (!input.event_date) {
-    throw new Error("תאריך אירוע הוא שדה חובה.");
-  }
+  const auth = await authorizeWrite();
+  const input = parseInput(eventSchema, raw);
 
   return postEvent({
     user_id: auth.userId,
@@ -202,7 +225,7 @@ export async function submitEvent(input: {
 
 export async function submitEventUpdate(
   event_id: string,
-  input: {
+  raw: {
     title?: string;
     description?: string;
     event_date?: string;
@@ -210,21 +233,23 @@ export async function submitEventUpdate(
     is_cancelled?: boolean;
   },
 ) {
-  const auth = await requireApprovedRegistration();
-  const event = await fetchEventById(event_id);
+  const auth = await authorizeWrite();
+  const id = parseInput(eventCommentSchema.shape.event_id, event_id);
+  const input = parseInput(eventUpdateSchema, raw);
+  const event = await fetchEventById(id);
 
   if (!event) {
-    throw new Error("האירוע לא נמצא.");
+    throw new UserFacingError("האירוע לא נמצא.");
   }
 
   const isOwner = event.user_id === auth.userId;
   const isAdmin = auth.profile.role === "admin";
 
   if (!isOwner && !isAdmin) {
-    throw new Error("Forbidden");
+    throw new UserFacingError("אין הרשאה לערוך אירוע זה.");
   }
 
-  return editEvent(event_id, {
+  return editEvent(id, {
     title: input.title,
     description: input.description,
     event_date: input.event_date ? new Date(input.event_date) : undefined,
@@ -238,36 +263,31 @@ export async function submitEventUpdate(
   });
 }
 
-export async function submitEventComment(input: {
+export async function submitEventComment(raw: {
   event_id: string;
   content: string;
 }) {
-  const auth = await requireApprovedRegistration();
-  return postEventComment({
-    event_id: input.event_id,
-    user_id: auth.userId,
-    content: input.content,
-  });
+  const auth = await authorizeWrite();
+  const input = parseInput(eventCommentSchema, raw);
+  return postEventComment({ ...input, user_id: auth.userId });
 }
 
-export async function submitProfessionalRequest(input: {
+export async function submitProfessionalRequest(raw: {
   title: string;
   description: string;
 }) {
-  const auth = await requireApprovedRegistration();
-  return postProfessionalRequest({
-    user_id: auth.userId,
-    title: input.title,
-    description: input.description,
-  });
+  const auth = await authorizeWrite();
+  const input = parseInput(professionalRequestSchema, raw);
+  return postProfessionalRequest({ user_id: auth.userId, ...input });
 }
 
-export async function submitProfessionalRequestComment(input: {
+export async function submitProfessionalRequestComment(raw: {
   request_id: string;
   content: string;
   parent_comment_id?: string | null;
 }) {
-  const auth = await requireApprovedRegistration();
+  const auth = await authorizeWrite();
+  const input = parseInput(professionalCommentSchema, raw);
   return postProfessionalRequestComment({
     request_id: input.request_id,
     user_id: auth.userId,
@@ -276,23 +296,19 @@ export async function submitProfessionalRequestComment(input: {
   });
 }
 
-export async function submitContentReport(input: {
+export async function submitContentReport(raw: {
   target_type: ReportTargetType;
   target_id: string;
   reason: string;
 }) {
-  const auth = await requireApprovedRegistration();
-  return submitReport({
-    user_id: auth.userId,
-    target_type: input.target_type,
-    target_id: input.target_id,
-    reason: input.reason,
-  });
+  const auth = await authorizeWrite("report");
+  const input = parseInput(reportSchema, raw);
+  return submitReport({ user_id: auth.userId, ...input });
 }
 
 function parseTimeInput(time: string): Date {
   const [hours, minutes] = time.split(":").map(Number);
   const date = new Date(0);
-  date.setUTCHours(hours, minutes ?? 0, 0, 0);
+  date.setUTCHours(hours, minutes, 0, 0);
   return date;
 }

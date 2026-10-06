@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchEvents } from "@/lib/actions";
+import { fetchEvents } from "@/lib/data";
 import { EventsCalendar } from "@/components/events/EventsCalendar";
 import { EventsViewNav } from "@/components/events/EventsViewNav";
 import {

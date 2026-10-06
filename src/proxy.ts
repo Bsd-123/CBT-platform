@@ -2,6 +2,8 @@ import { createServerClient, type SetAllCookies } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseFetch } from "@/lib/supabase/fetch";
 
+const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/auth/callback"];
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -29,10 +31,32 @@ export async function proxy(request: NextRequest) {
     },
   );
 
+  let userKnown = true;
+  let hasUser = false;
   try {
-    await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
+    hasUser = Boolean(data.user);
   } catch {
-    // Allow the request through when Supabase is temporarily unreachable.
+    // Supabase temporarily unreachable: fall through to the page-level guards.
+    userKnown = false;
+  }
+
+  const { pathname } = request.nextUrl;
+  const isPublic = PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+
+  if (userKnown && !hasUser && !isPublic) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 },
+      );
+    }
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = "";
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;

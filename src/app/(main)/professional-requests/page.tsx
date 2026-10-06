@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchProfessionalRequests } from "@/lib/actions";
+import { fetchProfessionalRequests } from "@/lib/data";
 import { PostProfessionalRequestForm } from "@/components/professional-requests/PostProfessionalRequestForm";
 
 export default async function ProfessionalRequestsPage() {

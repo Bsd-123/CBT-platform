@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateProfessionalRequestCommentInput,
   CreateProfessionalRequestInput,
@@ -64,12 +65,26 @@ export async function createProfessionalRequest(
 export async function createProfessionalRequestComment(
   input: CreateProfessionalRequestCommentInput,
 ): Promise<PublicProfessionalRequestComment> {
-  const request = await prisma.professionalRequest.findUnique({
-    where: { id: input.request_id },
+  const request = await prisma.professionalRequest.findFirst({
+    where: { id: input.request_id, ...visibleContentWhere() },
   });
 
   if (!request) {
     throw new Error("Professional request not found.");
+  }
+
+  if (input.parent_comment_id) {
+    const parent = await prisma.professionalRequestComment.findUnique({
+      where: { id: input.parent_comment_id },
+      include: { parent: { select: { parent_comment_id: true } } },
+    });
+    if (!parent || parent.request_id !== input.request_id) {
+      throw new Error("Invalid parent comment.");
+    }
+    // Reads render three levels (comment, reply, reply-to-reply).
+    if (parent.parent?.parent_comment_id) {
+      throw new Error("Maximum reply depth reached.");
+    }
   }
 
   const comment = await prisma.professionalRequestComment.create({
