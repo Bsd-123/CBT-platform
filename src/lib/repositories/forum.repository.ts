@@ -70,8 +70,15 @@ export async function searchForumQuestions(
       _count: { select: { answers: { where: visibleContentWhere() } } },
     },
     orderBy: { created_at: "desc" },
+    ...(filter.take !== undefined && { skip: filter.skip ?? 0, take: filter.take }),
   });
   return questions.map(pickPublicForumQuestionFields);
+}
+
+export async function countForumQuestions(
+  filter: SearchForumQuestionsFilter = {},
+): Promise<number> {
+  return prisma.forumQuestion.count({ where: buildForumSearchWhere(filter) });
 }
 
 export async function createForumQuestion(
