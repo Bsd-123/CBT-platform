@@ -5,6 +5,7 @@ import { getUserById } from "@/lib/repositories/user.repository";
 import type { PublicUser } from "@/lib/models/user";
 import { isRegistrationApproved } from "@/lib/auth/register";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
+import { canReviewMaterials } from "@/lib/materials/approval";
 
 export type AuthSession = {
   userId: string;
@@ -86,6 +87,18 @@ export async function assertAdminAccess(): Promise<AuthenticatedProfile> {
     redirect("/login");
   }
   if (auth.profile.role !== "admin") {
+    redirect("/");
+  }
+  return auth;
+}
+
+/** Page-level guard for the material review queue (experts and admins). */
+export async function assertReviewerAccess(): Promise<AuthenticatedProfile> {
+  const auth = await getAuthenticatedProfile();
+  if (!auth) {
+    redirect("/login");
+  }
+  if (!canReviewMaterials(auth.profile.role)) {
     redirect("/");
   }
   return auth;

@@ -1,6 +1,7 @@
 export { AuthError, ForbiddenError } from "./errors";
 export {
   assertAdminAccess,
+  assertReviewerAccess,
   getAuthSession,
   getAuthenticatedProfile,
   requireAuthSession,

@@ -13,6 +13,8 @@ import { ReportForm } from "@/components/shared/ReportForm";
 import { TagList } from "@/components/shared/TagList";
 import { StarRating } from "@/components/shared/StarRating";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
+import { MaterialReviewActions } from "@/components/materials/MaterialReviewActions";
+import { canReviewMaterials, canViewMaterial } from "@/lib/materials/approval";
 import { getMaterialTypeBadgeVariant } from "@/lib/utils/material-type-ui";
 
 type MaterialDetailPageProps = {
@@ -29,6 +31,14 @@ export default async function MaterialDetailPage({ params }: MaterialDetailPageP
   ]);
 
   if (!material) notFound();
+
+  // Pending and rejected materials are visible only to the uploader and reviewers.
+  const viewer = auth ? { userId: auth.userId, role: auth.profile.role } : null;
+  if (!canViewMaterial(material, viewer)) notFound();
+
+  const isApproved = material.approval_status === "approved";
+  const isReviewer = canReviewMaterials(auth?.profile.role);
+  const isOwner = auth?.userId === material.user_id;
 
   const userRating = auth
     ? await fetchUserMaterialRating(id, auth.userId)
@@ -47,6 +57,27 @@ export default async function MaterialDetailPage({ params }: MaterialDetailPageP
         <MaterialIcon name="arrow_forward" />
         חזרה לספריית חומרים
       </Link>
+
+      {material.approval_status === "pending" && (
+        <div className="banner-warning" role="status">
+          <p>
+            {isOwner
+              ? "החומר שלך ממתין לאישור מומחה ויפורסם בספרייה לאחר האישור."
+              : "חומר זה ממתין לאישור מומחה ואינו מוצג עדיין בספרייה."}
+          </p>
+          {isReviewer && (
+            <MaterialReviewActions materialId={material.id} materialTitle={material.title} />
+          )}
+        </div>
+      )}
+      {material.approval_status === "rejected" && (
+        <div className="banner-warning" role="status">
+          <p>
+            החומר נדחה ואינו מוצג בספרייה.
+            {material.rejection_reason ? " סיבה: " + material.rejection_reason : ""}
+          </p>
+        </div>
+      )}
 
       <article className="materials-clinical-card">
         <div className="materials-clinical-card-accent" />
@@ -88,16 +119,18 @@ export default async function MaterialDetailPage({ params }: MaterialDetailPageP
 
           <div className="materials-detail-actions">
             <DownloadMaterialButton fileKey={material.file_url} />
-            <ReportForm targetType="material" targetId={material.id} />
+            {isApproved && <ReportForm targetType="material" targetId={material.id} />}
           </div>
         </div>
       </article>
 
-      <section className="materials-clinical-card">
-        <div className="materials-clinical-card-body">
-          <MaterialRatingForm materialId={material.id} currentRating={userRating?.rating ?? null} />
-        </div>
-      </section>
+      {isApproved && (
+        <section className="materials-clinical-card">
+          <div className="materials-clinical-card-body">
+            <MaterialRatingForm materialId={material.id} currentRating={userRating?.rating ?? null} />
+          </div>
+        </section>
+      )}
     </>
   );
 }

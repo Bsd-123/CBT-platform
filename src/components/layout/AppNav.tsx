@@ -16,9 +16,11 @@ const SPACE_LINKS = [
 
 type AppNavProps = {
   profile: PublicUser;
+  /** Materials waiting for review; shown to experts and admins. */
+  pendingMaterials?: number;
 };
 
-export function AppNav({ profile }: AppNavProps) {
+export function AppNav({ profile, pendingMaterials = 0 }: AppNavProps) {
   const pathname = usePathname();
 
   return (
@@ -47,6 +49,14 @@ export function AppNav({ profile }: AppNavProps) {
               data-active={pathname.startsWith("/expert/referrals")}
             >
               אישורי הרשמה
+            </Link>
+          )}
+          {(profile.role === "expert" || profile.role === "admin") && (
+            <Link
+              href="/expert/materials"
+              data-active={pathname.startsWith("/expert/materials")}
+            >
+              אישור חומרים{pendingMaterials > 0 ? ` (${pendingMaterials})` : ""}
             </Link>
           )}
           {profile.role === "admin" && (

@@ -10,6 +10,7 @@ describe("getNotificationHref", () => {
     ["event", `/events/${id}`],
     ["professional_request", `/professional-requests/${id}`],
     ["material_request", `/materials/requests/${id}#responses`],
+    ["material", `/materials/${id}`],
   ])("maps %s", (type, href) => {
     expect(getNotificationHref(type, id)).toBe(href);
   });

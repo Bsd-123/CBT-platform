@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/layout/AppNav";
 import { UiProvider } from "@/components/ui/UiProvider";
+import { fetchPendingMaterialCount } from "@/lib/data";
+import { canReviewMaterials } from "@/lib/materials/approval";
 import {
   getAuthSession,
   getAuthenticatedProfile,
@@ -33,9 +35,13 @@ export default async function MainLayout({
     redirect("/pending-approval");
   }
 
+  const pendingMaterials = canReviewMaterials(auth.profile.role)
+    ? await fetchPendingMaterialCount()
+    : 0;
+
   return (
     <UiProvider>
-      <AppNav profile={auth.profile} />
+      <AppNav profile={auth.profile} pendingMaterials={pendingMaterials} />
       <main>{children}</main>
     </UiProvider>
   );

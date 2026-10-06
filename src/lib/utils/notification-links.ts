@@ -17,6 +17,8 @@ export function getNotificationHref(
       return `/events/${referenceId}`;
     case "professional_request":
       return `/professional-requests/${referenceId}`;
+    case "material":
+      return `/materials/${referenceId}`;
     case "material_request":
       return `/materials/requests/${referenceId}#responses`;
     default:

@@ -17,6 +17,7 @@ import {
   buildEditEventInitial,
 } from "@/components/events/EditEventForm";
 import { unwrap } from "@/lib/actions/result";
+import { APPROVAL_LABELS } from "@/lib/materials/approval";
 
 type ProfileTab = "materials" | "recommendations" | "forum" | "events";
 
@@ -235,6 +236,14 @@ export function ProfilePageView({
                     <p className="profile-material-desc">{material.description}</p>
                     <div className="profile-material-meta">
                       <span>{getMaterialMeta(material)}</span>
+                      {material.approval_status !== "approved" && (
+                        <span
+                          className="ui-badge"
+                          data-kind={material.approval_status === "rejected" ? "danger" : undefined}
+                        >
+                          {APPROVAL_LABELS[material.approval_status]}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </Link>

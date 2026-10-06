@@ -180,6 +180,10 @@ function formatNotificationLabel(type: PublicNotification["type"]) {
       return "תשובה חדשה לשאלתך בפורום";
     case "material_request_response":
       return "תגובה חדשה לבקשת החומר שלך";
+    case "material_approved":
+      return "החומר שהעלית אושר ופורסם";
+    case "material_rejected":
+      return "החומר שהעלית נדחה";
     default:
       return "התראה חדשה";
   }

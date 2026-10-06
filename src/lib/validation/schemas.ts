@@ -20,6 +20,17 @@ export const materialUploadSchema = z.object({
   tag_ids: z.array(uuid).min(1).max(10),
 });
 
+export const materialReviewSchema = z
+  .object({
+    material_id: uuid,
+    decision: z.enum(["approved", "rejected"]),
+    rejection_reason: z.string().trim().max(500).optional(),
+  })
+  .refine((value) => value.decision === "approved" || (value.rejection_reason?.length ?? 0) >= 3, {
+    path: ["rejection_reason"],
+    message: "reason required",
+  });
+
 export const materialRequestSchema = z.object({ title, description: longText });
 
 export const materialResponseSchema = z.object({

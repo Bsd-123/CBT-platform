@@ -9,6 +9,7 @@ import type {
 import { requireApprovedRegistration } from "@/lib/auth";
 import { UserFacingError } from "@/lib/errors";
 import { isFileKeyOwnedBy } from "@/lib/r2";
+import { initialApprovalFor } from "@/lib/materials/approval";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
 import { parseTagNames, syncEntityTags, syncEntityTagsByIds } from "@/lib/services/tags";
 import {
@@ -70,12 +71,16 @@ export async function submitMaterialUpload(raw: {
       throw new UserFacingError("קובץ לא תקין. יש להעלות את הקובץ מחדש.");
     }
 
+    // Regular users' uploads wait for an expert; experts and admins are auto-approved.
+    const approval = initialApprovalFor(auth.profile.role);
     const material = await uploadMaterial({
       user_id: auth.userId,
       title: input.title,
       description: input.description,
       material_type_id: input.material_type_id,
       file_url: input.file_url,
+      approval_status: approval.approval_status,
+      ...(approval.autoApproved && { reviewed_by: auth.userId, reviewed_at: new Date() }),
     });
 
     await syncEntityTagsByIds("material", material.id, input.tag_ids);
