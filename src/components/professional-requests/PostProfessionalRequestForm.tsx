@@ -31,7 +31,6 @@ export function PostProfessionalRequestForm() {
 
   return (
     <form className="stack" onSubmit={handleSubmit}>
-      <h2>פרסום פנייה מקצועית</h2>
       <div className="form-field">
         <label htmlFor="pro-title">כותרת</label>
         <input id="pro-title" required value={title} onChange={(e) => setTitle(e.target.value)} />

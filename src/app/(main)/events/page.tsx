@@ -1,73 +1,78 @@
-import Link from "next/link";
-import { fetchEvents } from "@/lib/data";
 import { CreateEventForm } from "@/components/events/CreateEventForm";
-import { formatEventDate } from "@/lib/utils/calendar";
 import { EventsViewNav } from "@/components/events/EventsViewNav";
+import { ContentCard } from "@/components/ui/ContentCard";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ModalButton } from "@/components/ui/Modal";
+import { PageHero } from "@/components/ui/PageHero";
+import { fetchEvents } from "@/lib/data";
+import { formatEventTimeValue } from "@/lib/utils/calendar";
+import { countLabel } from "@/lib/utils/format";
+
+function DateBadge({ value }: { value: Date | string }) {
+  const date = new Date(value);
+  const month = date.toLocaleDateString("he-IL", { month: "short", timeZone: "UTC" });
+  return (
+    <div className="ui-date-badge" aria-hidden="true">
+      <strong>{date.getUTCDate()}</strong>
+      <span>{month}</span>
+    </div>
+  );
+}
 
 export default async function EventsPage() {
-  const [allEvents, calendarEvents] = await Promise.all([
-    fetchEvents(),
-    fetchEvents({ calendar_only: true }),
-  ]);
+  const events = await fetchEvents();
 
   return (
-    <div className="stack">
-      <section className="card">
-        <h1>אירועים וסדנאות</h1>
-        <p className="muted">עדכוני אירועים מתפרסמים כתגובות שטוחות.</p>
-        <EventsViewNav active="list" />
-      </section>
+    <>
+      <PageHero
+        title="אירועים וסדנאות"
+        subtitle="עדכונים על אירועים מקצועיים. עדכונים מתפרסמים כתגובות."
+        actions={
+          <ModalButton label="אירוע חדש" icon="add" title="יצירת אירוע / סדנה">
+            <CreateEventForm />
+          </ModalButton>
+        }
+      />
 
-      <section className="card">
-        <CreateEventForm />
-      </section>
+      <EventsViewNav active="list" />
 
-      <section className="card stack">
-        <h2>כל האירועים ({allEvents.length})</h2>
-        {allEvents.length === 0 ? (
-          <p className="muted">עדיין לא פורסמו אירועים.</p>
-        ) : (
-          <ul className="list-plain">
-            {allEvents.map((event) => (
-              <li key={event.id}>
-                <Link href={`/events/${event.id}`}>
-                  <strong>{event.title}</strong>
-                </Link>
-                {event.is_cancelled && <span className="badge"> בוטל</span>}
-                <p className="muted">{event.description}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="card stack">
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", flexWrap: "wrap" }}>
-          <h2>אירועים בלוח השנה ({calendarEvents.length})</h2>
-          <Link href="/events/calendar" className="button secondary">
-            פתיחת לוח שנה
-          </Link>
-        </div>
-        {calendarEvents.length === 0 ? (
-          <p className="muted">אין אירועים פעילים בלוח השנה.</p>
-        ) : (
-          <ul className="list-plain">
-            {calendarEvents.map((event) => (
-              <li key={event.id}>
-                <Link href={`/events/${event.id}`}>
-                  <strong>{event.title}</strong>
-                </Link>
-                {event.event_date && (
-                  <span className="muted">
-                    {" "}
-                    — {formatEventDate(event.event_date)}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+      {events.length === 0 ? (
+        <EmptyState
+          icon="event"
+          title="עדיין לא פורסמו אירועים"
+          description="פרסמו סדנה או אירוע מקצועי לקהילה."
+        />
+      ) : (
+        <ul className="ui-list">
+          {events.map((event) => (
+            <li key={event.id}>
+              <ContentCard
+                href={`/events/${event.id}`}
+                title={event.title}
+                excerpt={event.description}
+                author={event.user?.full_name}
+                leading={event.event_date ? <DateBadge value={event.event_date} /> : undefined}
+                badges={
+                  event.is_cancelled ? (
+                    <span className="ui-badge" data-kind="danger">
+                      בוטל
+                    </span>
+                  ) : undefined
+                }
+                stats={[
+                  ...(event.event_time
+                    ? [{ icon: "schedule", label: formatEventTimeValue(event.event_time) }]
+                    : []),
+                  {
+                    icon: "chat_bubble",
+                    label: countLabel(event.comments?.length ?? 0, "עדכון", "עדכונים"),
+                  },
+                ]}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
