@@ -9,6 +9,8 @@ type CompleteProfileFormProps = {
   userId: string;
   expertRef?: string | null;
   infoMessage?: string;
+  /** false only while the system has no expert yet. */
+  referralRequired?: boolean;
 };
 
 const CLIENT_TIMEOUT_MS = 30_000;
@@ -35,6 +37,7 @@ export function CompleteProfileForm({
   userId,
   expertRef,
   infoMessage,
+  referralRequired = true,
 }: CompleteProfileFormProps) {
   const [fullName, setFullName] = useState("");
   const [title, setTitle] = useState("");
@@ -103,14 +106,14 @@ export function CompleteProfileForm({
 
       <div className="form-field">
         <label htmlFor="expert_code">
-          קוד מומחה מפנה{expertRef ? "" : " (אופציונלי)"}
+          קוד מומחה מפנה{referralRequired ? " (חובה)" : " (אופציונלי)"}
         </label>
         <input
           id="expert_code"
           value={expertCode}
           onChange={(event) => setExpertCode(event.target.value)}
           placeholder="#D90963D6"
-          required={Boolean(expertRef)}
+          required={referralRequired}
           readOnly={Boolean(expertRef)}
         />
       </div>

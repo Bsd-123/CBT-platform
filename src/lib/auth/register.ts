@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { UserFacingError } from "@/lib/errors";
 import { pickPublicUserFields, type PublicUser } from "@/lib/models/user";
 import { resolveExpertReferralId } from "@/lib/auth/resolve-expert-referral";
 
@@ -27,14 +28,17 @@ function normalizeRegisterInput(input: RegisterProfileInput): RegisterProfileInp
 
 function mapRegistrationError(error: unknown): Error {
   if (error instanceof Error) {
+    if (error.message === "Expert referral code required.") {
+      return new UserFacingError("יש להזין קוד מומחה מפנה כדי להירשם.");
+    }
     if (error.message === "Invalid expert referral.") {
-      return new Error("קוד המומחה המפנה אינו תקין.");
+      return new UserFacingError("קוד המומחה המפנה אינו תקין.");
     }
     if (error.message === "Invalid expert code format.") {
-      return new Error("קוד המומחה חייב להיות בפורמט #D90963D6 (8 תווים).");
+      return new UserFacingError("קוד המומחה חייב להיות בפורמט #D90963D6 (8 תווים).");
     }
     if (error.message === "Cannot refer yourself.") {
-      return new Error("לא ניתן להפנות את עצמכם.");
+      return new UserFacingError("לא ניתן להפנות את עצמכם.");
     }
 
     const message = error.message.toLowerCase();
@@ -45,13 +49,13 @@ function mapRegistrationError(error: unknown): Error {
       message.includes("econnrefused") ||
       message.includes("can't reach database")
     ) {
-      return new Error(
+      return new UserFacingError(
         "לא ניתן להתחבר למסד הנתונים. בדקו חיבור לאינטרנט ונסו שוב בעוד רגע.",
       );
     }
   }
 
-  return new Error("אירעה שגיאה בשמירת הפרופיל. נסו שוב.");
+  return new UserFacingError("אירעה שגיאה בשמירת הפרופיל. נסו שוב.");
 }
 
 export async function registerProfile(
@@ -75,6 +79,12 @@ export async function registerProfile(
             profile: pickPublicUserFields(existing),
             pending_expert_approval: pendingApproval !== null,
           };
+        }
+
+        // A referral code is mandatory, except on a brand-new system with no experts
+        // yet (otherwise the very first expert/admin could never register).
+        if (!normalized.expert_code && (await tx.user.count({ where: { role: "expert" } })) > 0) {
+          throw new Error("Expert referral code required.");
         }
 
         const expertId = await resolveExpertReferralId(
@@ -114,6 +124,11 @@ export async function registerProfile(
   } catch (error) {
     throw mapRegistrationError(error);
   }
+}
+
+/** Whether registration needs a referral code (false only while no expert exists yet). */
+export async function isReferralCodeRequired(): Promise<boolean> {
+  return (await prisma.user.count({ where: { role: "expert" } })) > 0;
 }
 
 export type RegistrationStatus = "approved" | "pending" | "rejected" | "none";

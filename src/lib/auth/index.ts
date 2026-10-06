@@ -14,6 +14,7 @@ export {
 export {
   registerProfile,
   isRegistrationApproved,
+  isReferralCodeRequired,
   getRegistrationStatus,
   getPendingApprovalState,
   type RegisterProfileInput,

@@ -109,6 +109,7 @@ export const registerSchema = z.object({
   id: uuid,
   full_name: z.string().trim().min(1).max(100),
   title: z.string().trim().max(100).nullish(),
+  // Required unless the system has no expert yet; enforced in registerProfile.
   expert_code: z.string().trim().max(64).nullish(),
 });
 
