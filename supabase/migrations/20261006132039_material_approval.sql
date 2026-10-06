@@ -5,7 +5,8 @@
 -- defaults to 'approved'; the application sets 'pending' explicitly for uploads by
 -- regular users (experts and admins are auto-approved).
 --
--- Apply BEFORE deploying the application code that reads these columns.
+-- Applied to project ywdxabrpljigkmczkgrw via the Supabase MCP on 2026-10-06 (version 20261006132039).
+-- On any other environment, apply BEFORE deploying the application code that reads these columns.
 
 create type "MaterialApprovalStatus" as enum ('pending', 'approved', 'rejected');
 
