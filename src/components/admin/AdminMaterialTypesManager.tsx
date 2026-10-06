@@ -11,6 +11,7 @@ import {
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { PublicMaterialType } from "@/lib/models/material-type";
+import { unwrap } from "@/lib/actions/result";
 
 const KEY_LABELS: Record<MaterialTypeKey, string> = {
   game: "משחק (game)",
@@ -52,7 +53,7 @@ export function AdminMaterialTypesManager({
 
     setCreating(true);
     try {
-      await adminCreateMaterialType({ key: newKey, label: newLabel, icon: newIcon || null });
+      unwrap(await adminCreateMaterialType({ key: newKey, label: newLabel, icon: newIcon || null }));
       setNewLabel("");
       setNewIcon("");
       toast("הקטגוריה נוצרה");
@@ -70,7 +71,7 @@ export function AdminMaterialTypesManager({
 
     setLoadingId(type.id);
     try {
-      await adminUpdateMaterialType(type.id, { label: edit.label, icon: edit.icon || null });
+      unwrap(await adminUpdateMaterialType(type.id, { label: edit.label, icon: edit.icon || null }));
       toast("הקטגוריה עודכנה");
       router.refresh();
     } catch (error) {
@@ -91,7 +92,7 @@ export function AdminMaterialTypesManager({
 
     setLoadingId(type.id);
     try {
-      await adminDeleteMaterialType(type.id);
+      unwrap(await adminDeleteMaterialType(type.id));
       toast("הקטגוריה נמחקה");
       router.refresh();
     } catch (error) {

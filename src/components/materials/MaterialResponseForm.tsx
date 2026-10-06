@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { uploadMaterialResponseFileResilient } from "@/lib/client/upload-api";
 import { submitMaterialResponse } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type MaterialResponseFormProps = {
   requestId: string;
@@ -30,11 +31,11 @@ export function MaterialResponseForm({ requestId }: MaterialResponseFormProps) {
     try {
       const file_url = file ? await uploadMaterialResponseFileResilient(file) : undefined;
 
-      await submitMaterialResponse({
+      unwrap(await submitMaterialResponse({
         request_id: requestId,
         text: text.trim() || undefined,
         file_url,
-      });
+      }));
 
       setText("");
       setFile(null);

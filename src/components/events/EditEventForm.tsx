@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitEventUpdate } from "@/lib/actions/submit";
 import { formatEventTime, toDateKey } from "@/lib/utils/calendar";
+import { unwrap } from "@/lib/actions/result";
 
 type EditEventFormProps = {
   eventId: string;
@@ -33,13 +34,13 @@ export function EditEventForm({ eventId, initial, canCancel }: EditEventFormProp
     setLoading(true);
 
     try {
-      await submitEventUpdate(eventId, {
+      unwrap(await submitEventUpdate(eventId, {
         title,
         description,
         event_date: eventDate,
         event_time: eventTime,
         is_cancelled: isCancelled,
-      });
+      }));
       router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "העדכון נכשל");

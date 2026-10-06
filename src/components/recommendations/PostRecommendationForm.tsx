@@ -6,6 +6,7 @@ import type { RecommendationType } from "@prisma/client";
 import { TagSelect } from "@/components/shared/TagSelect";
 import type { PublicTag } from "@/lib/models/tag";
 import { submitRecommendation } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type PostRecommendationFormProps = {
   tags: PublicTag[];
@@ -36,11 +37,11 @@ export function PostRecommendationForm({ tags, stayOnPage = false }: PostRecomme
     setLoading(true);
 
     try {
-      const item = await submitRecommendation({
+      const item = unwrap(await submitRecommendation({
         type: type || null,
         content,
         tag_ids: selectedTagIds,
-      });
+      }));
       setType("");
       setContent("");
       setSelectedTagIds([]);

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TagInput } from "@/components/shared/TagInput";
 import { submitForumQuestion } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 export function PostForumQuestionForm() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function PostForumQuestionForm() {
     setLoading(true);
 
     try {
-      const question = await submitForumQuestion({ title, content, tags });
+      const question = unwrap(await submitForumQuestion({ title, content, tags }));
       setTitle("");
       setContent("");
       setTags("");
