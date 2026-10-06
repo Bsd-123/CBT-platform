@@ -68,7 +68,7 @@ export async function createMaterialRating(
   }
 
   const material = await prisma.material.findFirst({
-    where: { id: input.material_id, is_hidden: false },
+    where: { id: input.material_id, is_hidden: false, approval_status: "approved" },
     select: { id: true },
   });
   if (!material) {

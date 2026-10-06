@@ -7,6 +7,8 @@ export const NOTIFICATION_TYPES: readonly NotificationType[] = [
   "comment_on_recommendation",
   "forum_answer",
   "material_request_response",
+  "material_approved",
+  "material_rejected",
 ] as const;
 
 export type CreateNotificationInput = {

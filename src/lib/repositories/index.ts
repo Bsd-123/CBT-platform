@@ -22,6 +22,9 @@ export {
 
 export {
   getMaterialById,
+  reviewMaterial,
+  countPendingMaterials,
+  listMaterialsForReview,
   listMaterials,
   countMaterials,
   countMaterialsByType,

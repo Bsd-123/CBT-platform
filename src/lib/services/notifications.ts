@@ -58,3 +58,19 @@ export async function notifyContentComment(
     reference_id: referenceId,
   });
 }
+
+export async function notifyMaterialReviewed(
+  uploaderId: string,
+  materialId: string,
+  decision: "approved" | "rejected",
+  reviewerId: string,
+) {
+  if (uploaderId === reviewerId) return;
+
+  await createNotification({
+    user_id: uploaderId,
+    type: decision === "approved" ? "material_approved" : "material_rejected",
+    reference_type: "material",
+    reference_id: materialId,
+  });
+}

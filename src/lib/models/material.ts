@@ -1,4 +1,4 @@
-import type { MaterialTypeKey } from "@prisma/client";
+import type { MaterialApprovalStatus, MaterialTypeKey } from "@prisma/client";
 import type { Material } from "@prisma/client";
 import {
   pickPublicMaterialTypeFields,
@@ -14,6 +14,17 @@ export type CreateMaterialInput = {
   description: string;
   file_url: string;
   material_type_id: string;
+  /** Defaults to approved at the database level; the upload action sets it from the uploader role. */
+  approval_status?: MaterialApprovalStatus;
+  reviewed_by?: string | null;
+  reviewed_at?: Date | null;
+};
+
+export type ReviewMaterialInput = {
+  material_id: string;
+  reviewer_id: string;
+  decision: "approved" | "rejected";
+  rejection_reason?: string | null;
 };
 
 export type ListMaterialsFilter = {
@@ -21,6 +32,9 @@ export type ListMaterialsFilter = {
   material_type_key?: MaterialTypeKey;
   user_id?: string;
   include_hidden?: boolean;
+  /** Include pending/rejected materials (uploader, reviewers, admin lists). Default: approved only. */
+  include_unapproved?: boolean;
+  approval_status?: MaterialApprovalStatus;
   search?: string;
   tag_ids?: string[];
   skip?: number;
@@ -41,6 +55,9 @@ export function pickPublicMaterialFields(
     file_url: material.file_url,
     material_type_id: material.material_type_id,
     created_at: material.created_at,
+    approval_status: material.approval_status,
+    reviewed_at: material.reviewed_at,
+    rejection_reason: material.rejection_reason,
     user: material.user ? pickPublicUserFields(material.user) : undefined,
     material_type: material.material_type
       ? pickPublicMaterialTypeFields(material.material_type)

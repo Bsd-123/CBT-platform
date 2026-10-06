@@ -1,6 +1,11 @@
 import "server-only";
 
-import type { CreateMaterialInput, ListMaterialsFilter } from "@/lib/models/material";
+import type { MaterialApprovalStatus } from "@prisma/client";
+import type {
+  CreateMaterialInput,
+  ListMaterialsFilter,
+  ReviewMaterialInput,
+} from "@/lib/models/material";
 import type {
   CreateExpertApprovalInput,
   UpdateExpertApprovalStatusInput,
@@ -69,6 +74,9 @@ import {
   getMaterialAverageRating,
   getMaterialAverageRatings,
   getMaterialById,
+  reviewMaterial,
+  countPendingMaterials,
+  listMaterialsForReview,
   getMaterialRating,
   getMaterialRequestById,
   getProfessionalRequestById,
@@ -146,8 +154,24 @@ export async function fetchMaterialAverageRatings(material_ids: string[]) {
   return getMaterialAverageRatings(material_ids);
 }
 
+/** Includes pending/rejected materials: callers must apply canViewMaterial(). */
 export async function fetchMaterialById(id: string) {
-  return getMaterialById(id);
+  return getMaterialById(id, false, true);
+}
+
+export async function fetchPendingMaterialCount() {
+  return countPendingMaterials();
+}
+
+export async function fetchMaterialsForReview(
+  status: MaterialApprovalStatus,
+  options: { skip?: number; take?: number } = {},
+) {
+  return listMaterialsForReview(status, options);
+}
+
+export async function decideMaterial(input: ReviewMaterialInput) {
+  return reviewMaterial(input);
 }
 
 export async function uploadMaterial(input: CreateMaterialInput) {
