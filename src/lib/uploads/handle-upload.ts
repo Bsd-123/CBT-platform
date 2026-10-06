@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { AuthError } from "@/lib/auth/errors";
 import { requireApprovedRegistration } from "@/lib/auth";
 import { GENERIC_ERROR_MESSAGE, RateLimitError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
 import { uploadObjectToR2 } from "@/lib/r2";
 import { checkUpload } from "@/lib/uploads/file-policy";
@@ -37,7 +38,7 @@ export async function handleUpload(
     if (error instanceof RateLimitError) {
       return NextResponse.json({ error: error.message }, { status: 429 });
     }
-    console.error("[upload] failed", error);
+    logger.error("upload failed", error, { route: new URL(request.url).pathname });
     return NextResponse.json({ error: GENERIC_ERROR_MESSAGE }, { status: 500 });
   }
 }
