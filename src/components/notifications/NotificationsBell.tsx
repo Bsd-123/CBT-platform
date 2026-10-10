@@ -20,12 +20,18 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<PublicNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [hasError, setHasError] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
-    const notifications = await fetchNotifications(userId);
-    setItems(notifications);
-    setUnreadCount(notifications.filter((item) => !item.is_read).length);
+    try {
+      const notifications = await fetchNotifications(userId);
+      setItems(notifications);
+      setUnreadCount(notifications.filter((item) => !item.is_read).length);
+      setHasError(false);
+    } catch {
+      setHasError(true);
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -72,12 +78,22 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
   }, [open]);
 
   async function handleMarkRead(id: string) {
-    await readNotification(id, userId);
+    try {
+      await readNotification(id, userId);
+    } catch {
+      setHasError(true);
+      return;
+    }
     await load();
   }
 
   async function handleMarkAllRead() {
-    await readAllNotifications(userId);
+    try {
+      await readAllNotifications(userId);
+    } catch {
+      setHasError(true);
+      return;
+    }
     await load();
   }
 
@@ -125,6 +141,11 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
             )}
           </div>
 
+          {hasError && (
+            <p className="muted" role="alert">
+              לא ניתן לטעון או לעדכן התראות. נסו שוב מאוחר יותר.
+            </p>
+          )}
           {items.length === 0 ? (
             <p className="muted">אין התראות חדשות</p>
           ) : (
