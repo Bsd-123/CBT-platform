@@ -34,3 +34,15 @@ describe("formatLog", () => {
     expect(parsed.error).toEqual({ message: "just a string" });
   });
 });
+
+describe("formatLog redaction", () => {
+  it("does not log the message of Prisma errors", () => {
+    const error = Object.assign(new Error("Invalid `prisma.user.create()` invocation: secret@example.com"), {
+      name: "PrismaClientKnownRequestError",
+      code: "P2002",
+    });
+    const line = formatLog("error", "db", error, {}, new Date("2026-10-06T10:00:00Z"));
+    expect(line).not.toContain("secret@example.com");
+    expect(JSON.parse(line).error.code).toBe("P2002");
+  });
+});
