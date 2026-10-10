@@ -5,7 +5,7 @@ import { requireApprovedRegistration } from "@/lib/auth";
 import { GENERIC_ERROR_MESSAGE, RateLimitError } from "@/lib/errors";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
 import { uploadObjectToR2 } from "@/lib/r2";
-import { checkUpload } from "@/lib/uploads/file-policy";
+import { MAX_UPLOAD_BYTES, checkUpload } from "@/lib/uploads/file-policy";
 
 export async function handleUpload(
   request: Request,
@@ -13,7 +13,13 @@ export async function handleUpload(
 ): Promise<NextResponse> {
   try {
     const auth = await requireApprovedRegistration();
-    enforceRateLimit("upload", auth.userId);
+    await enforceRateLimit("upload", auth.userId);
+
+    // Reject obviously oversized bodies before buffering them (headroom for multipart framing).
+    const declaredLength = Number(request.headers.get("content-length") ?? 0);
+    if (declaredLength > MAX_UPLOAD_BYTES + 1024 * 1024) {
+      return NextResponse.json({ error: "גודל הקובץ חורג מ-50MB." }, { status: 413 });
+    }
 
     const formData = await request.formData();
     const file = formData.get("file");
