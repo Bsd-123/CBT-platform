@@ -44,10 +44,9 @@ export function UiProvider({ children }: { children: ReactNode }) {
   const nextId = useRef(1);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   const confirmDialogRef = useRef<HTMLDivElement>(null);
-  const pendingRef = useRef(pending);
-  useEffect(() => {
-    pendingRef.current = pending;
-  }, [pending]);
+  // Source of truth for the open dialog, updated synchronously so back-to-back confirm()
+  // calls in one tick still settle the earlier promise.
+  const pendingRef = useRef<typeof pending>(null);
 
   const toast = useCallback((message: string, kind: ToastKind = "success") => {
     const id = nextId.current++;
@@ -62,13 +61,16 @@ export function UiProvider({ children }: { children: ReactNode }) {
       new Promise<boolean>((resolve) => {
         // A newer confirm replaces an open one: settle the older promise as "cancelled".
         pendingRef.current?.resolve(false);
-        setPending({ ...options, resolve });
+        const entry = { ...options, resolve };
+        pendingRef.current = entry;
+        setPending(entry);
       }),
     [],
   );
 
   function settle(result: boolean) {
-    pending?.resolve(result);
+    pendingRef.current?.resolve(result);
+    pendingRef.current = null;
     setPending(null);
   }
 
@@ -79,7 +81,8 @@ export function UiProvider({ children }: { children: ReactNode }) {
     confirmButtonRef.current?.focus();
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        pending?.resolve(false);
+        pendingRef.current?.resolve(false);
+        pendingRef.current = null;
         setPending(null);
       }
     }
