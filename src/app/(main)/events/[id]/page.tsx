@@ -6,6 +6,7 @@ import { EventCommentForm } from "@/components/events/EventCommentForm";
 import { EditEventForm, buildEditEventInitial } from "@/components/events/EditEventForm";
 import { formatEventDate, formatEventTimeValue } from "@/lib/utils/calendar";
 import { ReportForm } from "@/components/shared/ReportForm";
+import { isUuid } from "@/lib/utils/ids";
 
 type EventDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -13,6 +14,7 @@ type EventDetailPageProps = {
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const [event, comments, auth] = await Promise.all([
     fetchEventById(id),
     fetchEventComments(id),
