@@ -1,6 +1,7 @@
 import "server-only";
 import type { Prisma, ReportTargetType } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import { deleteObjectFromR2 } from "@/lib/r2";
 
 type Tx = Prisma.TransactionClient;
@@ -147,7 +148,7 @@ export async function deleteReportedContent(
       await deleteObjectFromR2(fileKey);
     } catch (error) {
       // The database is already consistent; an orphaned object is harmless to users.
-      console.error("[moderation] failed to delete stored file", fileKey, error);
+      logger.error("failed to delete stored file", error, { fileKey });
     }
   }
 }
