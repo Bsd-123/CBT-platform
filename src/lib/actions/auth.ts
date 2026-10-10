@@ -36,7 +36,7 @@ export async function fetchPostLoginPath() {
 
 export async function completeRegistration(raw: RegisterProfileInput) {
   const session = await requireAuthSession();
-  enforceRateLimit("register", session.userId);
+  await enforceRateLimit("register", session.userId);
   const input = parseInput(registerSchema, raw);
   if (session.userId !== input.id) {
     throw new AuthError("אין הרשאה לשמור פרופיל זה.");
@@ -68,7 +68,7 @@ export async function requireExpert() {
 
 export async function requestFileDownloadUrl(key: string) {
   const auth = await requireApprovedRegistration();
-  enforceRateLimit("download", auth.userId);
+  await enforceRateLimit("download", auth.userId);
 
   if (typeof key !== "string" || !isValidFileKey(key)) {
     throw new Error("מפתח קובץ לא תקין.");
