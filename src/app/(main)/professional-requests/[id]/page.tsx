@@ -9,6 +9,7 @@ import {
   fetchProfessionalRequestComments,
 } from "@/lib/data";
 import { formatDate } from "@/lib/utils/format";
+import { isUuid } from "@/lib/utils/ids";
 
 type ProfessionalRequestDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -18,6 +19,7 @@ export default async function ProfessionalRequestDetailPage({
   params,
 }: ProfessionalRequestDetailPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const [request, comments] = await Promise.all([
     fetchProfessionalRequestById(id),
     fetchProfessionalRequestComments(id),

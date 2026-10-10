@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+// Every page must render per request so Next.js can apply the CSP nonce from src/proxy.ts.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "קהילת מטפלי CBT",
   description: "פלטפורמת קהילה מקצועית למטפלי CBT",
