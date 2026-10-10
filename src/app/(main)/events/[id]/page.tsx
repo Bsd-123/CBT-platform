@@ -9,6 +9,7 @@ import { ReportForm } from "@/components/shared/ReportForm";
 import { Disclosure } from "@/components/ui/Disclosure";
 import { formatEventDate, formatEventTimeValue } from "@/lib/utils/calendar";
 import { formatDate } from "@/lib/utils/format";
+import { isUuid } from "@/lib/utils/ids";
 
 type EventPageProps = {
   params: Promise<{ id: string }>;
@@ -16,6 +17,7 @@ type EventPageProps = {
 
 export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const auth = await fetchAuthenticatedProfile();
   const [event, comments] = await Promise.all([fetchEventById(id), fetchEventComments(id)]);
 
