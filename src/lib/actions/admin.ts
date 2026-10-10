@@ -5,7 +5,7 @@ import { runAction } from "@/lib/actions/result";
 import type { ReportTargetType, UserRole } from "@prisma/client";
 import type { UpdateReportStatusInput } from "@/lib/models/report";
 import type { CreateTagInput } from "@/lib/models/tag";
-import { isUserRole, type UpdateUserInput } from "@/lib/models/user";
+import { isUserRole, pickPublicUserFields, type UpdateUserInput } from "@/lib/models/user";
 import { prisma } from "@/lib/db";
 import {
   approvalDecisionSchema,
@@ -18,7 +18,6 @@ import {
   hideReportedContent,
   restoreReportedContent,
 } from "@/lib/repositories/moderation.repository";
-import { updateUser } from "@/lib/repositories/user.repository";
 import { createTag, deleteTag } from "@/lib/repositories/tag.repository";
 import {
   createMaterialType,
@@ -82,24 +81,26 @@ export async function adminUpdateUserRole(user_id: string, role: UserRole) {
       throw new Error("Invalid role.");
     }
 
-    if (role !== "admin") {
-      const target = await prisma.user.findUnique({
-        where: { id: user_id },
-        select: { role: true },
-      });
-      if (target?.role === "admin") {
-        const otherAdmins = await prisma.user.count({
-          where: { role: "admin", id: { not: user_id } },
+    const user = await prisma.$transaction(async (tx) => {
+      if (role !== "admin") {
+        // Serialise role changes so two admins cannot demote each other concurrently.
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('admin-role-change'))`;
+        const target = await tx.user.findUnique({
+          where: { id: user_id },
+          select: { role: true },
         });
-        if (otherAdmins === 0) {
-          throw new UserFacingError("לא ניתן להסיר את מנהל המערכת האחרון.");
+        if (target?.role === "admin") {
+          const otherAdmins = await tx.user.count({
+            where: { role: "admin", id: { not: user_id } },
+          });
+          if (otherAdmins === 0) {
+            throw new UserFacingError("לא ניתן להסיר את מנהל המערכת האחרון.");
+          }
         }
       }
-    }
-
-    const input: UpdateUserInput = { role };
-    return updateUser(user_id, input);
-
+      return tx.user.update({ where: { id: user_id }, data: { role } satisfies UpdateUserInput });
+    });
+    return pickPublicUserFields(user);
   });
 }
 

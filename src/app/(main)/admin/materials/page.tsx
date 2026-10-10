@@ -10,7 +10,7 @@ type AdminMaterialsPageProps = {
 export default async function AdminMaterialsPage({ searchParams }: AdminMaterialsPageProps) {
   const { page: pageParam } = await searchParams;
   const parsed = Number.parseInt(pageParam ?? "1", 10);
-  const page = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  const page = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 10_000) : 1;
   const offset = (page - 1) * PAGE_SIZE;
 
   const { items, total } = await loadAdminMaterials({ limit: PAGE_SIZE, offset });
