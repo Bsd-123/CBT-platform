@@ -7,6 +7,7 @@ import {
 import { ProfessionalRequestCommentForm } from "@/components/professional-requests/ProfessionalRequestCommentForm";
 import { ProfessionalRequestCommentThread } from "@/components/professional-requests/ProfessionalRequestCommentThread";
 import { ReportForm } from "@/components/shared/ReportForm";
+import { isUuid } from "@/lib/utils/ids";
 
 type ProfessionalRequestDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -16,6 +17,7 @@ export default async function ProfessionalRequestDetailPage({
   params,
 }: ProfessionalRequestDetailPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const [request, comments] = await Promise.all([
     fetchProfessionalRequestById(id),
     fetchProfessionalRequestComments(id),
