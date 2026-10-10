@@ -1,3 +1,10 @@
+-- BEFORE APPLYING, verify both assumptions:
+--   1. notifications.user_id is uuid (the policy compares it with auth.uid()):
+--        select data_type from information_schema.columns
+--        where table_name = 'notifications' and column_name = 'user_id';
+--   2. The role in DATABASE_URL (Prisma) bypasses RLS or owns the table, otherwise enabling
+--      RLS locks the app out of its own notifications:
+--        select rolname, rolbypassrls from pg_roles where rolname = current_user;
 -- Row Level Security for notifications, safe to apply BEFORE enabling deny-all RLS
 -- on the other tables (see ACTION_PLAN.md INF-05).
 --
