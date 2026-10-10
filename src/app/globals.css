@@ -103,7 +103,8 @@ main {
   gap: 0.5rem;
 }
 
-.nav-menu-toggle {
+/* Prefixed so it beats the later, equal-specificity .nav-icon-btn { display } rule. */
+.site-header .nav-menu-toggle {
   display: none;
 }
 
@@ -119,8 +120,10 @@ main {
     margin-inline-start: auto;
   }
 
-  .nav-menu-toggle {
+  .site-header .nav-menu-toggle {
     display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
   }
 
   .site-header .nav-links {
