@@ -140,6 +140,10 @@ export async function deleteReportedContent(
 
   if (fileKey) {
     try {
+      // The same key can back more than one material; keep the object while any still use it.
+      const stillReferenced = await prisma.material.count({ where: { file_url: fileKey } });
+      if (stillReferenced > 0) return;
+
       await deleteObjectFromR2(fileKey);
     } catch (error) {
       // The database is already consistent; an orphaned object is harmless to users.
