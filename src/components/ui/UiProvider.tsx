@@ -1,5 +1,6 @@
 "use client";
 
+import { useFocusTrap } from "@/components/ui/useFocusTrap";
 import {
   createContext,
   useCallback,
@@ -42,6 +43,11 @@ export function UiProvider({ children }: { children: ReactNode }) {
   >(null);
   const nextId = useRef(1);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmDialogRef = useRef<HTMLDivElement>(null);
+  const pendingRef = useRef(pending);
+  useEffect(() => {
+    pendingRef.current = pending;
+  }, [pending]);
 
   const toast = useCallback((message: string, kind: ToastKind = "success") => {
     const id = nextId.current++;
@@ -54,6 +60,8 @@ export function UiProvider({ children }: { children: ReactNode }) {
   const confirm = useCallback(
     (options: ConfirmOptions) =>
       new Promise<boolean>((resolve) => {
+        // A newer confirm replaces an open one: settle the older promise as "cancelled".
+        pendingRef.current?.resolve(false);
         setPending({ ...options, resolve });
       }),
     [],
@@ -63,6 +71,8 @@ export function UiProvider({ children }: { children: ReactNode }) {
     pending?.resolve(result);
     setPending(null);
   }
+
+  useFocusTrap(confirmDialogRef, pending !== null);
 
   useEffect(() => {
     if (!pending) return;
@@ -98,7 +108,7 @@ export function UiProvider({ children }: { children: ReactNode }) {
             if (event.target === event.currentTarget) settle(false);
           }}
         >
-          <div className="ui-dialog ui-dialog-small" role="alertdialog" aria-modal="true" aria-label={pending.title}>
+          <div ref={confirmDialogRef} className="ui-dialog ui-dialog-small" role="alertdialog" aria-modal="true" aria-label={pending.title}>
             <div className="ui-dialog-body">
               <h2>{pending.title}</h2>
               {pending.message && <p className="muted">{pending.message}</p>}
