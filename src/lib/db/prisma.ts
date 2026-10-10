@@ -2,10 +2,26 @@ import { Prisma, PrismaClient } from "@prisma/client";
 
 /**
  * Connection-level failures from the Supabase pooler (server unreachable, connection closed,
- * connect timeout). These are transient, so one retry is safe for reads and writes alike:
- * Prisma raises them before the statement reaches the database.
+ * connect timeout). These are transient, so a retry is safe for reads and writes alike:
+ * Prisma raises them before the statement reaches the database. Prisma reports them either
+ * as an initialization error (often without a code) or as a request error with a P10xx code.
  */
-const TRANSIENT_CODES = new Set(["P1001", "P1002", "P1017"]);
+const TRANSIENT_CODES = new Set(["P1001", "P1002", "P1008", "P1017"]);
+const MAX_RETRIES = 2;
+
+function isTransientConnectionError(error: unknown): boolean {
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return (
+      !error.errorCode ||
+      TRANSIENT_CODES.has(error.errorCode) ||
+      /can't reach database server/i.test(error.message)
+    );
+  }
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return TRANSIENT_CODES.has(error.code);
+  }
+  return false;
+}
 
 function createClient() {
   const client = new PrismaClient({
@@ -16,17 +32,14 @@ function createClient() {
   });
 
   client.$use(async (params, next) => {
-    try {
-      return await next(params);
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientInitializationError &&
-        error.errorCode &&
-        TRANSIENT_CODES.has(error.errorCode)
-      ) {
-        return next(params);
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        return await next(params);
+      } catch (error) {
+        if (attempt >= MAX_RETRIES || !isTransientConnectionError(error)) {
+          throw error;
+        }
       }
-      throw error;
     }
   });
 
