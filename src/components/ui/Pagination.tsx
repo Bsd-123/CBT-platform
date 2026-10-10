@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { buildPageHref } from "@/lib/utils/pagination";
 
 type PaginationProps = {
@@ -10,6 +11,9 @@ type PaginationProps = {
 };
 
 export function Pagination({ basePath, params = {}, page, totalPages }: PaginationProps) {
+  // A stale or hand-edited ?page= beyond the last page lands on the last page instead of an empty list.
+  if (page > totalPages) redirect(buildPageHref(basePath, params, totalPages));
+
   if (totalPages <= 1) return null;
 
   return (
