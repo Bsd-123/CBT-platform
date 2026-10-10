@@ -40,7 +40,7 @@ export async function fetchMyEvents() {
 export async function updateMyProfile(raw: Pick<UpdateUserInput, "full_name" | "title">) {
   return runAction(async () => {
     const auth = await requireApprovedRegistration();
-    enforceRateLimit("write", auth.userId);
+    await enforceRateLimit("write", auth.userId);
     const input = parseInput(profileSchema, raw);
 
     return updateUser(auth.userId, {

@@ -14,7 +14,7 @@ export async function handleUpload(
 ): Promise<NextResponse> {
   try {
     const auth = await requireApprovedRegistration();
-    enforceRateLimit("upload", auth.userId);
+    await enforceRateLimit("upload", auth.userId);
 
     // Reject obviously oversized bodies before buffering them (headroom for multipart framing).
     const declaredLength = Number(request.headers.get("content-length") ?? 0);
