@@ -50,7 +50,7 @@ import {
 /** Authenticates, then throttles. Every mutating action starts with this. */
 async function authorizeWrite(bucket: "write" | "report" = "write") {
   const auth = await requireApprovedRegistration();
-  enforceRateLimit(bucket, auth.userId);
+  await enforceRateLimit(bucket, auth.userId);
   return auth;
 }
 
