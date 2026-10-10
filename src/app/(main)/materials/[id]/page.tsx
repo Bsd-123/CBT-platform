@@ -14,6 +14,7 @@ import { TagList } from "@/components/shared/TagList";
 import { StarRating } from "@/components/shared/StarRating";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { getMaterialTypeBadgeVariant } from "@/lib/utils/material-type-ui";
+import { isUuid } from "@/lib/utils/ids";
 
 type MaterialDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -21,6 +22,7 @@ type MaterialDetailPageProps = {
 
 export default async function MaterialDetailPage({ params }: MaterialDetailPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const [material, tags, averageRating, auth] = await Promise.all([
     fetchMaterialById(id),
     fetchEntityTags("material", id),

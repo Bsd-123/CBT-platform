@@ -7,6 +7,7 @@ import { ForumAnswerThread } from "@/components/forum/ForumAnswerThread";
 import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
 import { ReportForm } from "@/components/shared/ReportForm";
 import { enrichForumQuestionWithLikes } from "@/lib/services/forum-likes";
+import { isUuid } from "@/lib/utils/ids";
 
 type ForumQuestionPageProps = {
   params: Promise<{ id: string }>;
@@ -14,6 +15,7 @@ type ForumQuestionPageProps = {
 
 export default async function ForumQuestionPage({ params }: ForumQuestionPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const auth = await fetchAuthenticatedProfile();
   const [questionRaw, tags] = await Promise.all([
     fetchForumQuestionById(id),
