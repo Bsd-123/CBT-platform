@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { completeRegistration } from "@/lib/actions/auth";
+import { unwrap } from "@/lib/actions/result";
 import { formatReferralInputForDisplay } from "@/lib/utils/expert-code";
 
 type CompleteProfileFormProps = {
@@ -60,7 +61,8 @@ export function CompleteProfileForm({
         "השמירה נמשכה זמן רב. בדקו חיבור לאינטרנט ונסו שוב.",
       );
 
-      window.location.assign(result.pending_expert_approval ? "/pending-approval" : "/");
+      const registration = unwrap(result);
+      window.location.assign(registration.pending_expert_approval ? "/pending-approval" : "/");
       return;
     } catch (submitError) {
       setError(

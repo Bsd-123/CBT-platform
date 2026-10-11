@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/layout/AppNav";
+import { UiProvider } from "@/components/ui/UiProvider";
 import {
   getAuthSession,
   getAuthenticatedProfile,
@@ -33,9 +34,9 @@ export default async function MainLayout({
   }
 
   return (
-    <>
+    <UiProvider>
       <AppNav profile={auth.profile} />
       <main>{children}</main>
-    </>
+    </UiProvider>
   );
 }

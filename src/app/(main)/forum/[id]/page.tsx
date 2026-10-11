@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchEntityTags, fetchForumQuestionById } from "@/lib/actions";
-import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { ForumAnswerForm } from "@/components/forum/ForumAnswerForm";
 import { ForumAnswerThread } from "@/components/forum/ForumAnswerThread";
 import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
 import { ReportForm } from "@/components/shared/ReportForm";
+import { TagList } from "@/components/shared/TagList";
+import { MaterialIcon } from "@/components/shared/MaterialIcon";
+import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
+import { fetchEntityTags, fetchForumQuestionById } from "@/lib/data";
 import { enrichForumQuestionWithLikes } from "@/lib/services/forum-likes";
+import { formatDate } from "@/lib/utils/format";
+import { isUuid } from "@/lib/utils/ids";
 
 type ForumQuestionPageProps = {
   params: Promise<{ id: string }>;
@@ -14,6 +18,7 @@ type ForumQuestionPageProps = {
 
 export default async function ForumQuestionPage({ params }: ForumQuestionPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const auth = await fetchAuthenticatedProfile();
   const [questionRaw, tags] = await Promise.all([
     fetchForumQuestionById(id),
@@ -25,35 +30,38 @@ export default async function ForumQuestionPage({ params }: ForumQuestionPagePro
   const question = await enrichForumQuestionWithLikes(questionRaw, auth?.userId);
 
   return (
-    <div className="stack">
-      <section className="card stack">
-        <Link href="/forum">← חזרה לפורום</Link>
+    <>
+      <p>
+        <Link href="/forum">
+          <MaterialIcon name="arrow_forward" /> חזרה לפורום
+        </Link>
+      </p>
+
+      <section className="ui-section">
         <h1>{question.title}</h1>
-        <p className="muted">{question.user?.full_name}</p>
+        <div className="thread-meta">
+          <strong>{question.user?.full_name}</strong>
+          <span>{formatDate(question.created_at)}</span>
+        </div>
         <p>{question.content}</p>
-        {tags.length > 0 && (
-          <p>
-            {tags.map((tag) => (
-              <span key={tag.id} className="badge" style={{ marginInlineStart: "0.25rem" }}>
-                {tag.tag?.name}
-              </span>
-            ))}
-          </p>
-        )}
-        <ForumLikeButton
-          targetType="question"
-          targetId={question.id}
-          initialCount={question.like_count}
-          initialLiked={question.user_liked}
-        />
-        <ReportForm targetType="forum_question" targetId={question.id} />
+        <TagList tags={tags} />
+        <div className="thread-actions">
+          <ForumLikeButton
+            targetType="question"
+            targetId={question.id}
+            initialCount={question.like_count}
+            initialLiked={question.user_liked}
+          />
+          <ReportForm targetType="forum_question" targetId={question.id} />
+        </div>
       </section>
 
-      <section className="card stack">
+      <section className="ui-section">
         <h2>תשובות</h2>
         <ForumAnswerForm questionId={question.id} />
-        <ForumAnswerThread questionId={question.id} answers={question.answers ?? []} />
       </section>
-    </div>
+
+      <ForumAnswerThread questionId={question.id} answers={question.answers ?? []} />
+    </>
   );
 }

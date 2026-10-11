@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction } from "@/lib/actions/result";
 
 
 import { requireApprovedRegistration } from "@/lib/auth";
@@ -10,6 +11,8 @@ import { getUserActivity } from "@/lib/repositories/profile.repository";
 
 import { listEvents } from "@/lib/repositories/event.repository";
 
+import { enforceRateLimit } from "@/lib/security/rate-limit";
+import { parseInput, profileSchema } from "@/lib/validation/schemas";
 import { updateUser } from "@/lib/repositories/user.repository";
 
 
@@ -34,28 +37,16 @@ export async function fetchMyEvents() {
 
 
 
-export async function updateMyProfile(input: UpdateUserInput) {
+export async function updateMyProfile(raw: Pick<UpdateUserInput, "full_name" | "title">) {
+  return runAction(async () => {
+    const auth = await requireApprovedRegistration();
+    await enforceRateLimit("write", auth.userId);
+    const input = parseInput(profileSchema, raw);
 
-  const auth = await requireApprovedRegistration();
-
-
-
-  if (!input.full_name?.trim()) {
-
-    throw new Error("יש להזין שם מלא.");
-
-  }
-
-
-
-  return updateUser(auth.userId, {
-
-    full_name: input.full_name.trim(),
-
-    title: input.title?.trim() || null,
+    return updateUser(auth.userId, {
+      full_name: input.full_name,
+      title: input.title?.trim() || null,
+    });
 
   });
-
 }
-
-

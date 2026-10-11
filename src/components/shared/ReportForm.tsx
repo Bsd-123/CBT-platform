@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ReportTargetType } from "@prisma/client";
 import { submitContentReport } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type ReportFormProps = {
   targetType: ReportTargetType;
@@ -24,11 +25,11 @@ export function ReportForm({ targetType, targetId }: ReportFormProps) {
     setLoading(true);
 
     try {
-      await submitContentReport({
+      unwrap(await submitContentReport({
         target_type: targetType,
         target_id: targetId,
         reason,
-      });
+      }));
       setDone(true);
       setReason("");
       router.refresh();

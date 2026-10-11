@@ -1,24 +1,34 @@
-import { loadAdminReports } from "@/lib/admin/data";
-import { AdminNav } from "@/components/admin/AdminNav";
 import { AdminReportsList } from "@/components/admin/AdminReportsList";
+import { TabNav } from "@/components/ui/TabNav";
+import { loadAdminReports } from "@/lib/admin/data";
+import { REPORT_STATUS_LABELS } from "@/lib/utils/admin-labels";
+import type { ReportStatus } from "@prisma/client";
 
-export default async function AdminReportsPage() {
-  const reports = await loadAdminReports();
+type AdminReportsPageProps = {
+  searchParams: Promise<{ status?: string }>;
+};
+
+const STATUSES = Object.keys(REPORT_STATUS_LABELS) as ReportStatus[];
+
+export default async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
+  const { status: statusParam } = await searchParams;
+  const status = STATUSES.find((value) => value === statusParam);
+  const reports = await loadAdminReports(status ? { status } : {});
 
   return (
-    <div className="stack">
-      <section className="card">
-        <h1>ניהול מערכת</h1>
-        <AdminNav />
-        <h2>דיווחים</h2>
-        <p className="muted">
-          טיפול בדיווחים על תוכן: סטטוס open / reviewing / resolved.
-        </p>
-      </section>
-
-      <section className="card">
-        <AdminReportsList reports={reports} />
-      </section>
-    </div>
+    <>
+      <TabNav
+        ariaLabel="סינון דיווחים לפי סטטוס"
+        items={[
+          { href: "/admin/reports", label: "הכל", active: !status },
+          ...STATUSES.map((value) => ({
+            href: `/admin/reports?status=${value}`,
+            label: REPORT_STATUS_LABELS[value],
+            active: status === value,
+          })),
+        ]}
+      />
+      <AdminReportsList reports={reports} />
+    </>
   );
 }

@@ -32,6 +32,7 @@ export function MaterialsSidebar({
 
   function buildUrl(type?: string, tagIds?: string[]) {
     const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
     if (type) params.set("type", type);
     else params.delete("type");
 

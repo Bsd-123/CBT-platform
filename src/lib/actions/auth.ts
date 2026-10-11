@@ -1,5 +1,7 @@
 "use server";
 
+import { UserFacingError } from "@/lib/errors";
+import { runAction } from "@/lib/actions/result";
 import {
   getAuthenticatedProfile,
   getAuthSession,
@@ -14,11 +16,12 @@ import {
   type RegisterProfileInput,
 } from "@/lib/auth";
 import { AuthError } from "@/lib/auth/errors";
+import { prisma } from "@/lib/db";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
+import { parseInput, registerSchema } from "@/lib/validation/schemas";
 import {
-  buildMaterialFileKey,
-  buildMaterialResponseFileKey,
+  isValidFileKey,
   createSignedDownloadUrl,
-  createSignedUploadUrl,
 } from "@/lib/r2";
 
 export async function fetchAuthSession() {
@@ -33,17 +36,23 @@ export async function fetchPostLoginPath() {
   return resolvePostLoginPath();
 }
 
-export async function completeRegistration(input: RegisterProfileInput) {
-  const session = await requireAuthSession();
-  if (session.userId !== input.id) {
-    throw new AuthError("אין הרשאה לשמור פרופיל זה.");
-  }
+export async function completeRegistration(raw: RegisterProfileInput) {
+  return runAction(async () => {
+    const session = await requireAuthSession();
+    await enforceRateLimit("register", session.userId);
+    const input = parseInput(registerSchema, raw);
+    if (session.userId !== input.id) {
+      throw new AuthError("אין הרשאה לשמור פרופיל זה.");
+    }
 
-  return registerProfile(input);
+    return registerProfile(input);
+
+  });
 }
 
-export async function checkRegistrationApproved(user_id: string) {
-  return isRegistrationApproved(user_id);
+export async function checkRegistrationApproved() {
+  const session = await requireAuthSession();
+  return isRegistrationApproved(session.userId);
 }
 
 export async function logout() {
@@ -62,22 +71,33 @@ export async function requireExpert() {
   return requireRole("expert");
 }
 
-export async function requestMaterialUploadUrl(fileName: string, contentType: string) {
-  const auth = await requireApprovedRegistration();
-  const key = buildMaterialFileKey(auth.userId, fileName);
-  return createSignedUploadUrl({ key, contentType });
-}
-
-export async function requestMaterialResponseUploadUrl(
-  fileName: string,
-  contentType: string,
-) {
-  const auth = await requireApprovedRegistration();
-  const key = buildMaterialResponseFileKey(auth.userId, fileName);
-  return createSignedUploadUrl({ key, contentType });
-}
-
 export async function requestFileDownloadUrl(key: string) {
-  await requireApprovedRegistration();
-  return createSignedDownloadUrl({ key });
+  return runAction(async () => {
+    const auth = await requireApprovedRegistration();
+    await enforceRateLimit("download", auth.userId);
+
+    if (typeof key !== "string" || !isValidFileKey(key)) {
+      throw new UserFacingError("מפתח קובץ לא תקין.");
+    }
+
+    if (auth.profile.role !== "admin") {
+      const [material, response] = await Promise.all([
+        prisma.material.findFirst({
+          where: { file_url: key, is_hidden: false },
+          select: { id: true },
+        }),
+        prisma.materialResponse.findFirst({
+          where: { file_url: key },
+          select: { id: true },
+        }),
+      ]);
+
+      if (!material && !response) {
+        throw new UserFacingError("הקובץ לא נמצא.");
+      }
+    }
+
+    return createSignedDownloadUrl({ key });
+
+  });
 }

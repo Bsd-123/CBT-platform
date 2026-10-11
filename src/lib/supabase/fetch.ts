@@ -1,2 +1,2 @@
-/** Server-side fetch for Supabase (uses Node fetch; dev TLS via NODE_TLS_REJECT_UNAUTHORIZED). */
+/** Server-side fetch for Supabase (uses Node fetch; local dev only: npm run dev:insecure-tls). */
 export const supabaseFetch = fetch;

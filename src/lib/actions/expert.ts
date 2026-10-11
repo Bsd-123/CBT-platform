@@ -1,5 +1,7 @@
 "use server";
 
+import { ForbiddenError } from "@/lib/auth/errors";
+import { runAction } from "@/lib/actions/result";
 import type { UpdateExpertApprovalStatusInput } from "@/lib/models/expert-approval";
 import {
   listExpertApprovalsForExpert,
@@ -8,6 +10,7 @@ import {
 } from "@/lib/repositories/expert-approval.repository";
 import type { ListExpertApprovalsFilter } from "@/lib/models/expert-approval";
 import { requireRole } from "@/lib/auth";
+import { approvalDecisionSchema, parseInput } from "@/lib/validation/schemas";
 
 export async function fetchPendingReferrals() {
   const auth = await requireRole("expert", "admin");
@@ -24,11 +27,15 @@ export async function decideReferralApproval(
   user_id: string,
   input: UpdateExpertApprovalStatusInput,
 ) {
-  const auth = await requireRole("expert", "admin");
+  return runAction(async () => {
+    const auth = await requireRole("expert", "admin");
+    const decision = parseInput(approvalDecisionSchema, input);
 
-  if (auth.profile.role === "expert" && auth.userId !== expert_id) {
-    throw new Error("Forbidden");
-  }
+    if (auth.profile.role === "expert" && auth.userId !== expert_id) {
+      throw new ForbiddenError();
+    }
 
-  return updateExpertApprovalStatus(expert_id, user_id, input);
+    return updateExpertApprovalStatus(expert_id, user_id, decision);
+
+  });
 }
