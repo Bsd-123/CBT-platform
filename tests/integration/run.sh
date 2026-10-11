@@ -27,7 +27,7 @@ psql -d $DB < supabase/migrations/20261011120000_data_access_without_prisma.sql
 psql -d $DB < supabase/migrations/20261011184504_restrict_function_execute_to_authenticated.sql
 psql -d $DB < supabase/migrations/20261011192205_forum_question_domain.sql
 psql -d $DB < supabase/migrations/20261011200642_forum_question_tags_optional.sql
-psql -d $DB < supabase/migrations/20261012100000_event_favorites.sql
+psql -d $DB < supabase/migrations/20261011214437_event_favorites.sql
 psql -d $DB < tests/integration/seed.sql
 
 docker run -d --name $REST --network $NET -p 54330:3000 \

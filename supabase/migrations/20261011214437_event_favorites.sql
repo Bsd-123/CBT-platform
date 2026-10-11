@@ -3,11 +3,15 @@
 -- event with the service-role key when it sends the update emails, so no member can read
 -- another member's favorites.
 
+-- The surrogate primary key is deliberate: with a composite key made of the two foreign keys,
+-- PostgREST treats this as a many-to-many link between events and users, which makes every
+-- `events` -> `users` embed ambiguous and breaks existing queries.
 create table if not exists public.event_favorites (
+  id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references public.users (id) on delete cascade,
   event_id   uuid not null references public.events (id) on delete cascade,
   created_at timestamptz not null default now(),
-  primary key (user_id, event_id)
+  unique (user_id, event_id)
 );
 
 create index if not exists event_favorites_event_id_idx on public.event_favorites (event_id);

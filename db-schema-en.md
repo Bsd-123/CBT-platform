@@ -268,4 +268,4 @@ Public queries exclude rows where `is_hidden = true` unless explicitly requested
 
 *Schema Version: 1.1 | Updated: ForumLikes + is_hidden moderation + admin category/tag management*
 
-> **Event favorites:** `event_favorites (user_id, event_id, created_at)` has a composite primary key and cascades on delete. Members can read, add and remove only their own rows (Row Level Security); the server reads everyone's rows with the service-role key only to send event-update emails.
+> **Event favorites:** `event_favorites (id, user_id, event_id, created_at)` has a unique (user_id, event_id) pair and cascades on delete; the surrogate key keeps PostgREST from treating it as a many-to-many link between events and users. Members can read, add and remove only their own rows (Row Level Security); the server reads everyone's rows with the service-role key only to send event-update emails.

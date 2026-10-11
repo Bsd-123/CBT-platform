@@ -95,7 +95,7 @@ shared branded shell, `templates.ts` the individual emails).
    Until all of `RESEND_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `NEXT_PUBLIC_SITE_URL` are set, no
    email is sent and nothing else changes. Without `EMAIL_FROM`, Resend's test sender is used, which
    only delivers to the address of your own Resend account.
-3. Apply the migration `supabase/migrations/20261012100000_event_favorites.sql` (adds the
+3. Apply the migration `supabase/migrations/20261011214437_event_favorites.sql` (adds the
    `event_favorites` table used by the star button).
 
 The service-role key is used only in `src/lib/email/lookup.ts` to read members' addresses and the

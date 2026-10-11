@@ -375,6 +375,9 @@ describe("repositories against PostgREST + RLS", () => {
   it("event favorites: toggle, idempotence, privacy", async () => {
     as("m2");
     const eventId = (await events.listEvents())[0].id;
+    // The unqualified embed that older code uses must stay unambiguous.
+    const bare = await (state.client as PostgrestClient).from("events").select("*, user:users(*)").limit(1);
+    expect(bare.error).toBeNull();
     expect(await favorites.isEventFavorited(ID.m2, eventId)).toBe(false);
     await favorites.addEventFavorite(ID.m2, eventId);
     await favorites.addEventFavorite(ID.m2, eventId); // twice leaves a single row
