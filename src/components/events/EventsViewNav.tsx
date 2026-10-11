@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TabNav } from "@/components/ui/TabNav";
 
 type EventsViewNavProps = {
   active: "list" | "calendar";
@@ -6,13 +6,17 @@ type EventsViewNavProps = {
 
 export function EventsViewNav({ active }: EventsViewNavProps) {
   return (
-    <nav className="nav-links" aria-label="תצוגות אירועים" style={{ marginTop: "0.75rem" }}>
-      <Link href="/events" data-active={active === "list"}>
-        רשימה
-      </Link>
-      <Link href="/events/calendar" data-active={active === "calendar"}>
-        לוח שנה
-      </Link>
-    </nav>
+    <TabNav
+      ariaLabel="תצוגות אירועים"
+      items={[
+        { href: "/events", label: "רשימה", icon: "list", active: active === "list" },
+        {
+          href: "/events/calendar",
+          label: "לוח שנה",
+          icon: "calendar_month",
+          active: active === "calendar",
+        },
+      ]}
+    />
   );
 }

@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateMaterialTypeInput,
   MaterialTypeKey,

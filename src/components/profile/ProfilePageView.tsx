@@ -16,6 +16,7 @@ import {
   EditEventForm,
   buildEditEventInitial,
 } from "@/components/events/EditEventForm";
+import { unwrap } from "@/lib/actions/result";
 
 type ProfileTab = "materials" | "recommendations" | "forum" | "events";
 
@@ -146,7 +147,7 @@ export function ProfilePageView({
     setEditLoading(true);
 
     try {
-      await updateMyProfile({ full_name: fullName, title });
+      unwrap(await updateMyProfile({ full_name: fullName, title }));
       setShowEditProfile(false);
       router.refresh();
     } catch (saveError) {
@@ -384,9 +385,9 @@ export function ProfilePageView({
                 events.map((event) => {
                   const eventDate = event.event_date ? new Date(event.event_date) : null;
                   const monthLabel = eventDate
-                    ? eventDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
+                    ? eventDate.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase()
                     : "—";
-                  const dayLabel = eventDate ? String(eventDate.getDate()) : "—";
+                  const dayLabel = eventDate ? String(eventDate.getUTCDate()) : "—";
                   const participantCount = event.comments?.length ?? 0;
 
                   return (

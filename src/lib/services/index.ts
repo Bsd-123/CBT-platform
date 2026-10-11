@@ -1,3 +1,4 @@
+import "server-only";
 export {
   notifyMaterialRequestResponse,
   notifyForumAnswer,

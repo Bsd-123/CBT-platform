@@ -1,3 +1,4 @@
+import "server-only";
 import { createNotification } from "@/lib/repositories/notification.repository";
 
 export async function notifyMaterialRequestResponse(

@@ -1,3 +1,4 @@
+import "server-only";
 import { prisma } from "@/lib/db";
 import { pickPublicEventFields } from "@/lib/models/event";
 import { pickPublicForumAnswerFields, pickPublicForumQuestionFields } from "@/lib/models/forum";

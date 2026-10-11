@@ -23,6 +23,7 @@ export function pickPublicProfessionalRequestFields(
   request: ProfessionalRequest & {
     user?: Parameters<typeof pickPublicUserFields>[0];
     comments?: Parameters<typeof pickPublicProfessionalRequestCommentFields>[0][];
+    _count?: { comments: number };
   },
 ) {
   return {
@@ -33,6 +34,7 @@ export function pickPublicProfessionalRequestFields(
     created_at: request.created_at,
     user: request.user ? pickPublicUserFields(request.user) : undefined,
     comments: request.comments?.map(pickPublicProfessionalRequestCommentFields),
+    comment_count: request._count?.comments,
   };
 }
 

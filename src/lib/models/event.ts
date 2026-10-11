@@ -23,6 +23,8 @@ export type ListEventsFilter = {
   user_id?: string;
   calendar_only?: boolean;
   include_hidden?: boolean;
+  skip?: number;
+  take?: number;
 };
 
 export type CreateEventCommentInput = {

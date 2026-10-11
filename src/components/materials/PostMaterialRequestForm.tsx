@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitMaterialRequest } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 export function PostMaterialRequestForm() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export function PostMaterialRequestForm() {
     setLoading(true);
 
     try {
-      const request = await submitMaterialRequest({ title, description });
+      const request = unwrap(await submitMaterialRequest({ title, description }));
       setTitle("");
       setDescription("");
       router.push(`/materials/requests/${request.id}`);

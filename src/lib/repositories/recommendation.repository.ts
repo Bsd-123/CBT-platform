@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateRecommendationCommentInput,
   CreateRecommendationInput,
@@ -109,8 +110,8 @@ export async function createRecommendation(
 export async function createRecommendationComment(
   input: CreateRecommendationCommentInput,
 ): Promise<PublicRecommendationComment> {
-  const recommendation = await prisma.recommendation.findUnique({
-    where: { id: input.recommendation_id },
+  const recommendation = await prisma.recommendation.findFirst({
+    where: { id: input.recommendation_id, ...visibleContentWhere() },
   });
 
   if (!recommendation) {

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchMaterialRequestById } from "@/lib/actions";
+import { fetchMaterialRequestById } from "@/lib/data";
 import { MaterialResponseForm } from "@/components/materials/MaterialResponseForm";
 import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";
+import { isUuid } from "@/lib/utils/ids";
 
 type MaterialRequestDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -10,6 +11,7 @@ type MaterialRequestDetailPageProps = {
 
 export default async function MaterialRequestDetailPage({ params }: MaterialRequestDetailPageProps) {
   const { id } = await params;
+  if (!isUuid(id)) notFound();
   const request = await fetchMaterialRequestById(id);
   if (!request) notFound();
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchTags } from "@/lib/actions";
+import { fetchTags } from "@/lib/data";
 import { PostRecommendationForm } from "@/components/recommendations/PostRecommendationForm";
 import "@/app/recommendations.css";
 

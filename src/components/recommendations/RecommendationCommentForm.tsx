@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitRecommendationComment } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type RecommendationCommentFormProps = {
   recommendationId: string;
@@ -26,11 +27,11 @@ export function RecommendationCommentForm({
     setLoading(true);
 
     try {
-      await submitRecommendationComment({
+      unwrap(await submitRecommendationComment({
         recommendation_id: recommendationId,
         content,
         parent_comment_id: parentCommentId,
-      });
+      }));
       setContent("");
       router.refresh();
     } catch (submitError) {

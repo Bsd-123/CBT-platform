@@ -1,3 +1,4 @@
+import "server-only";
 import type {
   CreateEventCommentInput,
   CreateEventInput,
@@ -48,8 +49,13 @@ export async function listEvents(
     where: buildEventsWhere(filter),
     include: eventInclude,
     orderBy: [{ event_date: "asc" }, { event_time: "asc" }],
+    ...(filter.take !== undefined && { skip: filter.skip ?? 0, take: filter.take }),
   });
   return events.map(pickPublicEventFields);
+}
+
+export async function countEvents(filter: ListEventsFilter = {}): Promise<number> {
+  return prisma.event.count({ where: buildEventsWhere(filter) });
 }
 
 export async function createEvent(input: CreateEventInput): Promise<PublicEvent> {
@@ -75,8 +81,8 @@ export async function updateEvent(
 export async function createEventComment(
   input: CreateEventCommentInput,
 ): Promise<PublicEventComment> {
-  const event = await prisma.event.findUnique({
-    where: { id: input.event_id },
+  const event = await prisma.event.findFirst({
+    where: { id: input.event_id, ...visibleContentWhere() },
   });
 
   if (!event) {
