@@ -8,7 +8,12 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatReferralInputForDisplay } from "@/lib/utils/expert-code";
 import { unwrap } from "@/lib/actions/result";
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  /** false only while the system has no expert yet. */
+  referralRequired?: boolean;
+};
+
+export function RegisterForm({ referralRequired = true }: RegisterFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expertRef = searchParams.get("ref") ?? "";
@@ -21,7 +26,7 @@ export function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const expertRefRequired = Boolean(expertRef);
+  const expertRefLocked = Boolean(expertRef);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,15 +123,15 @@ export function RegisterForm() {
 
       <div className="form-field">
         <label htmlFor="expert_code">
-          קוד מומחה מפנה{expertRefRequired ? "" : " (אופציונלי)"}
+          קוד מומחה מפנה{referralRequired ? " (חובה)" : " (אופציונלי)"}
         </label>
         <input
           id="expert_code"
           value={expertCode}
           onChange={(event) => setExpertCode(event.target.value)}
           placeholder="#D90963D6"
-          required={expertRefRequired}
-          readOnly={expertRefRequired}
+          required={referralRequired}
+          readOnly={expertRefLocked}
         />
       </div>
 

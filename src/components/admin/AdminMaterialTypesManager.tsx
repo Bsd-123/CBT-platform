@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { MaterialTypeKey } from "@prisma/client";
+import type { MaterialTypeKey } from "@/lib/db/types";
 import {
   adminCreateMaterialType,
   adminDeleteMaterialType,

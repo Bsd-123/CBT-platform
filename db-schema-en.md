@@ -29,6 +29,12 @@
 - `material_type_id` (UUID, references MaterialTypes.id, required)
 - `is_hidden` (boolean, default false)
 - `created_at` (timestamp)
+- `approval_status` (enum: pending / approved / rejected, default approved)
+- `reviewed_by` (UUID, nullable — expert/admin who decided)
+- `reviewed_at` (timestamp, nullable)
+- `rejection_reason` (text, nullable)
+
+**Approval:** Uploads by regular users are saved as `pending` and appear in the library only once an expert or admin sets `approved`. Experts' and admins' own uploads are approved immediately. Pending/rejected materials are visible only to the uploader and reviewers. The first decision on a pending material wins.
 
 **Notes:** Files stored in Cloudflare R2, accessed via signed URLs only. Hidden materials are excluded from public lists.
 
@@ -212,7 +218,7 @@
 ## Notifications
 - `id` (UUID, primary key)
 - `user_id` (UUID, references Users.id, required)
-- `type` (enum: comment_on_content / comment_on_recommendation / forum_answer / material_request_response, required)
+- `type` (enum: comment_on_content / comment_on_recommendation / forum_answer / material_request_response / material_approved / material_rejected, required)
 - `reference_type` (text, e.g., "material", "forum", "recommendation", "event", "professional_request")
 - `reference_id` (UUID)
 - `is_read` (boolean, default false)

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { UserRole } from "@prisma/client";
+import type { UserRole } from "@/lib/db/types";
 import { adminUpdateUserRole } from "@/lib/actions/admin";
 import type {
   AdminUserDirectoryEntry,

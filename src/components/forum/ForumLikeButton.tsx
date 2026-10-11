@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { ForumLikeTargetType } from "@prisma/client";
+import type { ForumLikeTargetType } from "@/lib/db/types";
 import { submitForumLikeToggle } from "@/lib/actions/submit";
 import { unwrap } from "@/lib/actions/result";
 

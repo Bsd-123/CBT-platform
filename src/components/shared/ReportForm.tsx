@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { ReportTargetType } from "@prisma/client";
+import type { ReportTargetType } from "@/lib/db/types";
 import { submitContentReport } from "@/lib/actions/submit";
 import { unwrap } from "@/lib/actions/result";
 

@@ -1,4 +1,4 @@
-import type { MaterialType, MaterialTypeKey } from "@prisma/client";
+import type { MaterialType, MaterialTypeKey } from "@/lib/db/types";
 
 export type { MaterialType, MaterialTypeKey };
 

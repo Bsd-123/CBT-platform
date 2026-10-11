@@ -1,4 +1,4 @@
-import type { User, UserRole } from "@prisma/client";
+import type { User, UserRole } from "@/lib/db/types";
 import { formatExpertCode } from "@/lib/utils/expert-code";
 
 export type { User, UserRole };

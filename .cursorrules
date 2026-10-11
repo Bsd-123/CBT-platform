@@ -28,7 +28,8 @@ A professional community platform for CBT practitioners to share knowledge, mate
 
 ### Expert
 - All regular user permissions
-- Single responsibility: **Approve or reject users who registered via their referral**
+- Responsibilities: **Approve or reject users who registered via their referral** and **approve or reject materials uploaded by regular users** (review queue page)
+- Registration requires a referral code from an existing expert
 - No further relationship with approved users
 - **No dashboard**
 - **No community management or tracking**
@@ -48,7 +49,7 @@ A professional community platform for CBT practitioners to share knowledge, mate
 ## System Spaces
 
 ### 1. Materials Library
-- **Upload Material:** File + text description + tags
+- **Upload Material:** File + text description + tags. Uploads by regular users are published only after an expert (or admin) approves them; experts/admins are auto-approved
 - **Request Material:** Public text post
 - **Respond to Request:** Linked to original request
 - **Rate Materials:** Numerical rating system (not likes)

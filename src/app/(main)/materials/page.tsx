@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import type { MaterialTypeKey } from "@prisma/client";
+import type { MaterialTypeKey } from "@/lib/db/types";
 import {
   fetchEntityTagsForEntities,
   fetchMaterialAverageRatings,

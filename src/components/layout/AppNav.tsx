@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { PublicUser } from "@/lib/models/user";
 import { NotificationsBell } from "@/components/notifications/NotificationsBell";
@@ -16,10 +17,18 @@ const SPACE_LINKS = [
 
 type AppNavProps = {
   profile: PublicUser;
+  /** Materials waiting for review; shown to experts and admins. */
+  pendingMaterials?: number;
 };
 
-export function AppNav({ profile }: AppNavProps) {
+export function AppNav({ profile, pendingMaterials = 0 }: AppNavProps) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  // Close the mobile menu after navigating.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <header className="site-header">
@@ -28,7 +37,26 @@ export function AppNav({ profile }: AppNavProps) {
           קהילת מטפלי CBT
         </Link>
 
-        <nav className="nav-links" aria-label="ניווט ראשי">
+        <div className="nav-actions-mobile">
+          <NotificationsBell userId={profile.id} />
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-expanded={open}
+            aria-controls="main-nav"
+            aria-label={open ? "סגירת התפריט" : "פתיחת התפריט"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span aria-hidden="true">{open ? "✕" : "☰"}</span>
+          </button>
+        </div>
+
+        <nav
+          id="main-nav"
+          className="nav-links"
+          data-open={open}
+          aria-label="ניווט ראשי"
+        >
           {SPACE_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -49,14 +77,19 @@ export function AppNav({ profile }: AppNavProps) {
               אישורי הרשמה
             </Link>
           )}
-          {profile.role === "admin" && (
-            <>
-              <Link href="/admin/reports" data-active={pathname.startsWith("/admin")}>
-                ניהול
-              </Link>
-            </>
+          {(profile.role === "expert" || profile.role === "admin") && (
+            <Link
+              href="/expert/materials"
+              data-active={pathname.startsWith("/expert/materials")}
+            >
+              אישור חומרים{pendingMaterials > 0 ? ` (${pendingMaterials})` : ""}
+            </Link>
           )}
-          <NotificationsBell userId={profile.id} />
+          {profile.role === "admin" && (
+            <Link href="/admin/reports" data-active={pathname.startsWith("/admin")}>
+              ניהול
+            </Link>
+          )}
           <LogoutButton />
         </nav>
       </div>

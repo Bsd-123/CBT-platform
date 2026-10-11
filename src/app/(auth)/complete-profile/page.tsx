@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { CompleteProfileForm } from "@/components/auth/CompleteProfileForm";
-import { getAuthSession, getAuthenticatedProfile } from "@/lib/auth";
+import { getAuthSession, getAuthenticatedProfile, isReferralCodeRequired } from "@/lib/auth";
 
 const PROFILE_MESSAGES: Record<string, string> = {
   missing_profile:
@@ -25,5 +25,13 @@ export default async function CompleteProfilePage({ searchParams }: CompleteProf
 
   const infoMessage = reason ? PROFILE_MESSAGES[reason] : undefined;
 
-  return <CompleteProfileForm userId={session.userId} infoMessage={infoMessage} />;
+  const referralRequired = await isReferralCodeRequired();
+
+  return (
+    <CompleteProfileForm
+      userId={session.userId}
+      infoMessage={infoMessage}
+      referralRequired={referralRequired}
+    />
+  );
 }

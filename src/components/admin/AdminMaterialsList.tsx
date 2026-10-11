@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { AdminMaterialItem } from "@/lib/repositories/material.repository";
 import { formatDate } from "@/lib/utils/format";
+import { APPROVAL_LABELS } from "@/lib/materials/approval";
 import { unwrap } from "@/lib/actions/result";
 
 type Props = {
@@ -68,6 +69,7 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
               <th>כותרת</th>
               <th>תגיות</th>
               <th>מצב</th>
+              <th>אישור</th>
               <th>מעלה</th>
               <th>תאריך</th>
               <th>פעולות</th>
@@ -91,6 +93,7 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
                     <span className="ui-badge">גלוי</span>
                   )}
                 </td>
+                <td>{APPROVAL_LABELS[material.approvalStatus]}</td>
                 <td>{material.uploader?.full_name ?? "-"}</td>
                 <td>{formatDate(material.createdAt)}</td>
                 <td>

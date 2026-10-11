@@ -1,4 +1,4 @@
-import type { Report, ReportStatus, ReportTargetType } from "@prisma/client";
+import type { Report, ReportStatus, ReportTargetType } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { Report, ReportStatus, ReportTargetType };

@@ -2,7 +2,7 @@ import type {
   Recommendation,
   RecommendationComment,
   RecommendationType,
-} from "@prisma/client";
+} from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { Recommendation, RecommendationComment, RecommendationType };

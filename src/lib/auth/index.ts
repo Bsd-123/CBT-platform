@@ -1,6 +1,7 @@
 export { AuthError, ForbiddenError } from "./errors";
 export {
   assertAdminAccess,
+  assertReviewerAccess,
   getAuthSession,
   getAuthenticatedProfile,
   requireAuthSession,
@@ -14,6 +15,7 @@ export {
 export {
   registerProfile,
   isRegistrationApproved,
+  isReferralCodeRequired,
   getRegistrationStatus,
   getPendingApprovalState,
   type RegisterProfileInput,

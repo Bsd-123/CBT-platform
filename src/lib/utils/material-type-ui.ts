@@ -1,4 +1,4 @@
-import type { MaterialTypeKey } from "@prisma/client";
+import type { MaterialTypeKey } from "@/lib/db/types";
 
 const TYPE_ICONS: Record<MaterialTypeKey, string> = {
   game: "extension",

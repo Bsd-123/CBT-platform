@@ -1,7 +1,7 @@
 import type {
   ProfessionalRequest,
   ProfessionalRequestComment,
-} from "@prisma/client";
+} from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { ProfessionalRequest, ProfessionalRequestComment };

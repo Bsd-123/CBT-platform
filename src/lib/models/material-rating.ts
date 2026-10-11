@@ -1,4 +1,4 @@
-import type { MaterialRating } from "@prisma/client";
+import type { MaterialRating } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { MaterialRating };

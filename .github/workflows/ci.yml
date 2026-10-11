@@ -14,7 +14,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx prisma generate
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
@@ -23,5 +22,3 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
-          DATABASE_URL: postgresql://user:pass@localhost:5432/db
-          DIRECT_URL: postgresql://user:pass@localhost:5432/db

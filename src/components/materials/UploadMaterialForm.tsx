@@ -12,9 +12,15 @@ import { unwrap } from "@/lib/actions/result";
 type UploadMaterialFormProps = {
   materialTypes: PublicMaterialType[];
   tags: PublicTag[];
+  /** True for regular users: the upload waits for an expert before it is published. */
+  requiresApproval?: boolean;
 };
 
-export function UploadMaterialForm({ materialTypes, tags }: UploadMaterialFormProps) {
+export function UploadMaterialForm({
+  materialTypes,
+  tags,
+  requiresApproval = false,
+}: UploadMaterialFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -65,6 +71,11 @@ export function UploadMaterialForm({ materialTypes, tags }: UploadMaterialFormPr
   return (
     <form className="stack" onSubmit={handleSubmit}>
       <h2>העלאת חומר</h2>
+      {requiresApproval && (
+        <p className="banner-warning">
+          חומרים שמועלים על ידי משתמשים מתפרסמים בספרייה רק לאחר אישור מומחה. תקבלו התראה כשהחומר יאושר או יידחה.
+        </p>
+      )}
       <div className="form-field">
         <label htmlFor="material-title">כותרת</label>
         <input id="material-title" required value={title} onChange={(e) => setTitle(e.target.value)} />

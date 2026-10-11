@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import type { UserRole } from "@prisma/client";
+import { useState } from "react";
+import type { UserRole } from "@/lib/db/types";
 import type { PublicEvent } from "@/lib/models/event";
 import type { PublicMaterial } from "@/lib/models/material";
 import type { PublicRecommendation } from "@/lib/models/recommendation";
@@ -17,6 +17,7 @@ import {
   buildEditEventInitial,
 } from "@/components/events/EditEventForm";
 import { unwrap } from "@/lib/actions/result";
+import { APPROVAL_LABELS } from "@/lib/materials/approval";
 
 type ProfileTab = "materials" | "recommendations" | "forum" | "events";
 
@@ -104,15 +105,6 @@ function getRecommendationTitle(content: string): string {
   return `${firstLine.slice(0, 72)}…`;
 }
 
-function countMonthlyActivity(
-  items: { created_at: Date | string }[],
-  now = new Date(),
-): number {
-  const monthAgo = new Date(now);
-  monthAgo.setDate(monthAgo.getDate() - 30);
-  return items.filter((item) => new Date(item.created_at) >= monthAgo).length;
-}
-
 export function ProfilePageView({
   profile,
   materials,
@@ -131,14 +123,6 @@ export function ProfilePageView({
   const [editError, setEditError] = useState<string | null>(null);
   const [editLoading, setEditLoading] = useState(false);
 
-  const allActivity = useMemo(
-    () => [...materials, ...recommendations, ...forumQuestions, ...forumAnswers, ...events],
-    [materials, recommendations, forumQuestions, forumAnswers, events],
-  );
-
-  const monthlyCount = useMemo(() => countMonthlyActivity(allActivity), [allActivity]);
-  const monthlyGoal = 10;
-  const monthlyProgress = Math.min(100, Math.round((monthlyCount / monthlyGoal) * 100));
   const displayTitle = profile.title || ROLE_LABELS[profile.role];
 
   async function handleSaveProfile(event: React.FormEvent) {
@@ -215,21 +199,6 @@ export function ProfilePageView({
             )}
           </div>
 
-          <div className="profile-clinical-card profile-side-card profile-clinical-card--accent">
-            <h3>פעילות בסביבת העבודה</h3>
-            <p>
-              {profile.full_name} תרם/ה {monthlyCount} פריטים לקהילה החודש.
-            </p>
-            <div className="profile-activity-progress" aria-hidden="true">
-              <div
-                className="profile-activity-progress-bar"
-                style={{ width: `${monthlyProgress}%` }}
-              />
-            </div>
-            <p className="profile-activity-progress-label">
-              יעד חודשי: {monthlyProgress}% הושלם
-            </p>
-          </div>
         </aside>
 
         <section className="profile-main">
@@ -267,6 +236,14 @@ export function ProfilePageView({
                     <p className="profile-material-desc">{material.description}</p>
                     <div className="profile-material-meta">
                       <span>{getMaterialMeta(material)}</span>
+                      {material.approval_status !== "approved" && (
+                        <span
+                          className="ui-badge"
+                          data-kind={material.approval_status === "rejected" ? "danger" : undefined}
+                        >
+                          {APPROVAL_LABELS[material.approval_status]}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </Link>

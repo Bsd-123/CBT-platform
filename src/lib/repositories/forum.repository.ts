@@ -6,143 +6,135 @@ import type {
   PublicForumQuestion,
   SearchForumQuestionsFilter,
 } from "@/lib/models/forum";
-import {
-  pickPublicForumAnswerFields,
-  pickPublicForumQuestionFields,
-} from "@/lib/models/forum";
-import { prisma } from "@/lib/db";
-import { notifyForumAnswer } from "@/lib/services/notifications";
-import { visibleContentWhere } from "@/lib/db/visibility";
+import { pickPublicForumAnswerFields, pickPublicForumQuestionFields } from "@/lib/models/forum";
+import { countOf, getDb, row, rows } from "@/lib/db/client";
+import { ilikeAny } from "@/lib/db/search";
+import { buildReplyTree } from "@/lib/db/tree";
+import type { ForumAnswer, ForumQuestion, User } from "@/lib/db/types";
 
-const answerVisibility = visibleContentWhere();
+// The forum_answers author (user_id) is the only foreign key to users, so the embed is unambiguous.
+const WITH_AUTHOR = "*, user:users(*)";
 
-const questionInclude = {
-  user: true,
-  answers: {
-    where: { parent_answer_id: null, ...answerVisibility },
-    include: {
-      user: true,
-      replies: {
-        where: answerVisibility,
-        include: {
-          user: true,
-          replies: { where: answerVisibility, include: { user: true } },
-        },
-      },
-    },
-    orderBy: { created_at: "asc" as const },
-  },
-} as const;
+type AnswerRow = ForumAnswer & { user: User };
+type QuestionRow = ForumQuestion & { user: User };
 
-function buildForumSearchWhere(filter: SearchForumQuestionsFilter) {
-  const base = visibleContentWhere(filter.include_hidden);
-
-  if (!filter.query?.trim()) return base;
-
-  const query = filter.query.trim();
-  return {
-    ...base,
-    OR: [
-      { title: { contains: query, mode: "insensitive" as const } },
-      { content: { contains: query, mode: "insensitive" as const } },
-    ],
-  };
+async function loadVisibleAnswers(question_id: string): Promise<AnswerRow[]> {
+  const db = await getDb();
+  return rows<AnswerRow>(
+    await db
+      .from("forum_answers")
+      .select(WITH_AUTHOR)
+      .eq("question_id", question_id)
+      .eq("is_hidden", false)
+      .order("created_at", { ascending: true }),
+  );
 }
 
 export async function getForumQuestionById(
   id: string,
   include_hidden = false,
 ): Promise<PublicForumQuestion | null> {
-  const question = await prisma.forumQuestion.findFirst({
-    where: { id, ...visibleContentWhere(include_hidden) },
-    include: questionInclude,
+  const db = await getDb();
+  let query = db.from("forum_questions").select(WITH_AUTHOR).eq("id", id);
+  if (!include_hidden) query = query.eq("is_hidden", false);
+
+  const question = row<QuestionRow>(await query.maybeSingle());
+  if (!question) return null;
+
+  const answers = await loadVisibleAnswers(id);
+  return pickPublicForumQuestionFields({
+    ...question,
+    answers: buildReplyTree(answers, (answer) => answer.parent_answer_id),
   });
-  return question ? pickPublicForumQuestionFields(question) : null;
 }
 
 export async function searchForumQuestions(
   filter: SearchForumQuestionsFilter = {},
 ): Promise<PublicForumQuestion[]> {
-  const questions = await prisma.forumQuestion.findMany({
-    where: buildForumSearchWhere(filter),
-    include: {
-      user: true,
-      _count: { select: { answers: { where: visibleContentWhere() } } },
-    },
-    orderBy: { created_at: "desc" },
-    ...(filter.take !== undefined && { skip: filter.skip ?? 0, take: filter.take }),
-  });
-  return questions.map(pickPublicForumQuestionFields);
+  const db = await getDb();
+  let query = db.from("forum_questions").select(WITH_AUTHOR);
+  if (!filter.include_hidden) query = query.eq("is_hidden", false);
+  const text = filter.query?.trim();
+  if (text) query = query.or(ilikeAny(["title", "content"], text));
+  query = query.order("created_at", { ascending: false });
+  if (filter.take !== undefined) {
+    const skip = filter.skip ?? 0;
+    query = query.range(skip, skip + filter.take - 1);
+  }
+  const questions = rows<QuestionRow>(await query);
+
+  // Visible answer count per question, in one query.
+  const counts = new Map<string, number>();
+  if (questions.length > 0) {
+    const answers = rows<{ question_id: string }>(
+      await db
+        .from("forum_answers")
+        .select("question_id")
+        .in("question_id", questions.map((question) => question.id))
+        .eq("is_hidden", false),
+    );
+    for (const { question_id } of answers) counts.set(question_id, (counts.get(question_id) ?? 0) + 1);
+  }
+
+  return questions.map((question) =>
+    pickPublicForumQuestionFields({ ...question, _count: { answers: counts.get(question.id) ?? 0 } }),
+  );
 }
 
-export async function countForumQuestions(
-  filter: SearchForumQuestionsFilter = {},
-): Promise<number> {
-  return prisma.forumQuestion.count({ where: buildForumSearchWhere(filter) });
+export async function countForumQuestions(filter: SearchForumQuestionsFilter = {}): Promise<number> {
+  const db = await getDb();
+  let query = db.from("forum_questions").select("id", { count: "exact", head: true });
+  if (!filter.include_hidden) query = query.eq("is_hidden", false);
+  const text = filter.query?.trim();
+  if (text) query = query.or(ilikeAny(["title", "content"], text));
+  return countOf(await query);
 }
 
 export async function createForumQuestion(
   input: CreateForumQuestionInput,
 ): Promise<PublicForumQuestion> {
-  const question = await prisma.forumQuestion.create({
-    data: input,
-    include: { user: true },
-  });
-  return pickPublicForumQuestionFields(question);
+  const db = await getDb();
+  const question = row<QuestionRow>(
+    await db
+      .from("forum_questions")
+      .insert({ user_id: input.user_id, title: input.title, content: input.content })
+      .select(WITH_AUTHOR)
+      .single(),
+  );
+  return pickPublicForumQuestionFields(question!);
 }
 
-export async function createForumAnswer(
-  input: CreateForumAnswerInput,
-): Promise<PublicForumAnswer> {
-  const question = await prisma.forumQuestion.findFirst({
-    where: { id: input.question_id, ...visibleContentWhere() },
-  });
+/**
+ * Reply-depth rules and the question owner's notification are handled by database triggers;
+ * their errors ("Invalid parent answer.", "Maximum reply depth reached.") surface unchanged.
+ */
+export async function createForumAnswer(input: CreateForumAnswerInput): Promise<PublicForumAnswer> {
+  const db = await getDb();
+  const exists = countOf(
+    await db
+      .from("forum_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("id", input.question_id)
+      .eq("is_hidden", false),
+  );
+  if (exists === 0) throw new Error("Forum question not found.");
 
-  if (!question) {
-    throw new Error("Forum question not found.");
-  }
-
-  if (input.parent_answer_id) {
-    const parent = await prisma.forumAnswer.findFirst({
-      where: { id: input.parent_answer_id, ...visibleContentWhere() },
-      include: { parent: { select: { parent_answer_id: true } } },
-    });
-    if (!parent || parent.question_id !== input.question_id) {
-      throw new Error("Invalid parent answer.");
-    }
-    // Reads render three levels (answer, reply, reply-to-reply).
-    if (parent.parent?.parent_answer_id) {
-      throw new Error("Maximum reply depth reached.");
-    }
-  }
-
-  const answer = await prisma.forumAnswer.create({
-    data: input,
-    include: { user: true },
-  });
-
-  await notifyForumAnswer(question.user_id, question.id, input.user_id);
-
-  return pickPublicForumAnswerFields(answer);
+  const answer = row<AnswerRow>(
+    await db
+      .from("forum_answers")
+      .insert({
+        question_id: input.question_id,
+        user_id: input.user_id,
+        content: input.content,
+        parent_answer_id: input.parent_answer_id ?? null,
+      })
+      .select(WITH_AUTHOR)
+      .single(),
+  );
+  return pickPublicForumAnswerFields(answer!);
 }
 
-export async function listForumAnswersByQuestion(
-  question_id: string,
-): Promise<PublicForumAnswer[]> {
-  const answerVisibility = visibleContentWhere();
-  const answers = await prisma.forumAnswer.findMany({
-    where: { question_id, parent_answer_id: null, ...answerVisibility },
-    include: {
-      user: true,
-      replies: {
-        where: answerVisibility,
-        include: {
-          user: true,
-          replies: { where: answerVisibility, include: { user: true } },
-        },
-      },
-    },
-    orderBy: { created_at: "asc" },
-  });
-  return answers.map(pickPublicForumAnswerFields);
+export async function listForumAnswersByQuestion(question_id: string): Promise<PublicForumAnswer[]> {
+  const answers = await loadVisibleAnswers(question_id);
+  return buildReplyTree(answers, (answer) => answer.parent_answer_id).map(pickPublicForumAnswerFields);
 }

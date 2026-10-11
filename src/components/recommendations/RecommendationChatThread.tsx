@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { RecommendationType } from "@prisma/client";
+import type { RecommendationType } from "@/lib/db/types";
 import type { PublicRecommendationComment } from "@/lib/models/recommendation";
 import type { RecommendationFeedItem } from "@/lib/repositories/recommendation.repository";
 import { getInitials } from "@/lib/utils/expert-approval-ui";

@@ -1,6 +1,11 @@
 import "server-only";
 
-import type { CreateMaterialInput, ListMaterialsFilter } from "@/lib/models/material";
+import type { MaterialApprovalStatus } from "@/lib/db/types";
+import type {
+  CreateMaterialInput,
+  ListMaterialsFilter,
+  ReviewMaterialInput,
+} from "@/lib/models/material";
 import type {
   CreateExpertApprovalInput,
   UpdateExpertApprovalStatusInput,
@@ -34,7 +39,6 @@ import type {
   CreateMaterialRatingInput,
   UpdateMaterialRatingInput,
 } from "@/lib/models/material-rating";
-import type { CreateNotificationInput } from "@/lib/models/notification";
 import type {
   CreateReportInput,
   ListReportsFilter,
@@ -46,21 +50,18 @@ import {
   countUnreadNotifications,
   createEvent,
   createEventComment,
-  createExpertApproval,
   createForumAnswer,
   createForumQuestion,
   createMaterial,
   createMaterialRating,
   createMaterialRequest,
   createMaterialResponse,
-  createNotification,
   createProfessionalRequest,
   createProfessionalRequestComment,
   createRecommendation,
   createRecommendationComment,
   createReport,
   createTag,
-  createUser,
   deleteMaterialRating,
   detachEntityTag,
   getEventById,
@@ -69,6 +70,9 @@ import {
   getMaterialAverageRating,
   getMaterialAverageRatings,
   getMaterialById,
+  reviewMaterial,
+  countPendingMaterials,
+  listMaterialsForReview,
   getMaterialRating,
   getMaterialRequestById,
   getProfessionalRequestById,
@@ -117,10 +121,6 @@ export async function fetchUserById(id: string) {
   return getUserById(id);
 }
 
-export async function registerUserProfile(input: CreateUserInput) {
-  return createUser(input);
-}
-
 export async function editUserProfile(id: string, input: UpdateUserInput) {
   return updateUser(id, input);
 }
@@ -146,8 +146,24 @@ export async function fetchMaterialAverageRatings(material_ids: string[]) {
   return getMaterialAverageRatings(material_ids);
 }
 
+/** Includes pending/rejected materials: callers must apply canViewMaterial(). */
 export async function fetchMaterialById(id: string) {
-  return getMaterialById(id);
+  return getMaterialById(id, false, true);
+}
+
+export async function fetchPendingMaterialCount() {
+  return countPendingMaterials();
+}
+
+export async function fetchMaterialsForReview(
+  status: MaterialApprovalStatus,
+  options: { skip?: number; take?: number } = {},
+) {
+  return listMaterialsForReview(status, options);
+}
+
+export async function decideMaterial(input: ReviewMaterialInput) {
+  return reviewMaterial(input);
 }
 
 export async function uploadMaterial(input: CreateMaterialInput) {
@@ -189,10 +205,6 @@ export async function fetchPendingReferralsForExpert(expert_id: string) {
 
 export async function fetchReferralApproval(expert_id: string, user_id: string) {
   return getExpertApprovalByExpertAndUser(expert_id, user_id);
-}
-
-export async function submitReferralApproval(input: CreateExpertApprovalInput) {
-  return createExpertApproval(input);
 }
 
 export async function decideReferralApproval(
@@ -255,7 +267,7 @@ export async function fetchForumAnswers(question_id: string) {
 
 export async function toggleForumLike(
   user_id: string,
-  target_type: import("@prisma/client").ForumLikeTargetType,
+  target_type: import("@/lib/db/types").ForumLikeTargetType,
   target_id: string,
 ) {
   return toggleForumLikeInRepo(user_id, target_type, target_id);
@@ -379,10 +391,6 @@ export async function fetchEntityTags(entity_type: EntityType, entity_id: string
 // Notifications
 export async function fetchNotifications(user_id: string, unreadOnly = false) {
   return listNotificationsForUser(user_id, unreadOnly);
-}
-
-export async function notifyUser(input: CreateNotificationInput) {
-  return createNotification(input);
 }
 
 export async function readNotification(id: string, user_id: string) {

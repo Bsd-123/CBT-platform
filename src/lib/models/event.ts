@@ -1,4 +1,4 @@
-import type { Event, EventComment } from "@prisma/client";
+import type { Event, EventComment } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { Event, EventComment };
