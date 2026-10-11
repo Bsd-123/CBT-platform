@@ -17,6 +17,7 @@ vi.mock("@/lib/r2", () => ({ deleteObjectFromR2: vi.fn(async () => {}) }));
 import { deleteObjectFromR2 } from "@/lib/r2";
 import { getPendingApprovalState, getRegistrationStatus, isReferralCodeRequired, registerProfile } from "@/lib/auth/register";
 import * as events from "@/lib/repositories/event.repository";
+import * as favorites from "@/lib/repositories/event-favorite.repository";
 import * as approvals from "@/lib/repositories/expert-approval.repository";
 import * as forum from "@/lib/repositories/forum.repository";
 import * as likes from "@/lib/repositories/forum-like.repository";
@@ -369,6 +370,25 @@ describe("repositories against PostgREST + RLS", () => {
     expect(await materialRequests.listMaterialResponsesByRequest(materialRequest.id)).toHaveLength(1);
     as("m1");
     expect((await notifications.listNotificationsForUser(ID.m1)).some((item) => item.type === "material_request_response")).toBe(true);
+  });
+
+  it("event favorites: toggle, idempotence, privacy", async () => {
+    as("m2");
+    const eventId = (await events.listEvents())[0].id;
+    expect(await favorites.isEventFavorited(ID.m2, eventId)).toBe(false);
+    await favorites.addEventFavorite(ID.m2, eventId);
+    await favorites.addEventFavorite(ID.m2, eventId); // twice leaves a single row
+    expect(await favorites.isEventFavorited(ID.m2, eventId)).toBe(true);
+
+    as("m1");
+    expect(await favorites.isEventFavorited(ID.m2, eventId)).toBe(false); // other members see nothing
+    await expect(favorites.addEventFavorite(ID.m2, eventId)).rejects.toThrow(); // cannot favorite as someone else
+    as("pending");
+    await expect(favorites.addEventFavorite(ID.pending, eventId)).rejects.toThrow();
+
+    as("m2");
+    await favorites.removeEventFavorite(ID.m2, eventId);
+    expect(await favorites.isEventFavorited(ID.m2, eventId)).toBe(false);
   });
 
   it("profile page data", async () => {

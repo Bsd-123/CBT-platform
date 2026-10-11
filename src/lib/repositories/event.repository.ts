@@ -15,7 +15,9 @@ import type { Event, EventComment, User } from "@/lib/db/types";
 type CommentRow = EventComment & { user: User };
 type EventRow = Event & { user: User; comments: CommentRow[] };
 
-const EVENT_SELECT = "*, user:users(*), comments:event_comments(*, user:users(*))";
+// `events_user_id_fkey` names the organizer: event_favorites also links events and users, so a bare
+// `users(*)` embed would be ambiguous.
+const EVENT_SELECT = "*, user:users!events_user_id_fkey(*), comments:event_comments(*, user:users(*))";
 
 function withSortedComments(event: EventRow): EventRow {
   return {

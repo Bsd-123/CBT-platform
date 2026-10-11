@@ -83,6 +83,12 @@ export {
 } from "./event.repository";
 
 export {
+  addEventFavorite,
+  isEventFavorited,
+  removeEventFavorite,
+} from "./event-favorite.repository";
+
+export {
   getProfessionalRequestById,
   listProfessionalRequests,
   countProfessionalRequests,

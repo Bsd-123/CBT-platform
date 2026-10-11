@@ -58,3 +58,51 @@ Without custom SMTP, the sender may still show as Supabase; the HTML template st
 ## Replace the placeholder logo
 
 The repo includes a default SVG at [`public/brand/logo.svg`](../../public/brand/logo.svg). Replace it with your brand logo and upload the same file to Supabase Storage (or use `logo.png` after deploy).
+
+---
+
+# Notification emails (Resend)
+
+Separate from the Supabase Auth emails above, the app sends its own notification emails through
+[Resend](https://resend.com). They are sent from the server after the response, so they never slow
+down a request, and the feature is **off until configured**.
+
+## What gets emailed
+
+| Event | Recipient | Content |
+|---|---|---|
+| Answer posted on a forum question | the question's author | preview of the answer + link to it |
+| Comment on a professional request | the request's author | preview + link |
+| Response to a material request (text and/or an uploaded file) | the requester | preview + link |
+| Organizer edits an event (date, time, title, description, cancellation) | everyone who starred the event, except the editor | before/after of each change + current details + link |
+| Content hidden or deleted by an admin, or a material rejected by a reviewer | the content's author | what happened, the reason, and a request to follow the community guidelines |
+
+Nobody is emailed about their own actions. Templates live in `src/lib/email/` (`layout.ts` is the
+shared branded shell, `templates.ts` the individual emails).
+
+## Setup
+
+1. Create a Resend account and an API key, and verify your sending domain (Resend → Domains).
+2. Set these server environment variables (Vercel → Settings → Environment Variables):
+
+   | Variable | Value |
+   |---|---|
+   | `RESEND_API_KEY` | your Resend key |
+   | `EMAIL_FROM` | `קהילת מטפלי CBT <no-reply@your-domain.com>` (must be on the verified domain) |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → `service_role` (server only) |
+   | `NEXT_PUBLIC_SITE_URL` | your production URL, used for links in emails |
+
+   Until all of `RESEND_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `NEXT_PUBLIC_SITE_URL` are set, no
+   email is sent and nothing else changes. Without `EMAIL_FROM`, Resend's test sender is used, which
+   only delivers to the address of your own Resend account.
+3. Apply the migration `supabase/migrations/20261012100000_event_favorites.sql` (adds the
+   `event_favorites` table used by the star button).
+
+The service-role key is used only in `src/lib/email/lookup.ts` to read members' addresses and the
+list of people who starred an event. Row Level Security keeps every member's favorites private
+from other members.
+
+## Not covered
+
+There is no per-user opt-out yet, and events have no location field, so updates cover the
+fields that exist: date, time, title, description and cancellation.

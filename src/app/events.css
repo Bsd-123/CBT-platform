@@ -317,3 +317,46 @@
     transition: none;
   }
 }
+
+/* ---------- Favorite (star) toggle ---------- */
+
+.event-favorite {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.event-favorite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--ev-border);
+  border-radius: 9999px;
+  background: var(--ev-surface);
+  color: var(--ev-text-muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.event-favorite-btn:hover:not(:disabled) {
+  border-color: var(--ev-primary);
+  color: var(--ev-text);
+}
+
+.event-favorite-btn.is-active {
+  background: #fff0ec;
+  border-color: var(--ev-primary);
+  color: #a43c28;
+}
+
+.event-favorite-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.event-favorite-btn .material-symbol {
+  font-size: 1.125rem;
+}

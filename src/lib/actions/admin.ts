@@ -1,5 +1,6 @@
 "use server";
 
+import { captureModerationTarget, notifyContentModerated } from "@/lib/email/notify";
 import { UserFacingError } from "@/lib/errors";
 import { runAction } from "@/lib/actions/result";
 import type { ReportTargetType, UserRole } from "@/lib/db/types";
@@ -32,6 +33,8 @@ import type { UpdateExpertApprovalStatusInput } from "@/lib/models/expert-approv
 import { updateExpertApprovalStatus } from "@/lib/repositories/expert-approval.repository";
 import { requireRole } from "@/lib/auth";
 
+const cleanReason = (reason?: string) => reason?.trim().slice(0, 500) || null;
+
 export async function resolveReport(id: string, input: UpdateReportStatusInput) {
   return runAction(async () => {
     await requireRole("admin");
@@ -40,14 +43,20 @@ export async function resolveReport(id: string, input: UpdateReportStatusInput) 
   });
 }
 
+/** `reason` (optional) is passed on to the author in the moderation email. */
 export async function adminHideReportedContent(
   target_type: ReportTargetType,
   target_id: string,
+  reason?: string,
 ) {
   return runAction(async () => {
-    await requireRole("admin");
+    const auth = await requireRole("admin");
+    const target = await captureModerationTarget(target_type, target_id);
     await hideReportedContent(target_type, target_id);
 
+    if (target) {
+      notifyContentModerated({ ...target, actorId: auth.userId, action: "hidden", reason: cleanReason(reason) });
+    }
   });
 }
 
@@ -65,11 +74,16 @@ export async function adminRestoreReportedContent(
 export async function adminDeleteReportedContent(
   target_type: ReportTargetType,
   target_id: string,
+  reason?: string,
 ) {
   return runAction(async () => {
-    await requireRole("admin");
+    const auth = await requireRole("admin");
+    const target = await captureModerationTarget(target_type, target_id);
     await deleteReportedContent(target_type, target_id);
 
+    if (target) {
+      notifyContentModerated({ ...target, actorId: auth.userId, action: "deleted", reason: cleanReason(reason) });
+    }
   });
 }
 

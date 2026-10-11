@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
-import { fetchEventById, fetchEventComments } from "@/lib/data";
+import { fetchEventById, fetchEventComments, fetchIsEventFavorited } from "@/lib/data";
 import { EventCommentForm } from "@/components/events/EventCommentForm";
 import { EditEventForm } from "@/components/events/EditEventForm";
+import { FavoriteEventButton } from "@/components/events/FavoriteEventButton";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { ReportForm } from "@/components/shared/ReportForm";
 import { Disclosure } from "@/components/ui/Disclosure";
@@ -27,6 +28,7 @@ export default async function EventPage({ params }: EventPageProps) {
   if (!event) notFound();
 
   const isOwner = auth?.userId === event.user_id;
+  const isFavorited = auth ? await fetchIsEventFavorited(auth.userId, event.id) : false;
 
   // Same date treatment as the published-events card on the profile page.
   const eventDate = event.event_date ? new Date(event.event_date) : null;
@@ -94,6 +96,7 @@ export default async function EventPage({ params }: EventPageProps) {
               {countLabel(comments.length, "תגובה", "תגובות")}
             </span>
             <div className="event-actions">
+              {auth && <FavoriteEventButton eventId={event.id} initialFavorited={isFavorited} />}
               <ReportForm targetType="event" targetId={event.id} />
             </div>
           </div>

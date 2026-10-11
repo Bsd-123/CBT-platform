@@ -8,6 +8,13 @@ import type {
 } from "@/lib/db/types";
 import { requireApprovedRegistration } from "@/lib/auth";
 import { UserFacingError } from "@/lib/errors";
+import { diffEvent } from "@/lib/email/event-changes";
+import {
+  notifyEventUpdate,
+  notifyForumAnswer,
+  notifyMaterialResponse,
+  notifyProfessionalComment,
+} from "@/lib/email/notify";
 import { isFileKeyOwnedBy } from "@/lib/r2";
 import { initialApprovalFor } from "@/lib/materials/approval";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
@@ -32,6 +39,7 @@ import {
 } from "@/lib/validation/schemas";
 import {
   editEvent,
+  favoriteEvent,
   fetchEventById,
   postEvent,
   postEventComment,
@@ -46,6 +54,7 @@ import {
   respondToMaterialRequest,
   submitReport,
   toggleForumLike,
+  unfavoriteEvent,
   uploadMaterial,
 } from "@/lib/data";
 
@@ -121,12 +130,20 @@ export async function submitMaterialResponse(raw: {
       throw new UserFacingError("קובץ לא תקין. יש להעלות את הקובץ מחדש.");
     }
 
-    return respondToMaterialRequest({
+    const response = await respondToMaterialRequest({
       request_id: input.request_id,
       user_id: auth.userId,
       text: input.text || null,
       file_url: input.file_url || null,
     });
+
+    notifyMaterialResponse({
+      requestId: input.request_id,
+      responderId: auth.userId,
+      text: input.text || null,
+      hasFile: Boolean(input.file_url),
+    });
+    return response;
 
   });
 }
@@ -169,12 +186,21 @@ export async function submitForumAnswer(raw: {
   return runAction(async () => {
     const auth = await authorizeWrite();
     const input = parseInput(forumAnswerSchema, raw);
-    return postForumAnswer({
+    const answer = await postForumAnswer({
       question_id: input.question_id,
       user_id: auth.userId,
       content: input.content,
       parent_answer_id: input.parent_answer_id ?? null,
     });
+
+    // Email the question's author (after the response is sent; a no-op when email is not set up).
+    notifyForumAnswer({
+      questionId: input.question_id,
+      answerId: answer.id,
+      authorId: auth.userId,
+      content: input.content,
+    });
+    return answer;
 
   });
 }
@@ -278,7 +304,7 @@ export async function submitEventUpdate(
       throw new UserFacingError("אין הרשאה לערוך אירוע זה.");
     }
 
-    return editEvent(id, {
+    const updated = await editEvent(id, {
       title: input.title,
       description: input.description,
       event_date: input.event_date ? new Date(input.event_date) : undefined,
@@ -290,6 +316,13 @@ export async function submitEventUpdate(
             : null,
       is_cancelled: input.is_cancelled,
     });
+
+    // Tell everyone who favorited the event what changed (nothing is sent when nothing changed).
+    const changes = diffEvent(event, updated);
+    if (changes.length > 0) {
+      notifyEventUpdate({ eventId: id, editorId: auth.userId, changes });
+    }
+    return updated;
 
   });
 }
@@ -303,6 +336,20 @@ export async function submitEventComment(raw: {
     const input = parseInput(eventCommentSchema, raw);
     return postEventComment({ ...input, user_id: auth.userId });
 
+  });
+}
+
+/** Stars or un-stars an event; favorited events email the member when the organizer changes them. */
+export async function submitEventFavorite(event_id: string, favorited: boolean) {
+  return runAction(async () => {
+    const auth = await authorizeWrite();
+    const id = parseInput(eventCommentSchema.shape.event_id, event_id);
+    if (favorited) {
+      await favoriteEvent(auth.userId, id);
+    } else {
+      await unfavoriteEvent(auth.userId, id);
+    }
+    return { favorited };
   });
 }
 
@@ -326,12 +373,19 @@ export async function submitProfessionalRequestComment(raw: {
   return runAction(async () => {
     const auth = await authorizeWrite();
     const input = parseInput(professionalCommentSchema, raw);
-    return postProfessionalRequestComment({
+    const created = await postProfessionalRequestComment({
       request_id: input.request_id,
       user_id: auth.userId,
       content: input.content,
       parent_comment_id: input.parent_comment_id ?? null,
     });
+
+    notifyProfessionalComment({
+      requestId: input.request_id,
+      authorId: auth.userId,
+      content: input.content,
+    });
+    return created;
 
   });
 }

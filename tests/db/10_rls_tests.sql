@@ -263,6 +263,27 @@ select t_run('anon cannot call register_profile', null, $q$select public.registe
 select t_run('anon can still ask whether a referral code is required', null, 'select public.is_referral_code_required()', 'ok', 'anon');
 select t_run('trigger functions cannot be called directly', :m1, 'select public.notify_on_insert()', 'error:permission denied');
 
+-- ===================== event favorites =====================
+insert into public.events (id, user_id, title, description) values
+  ('44444444-0000-4000-8000-000000000009', :m1, 'Fav event', 'd');
+insert into public.events (id, user_id, title, description, is_hidden) values
+  ('44444444-0000-4000-8000-000000000008', :m1, 'Hidden fav event', 'd', true);
+select t_run('member favorites an event', :m2, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m2, '44444444-0000-4000-8000-000000000009'), 'ok');
+select t_run('favoriting twice is rejected', :m2, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m2, '44444444-0000-4000-8000-000000000009'), 'denied');
+select t_run('cannot favorite as someone else', :m2, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m1, '44444444-0000-4000-8000-000000000009'), 'denied');
+select t_run('cannot favorite a hidden event', :m2, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m2, '44444444-0000-4000-8000-000000000008'), 'denied');
+select t_run('pending member cannot favorite', :pending, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :pending, '44444444-0000-4000-8000-000000000009'), 'denied');
+select t_run('anon cannot favorite', null, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m2, '44444444-0000-4000-8000-000000000009'), 'denied', 'anon');
+select t_run('member reads their own favorites', :m2, 'select * from public.event_favorites', 'rows:1');
+select t_run('other members cannot read favorites', :m1, 'select * from public.event_favorites', 'rows:0');
+select t_run('even admins cannot read others favorites through the API', :admin, 'select * from public.event_favorites', 'rows:0');
+select t_run('cannot remove someone elses favorite', :m1, format($q$delete from public.event_favorites where event_id = %L$q$, '44444444-0000-4000-8000-000000000009'), 'affected:0');
+select t_run('member unfavorites', :m2, format($q$delete from public.event_favorites where event_id = %L$q$, '44444444-0000-4000-8000-000000000009'), 'affected:1');
+select t_run('favorites cannot be edited', :m2, $q$update public.event_favorites set created_at = now()$q$, 'denied');
+select t_run('re-favorite after removal works', :m2, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m2, '44444444-0000-4000-8000-000000000009'), 'ok');
+select t_run('deleting an event removes its favorites', :admin, format($q$select public.moderate_delete_content('event', %L)$q$, '44444444-0000-4000-8000-000000000009'), 'ok');
+select t_run('favorites are gone with the event', :m2, 'select * from public.event_favorites', 'rows:0');
+
 -- ===================== report =====================
 \echo
 \echo === FAILURES ===

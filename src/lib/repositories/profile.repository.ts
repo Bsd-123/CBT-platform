@@ -106,7 +106,7 @@ export async function getUserProfilePageData(user_id: string): Promise<UserProfi
       .order("created_at", newestFirst),
     db
       .from("events")
-      .select("*, user:users(*), comments:event_comments(*, user:users(*))")
+      .select("*, user:users!events_user_id_fkey(*), comments:event_comments(*, user:users(*))")
       .eq("user_id", user_id)
       .order("created_at", newestFirst),
   ]);

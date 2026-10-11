@@ -4,6 +4,7 @@ import { runAction } from "@/lib/actions/result";
 import { requireRole } from "@/lib/auth";
 import { UserFacingError } from "@/lib/errors";
 import { decideMaterial } from "@/lib/data";
+import { notifyContentModerated } from "@/lib/email/notify";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
 import { materialReviewSchema, parseInput } from "@/lib/validation/schemas";
 
@@ -33,7 +34,18 @@ export async function reviewMaterialUpload(raw: {
       throw error;
     }
 
-    // The uploader is notified by `review_material` in the database.
+    // The uploader is notified in the app by `review_material` in the database; a rejection is
+    // also emailed with the reviewer's reason.
+    if (input.decision === "rejected") {
+      notifyContentModerated({
+        ownerId: result.owner_id,
+        actorId: auth.userId,
+        kind: "material",
+        action: "rejected",
+        title: result.title,
+        reason: input.rejection_reason?.trim() || null,
+      });
+    }
     return { decision: input.decision };
   });
 }

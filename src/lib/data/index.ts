@@ -64,7 +64,10 @@ import {
   createTag,
   deleteMaterialRating,
   detachEntityTag,
+  addEventFavorite,
   getEventById,
+  isEventFavorited,
+  removeEventFavorite,
   getExpertApprovalByExpertAndUser,
   getForumQuestionById,
   getMaterialAverageRating,
@@ -321,6 +324,18 @@ export async function editEvent(id: string, input: UpdateEventInput) {
 
 export async function postEventComment(input: CreateEventCommentInput) {
   return createEventComment(input);
+}
+
+export async function favoriteEvent(user_id: string, event_id: string) {
+  return addEventFavorite(user_id, event_id);
+}
+
+export async function unfavoriteEvent(user_id: string, event_id: string) {
+  return removeEventFavorite(user_id, event_id);
+}
+
+export async function fetchIsEventFavorited(user_id: string, event_id: string) {
+  return isEventFavorited(user_id, event_id);
 }
 
 export async function fetchEventComments(event_id: string) {

@@ -31,6 +31,8 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
   const router = useRouter();
   const { toast, confirm } = useUi();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  // Optional explanation per report, sent to the content's author when it is hidden or deleted.
+  const [reasons, setReasons] = useState<Record<string, string>>({});
 
   async function run(
     reportId: string,
@@ -60,7 +62,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
 
     await run(
       report.id,
-      () => adminDeleteReportedContent(report.target_type, report.target_id),
+      () => adminDeleteReportedContent(report.target_type, report.target_id, reasons[report.id]),
       "התוכן נמחק",
     );
   }
@@ -146,6 +148,18 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                   </select>
                 </td>
                 <td>
+                  <label className="visually-hidden" htmlFor={`reason-${report.id}`}>
+                    סיבה שתישלח למחבר
+                  </label>
+                  <input
+                    id={`reason-${report.id}`}
+                    className="admin-report-reason"
+                    value={reasons[report.id] ?? ""}
+                    maxLength={500}
+                    disabled={busy}
+                    placeholder="סיבה שתישלח למחבר (לא חובה)"
+                    onChange={(event) => setReasons((current) => ({ ...current, [report.id]: event.target.value }))}
+                  />
                   <div className="ui-table-actions">
                     <button
                       type="button"
@@ -154,7 +168,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                       onClick={() =>
                         void run(
                           report.id,
-                          () => adminHideReportedContent(report.target_type, report.target_id),
+                          () => adminHideReportedContent(report.target_type, report.target_id, reasons[report.id]),
                           "התוכן הוסתר",
                         )
                       }
