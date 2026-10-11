@@ -16,7 +16,7 @@ export async function reviewMaterialUpload(raw: {
 }) {
   return runAction(async () => {
     const auth = await requireRole("expert", "admin");
-    enforceRateLimit("write", auth.userId);
+    await enforceRateLimit("write", auth.userId);
     const input = parseInput(materialReviewSchema, raw);
 
     let result: { owner_id: string; title: string };
