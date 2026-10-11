@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import type { ForumLikeTargetType } from "@/lib/db/types";
 import { submitForumLikeToggle } from "@/lib/actions/submit";
 import { unwrap } from "@/lib/actions/result";
@@ -11,6 +12,11 @@ type ForumLikeButtonProps = {
   targetId: string;
   initialCount: number;
   initialLiked: boolean;
+  /**
+   * classic: the pill used in forum lists. inline: heart + count for a post's action bar.
+   * stacked: heart above the count, for the vote column beside an answer.
+   */
+  variant?: "classic" | "inline" | "stacked";
 };
 
 export function ForumLikeButton({
@@ -18,6 +24,7 @@ export function ForumLikeButton({
   targetId,
   initialCount,
   initialLiked,
+  variant = "classic",
 }: ForumLikeButtonProps) {
   const router = useRouter();
   const [count, setCount] = useState(initialCount);
@@ -39,6 +46,25 @@ export function ForumLikeButton({
     } finally {
       setLoading(false);
     }
+  }
+
+  if (variant !== "classic") {
+    return (
+      <div className={`fq-like fq-like--${variant}`}>
+        <button
+          type="button"
+          className="fq-like-btn"
+          disabled={loading}
+          aria-pressed={liked}
+          aria-label={liked ? "הסרת סימון אהבתי" : "סימון אהבתי"}
+          onClick={() => void handleToggle()}
+        >
+          <MaterialIcon name="favorite" filled={liked} />
+          <span className="fq-like-count">{count}</span>
+        </button>
+        {error && <span className="error" role="alert">{error}</span>}
+      </div>
+    );
   }
 
   return (

@@ -1,6 +1,7 @@
 @import "./materials.css";
 @import "./home.css";
 @import "./ui.css";
+@import "./forum.css";
 
 :root {
   --bg: #f7f6f2;

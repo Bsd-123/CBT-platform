@@ -1,24 +1,26 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ForumAnswerForm } from "@/components/forum/ForumAnswerForm";
-import { ForumAnswerThread } from "@/components/forum/ForumAnswerThread";
-import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
-import { ReportForm } from "@/components/shared/ReportForm";
-import { TagList } from "@/components/shared/TagList";
+import { ForumAnswersSection } from "@/components/forum/ForumAnswersSection";
+import { ForumQuestionCard } from "@/components/forum/ForumQuestionCard";
+import { PostForumQuestionForm } from "@/components/forum/PostForumQuestionForm";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
+import { ModalButton } from "@/components/ui/Modal";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { fetchEntityTags, fetchForumQuestionById } from "@/lib/data";
+import { parseAnswerSort } from "@/lib/forum/thread";
 import { enrichForumQuestionWithLikes } from "@/lib/services/forum-likes";
-import { formatDate } from "@/lib/utils/format";
 import { isUuid } from "@/lib/utils/ids";
 
 type ForumQuestionPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ sort?: string }>;
 };
 
-export default async function ForumQuestionPage({ params }: ForumQuestionPageProps) {
+export default async function ForumQuestionPage({ params, searchParams }: ForumQuestionPageProps) {
   const { id } = await params;
   if (!isUuid(id)) notFound();
+  const sort = parseAnswerSort((await searchParams).sort);
   const auth = await fetchAuthenticatedProfile();
   const [questionRaw, tags] = await Promise.all([
     fetchForumQuestionById(id),
@@ -28,40 +30,60 @@ export default async function ForumQuestionPage({ params }: ForumQuestionPagePro
   if (!questionRaw) notFound();
 
   const question = await enrichForumQuestionWithLikes(questionRaw, auth?.userId);
+  const answers = question.answers ?? [];
 
   return (
-    <>
-      <p>
-        <Link href="/forum">
+    <div className="fq-page">
+      {/* Header and navigation */}
+      <nav className="fq-breadcrumb" aria-label="נתיב ניווט">
+        <ol>
+          <li>
+            <Link href="/">ראשי</Link>
+          </li>
+          <li aria-hidden="true">
+            <MaterialIcon name="chevron_left" />
+          </li>
+          <li>
+            <Link href="/forum">פורום</Link>
+          </li>
+          <li aria-hidden="true">
+            <MaterialIcon name="chevron_left" />
+          </li>
+          <li className="fq-breadcrumb-current" aria-current="page">
+            {question.title}
+          </li>
+        </ol>
+      </nav>
+
+      <div className="fq-toolbar">
+        <Link href="/forum" className="ui-link-btn">
           <MaterialIcon name="arrow_forward" /> חזרה לפורום
         </Link>
-      </p>
+        <ModalButton label="שאלה חדשה" icon="add" title="פרסום שאלה">
+          <PostForumQuestionForm />
+        </ModalButton>
+      </div>
 
-      <section className="ui-section">
-        <h1>{question.title}</h1>
-        <div className="thread-meta">
-          <strong>{question.user?.full_name}</strong>
-          <span>{formatDate(question.created_at)}</span>
-        </div>
-        <p>{question.content}</p>
-        <TagList tags={tags} />
-        <div className="thread-actions">
-          <ForumLikeButton
-            targetType="question"
-            targetId={question.id}
-            initialCount={question.like_count}
-            initialLiked={question.user_liked}
-          />
-          <ReportForm targetType="forum_question" targetId={question.id} />
-        </div>
-      </section>
+      {/* Main question */}
+      <ForumQuestionCard
+        question={question}
+        tags={tags}
+        answerCount={answers.length}
+      />
 
-      <section className="ui-section">
-        <h2>תשובות</h2>
+      {/* Answers: section bar, top answer, then the rest */}
+      <ForumAnswersSection
+        questionId={question.id}
+        questionOwnerId={question.user_id}
+        answers={answers}
+        sort={sort}
+      />
+
+      {/* Reply composer */}
+      <section id="answer-form" className="fq-card fq-composer" aria-labelledby="composer-title">
+        <h2 id="composer-title">התשובה שלך</h2>
         <ForumAnswerForm questionId={question.id} />
       </section>
-
-      <ForumAnswerThread questionId={question.id} answers={question.answers ?? []} />
-    </>
+    </div>
   );
 }
