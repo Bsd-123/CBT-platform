@@ -125,8 +125,21 @@ describe("moderation", () => {
     expect(sent().html).toContain("פרטי מטופל");
 
     mocks.sendEmail.mockClear();
+    const info = vi.spyOn(console, "log").mockImplementation(() => {});
     await deliverModeration(config, { ownerId: "admin", actorId: "admin", kind: "event", action: "deleted" });
     expect(mocks.sendEmail).not.toHaveBeenCalled();
+    // the skip is visible in the logs, so it is not mistaken for a failure
+    expect(info.mock.calls.map(String).join(" | ")).toContain("the recipient is the person who did the action");
+    info.mockRestore();
+  });
+
+  it("logs when an email was sent, without the address", async () => {
+    const info = vi.spyOn(console, "log").mockImplementation(() => {});
+    await deliverModeration(config, { ownerId: "author", actorId: "admin", kind: "event", action: "hidden" });
+    const logged = info.mock.calls.map(String).join(" | ");
+    expect(logged).toContain("Email sent");
+    expect(logged).not.toContain("author@x.test");
+    info.mockRestore();
   });
 });
 

@@ -1,5 +1,5 @@
 import "server-only";
-import { getEmailConfig, type EmailConfig } from "@/lib/email/config";
+import { getEmailConfig, missingEmailSettings, type EmailConfig } from "@/lib/email/config";
 import { runInBackground } from "@/lib/email/dispatch";
 import type { EventChange } from "@/lib/email/event-changes";
 import {
@@ -46,13 +46,17 @@ async function mailMember(
   build: (recipient: Recipient) => EmailTemplate,
   label: string,
 ): Promise<void> {
-  if (actorId && userId === actorId) return;
+  if (actorId && userId === actorId) {
+    logger.info("Email skipped: the recipient is the person who did the action", { label, userId });
+    return;
+  }
   const recipient = await getRecipient(config, userId);
   if (!recipient) {
     logger.info("Email skipped: recipient has no address", { label, userId });
     return;
   }
-  await sendEmail(config, toMessage(recipient, build(recipient)));
+  const sent = await sendEmail(config, toMessage(recipient, build(recipient)));
+  logger.info(sent ? "Email sent" : "Email NOT sent (see the Resend warning above)", { label, userId });
 }
 
 /* ---------- Replies to questions and requests ---------- */
@@ -247,7 +251,10 @@ export async function deliverModeration(config: EmailConfig, input: ModerationNo
 
 function enqueue<T>(label: string, input: T, deliver: (config: EmailConfig, input: T) => Promise<void>): void {
   const config = getEmailConfig();
-  if (!config) return;
+  if (!config) {
+    logger.info("Email skipped: not configured", { label, missing: missingEmailSettings() });
+    return;
+  }
   runInBackground(label, () => deliver(config, input));
 }
 
@@ -268,7 +275,10 @@ export async function captureModerationTarget(
   id: string,
 ): Promise<ContentSnapshot | null> {
   const config = getEmailConfig();
-  if (!config) return null;
+  if (!config) {
+    logger.info("Email skipped: not configured", { label: "moderation", missing: missingEmailSettings() });
+    return null;
+  }
   try {
     return await snapshotContent(config, kind, id);
   } catch (error) {
