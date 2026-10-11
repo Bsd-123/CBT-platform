@@ -487,6 +487,36 @@ main {
   position: relative;
 }
 
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.notifications-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.notifications-item:last-child {
+  border-bottom: 0;
+}
+
+.notifications-item[data-unread="true"] {
+  font-weight: 600;
+}
+
+.notifications-item-link {
+  flex: 1;
+  color: inherit;
+}
+
 .grid-2 {
   display: grid;
   gap: 1rem;
