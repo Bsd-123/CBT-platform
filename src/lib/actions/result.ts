@@ -1,5 +1,6 @@
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { GENERIC_ERROR_MESSAGE, UserFacingError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 /**
  * In production Next.js replaces the message of any error thrown from a Server
@@ -58,7 +59,7 @@ export async function runAction<T>(task: () => Promise<T>): Promise<ActionResult
 
     const message = toUserMessage(error);
     if (message === GENERIC_ERROR_MESSAGE) {
-      console.error("[action] unexpected error", error);
+      logger.error("server action failed", error);
     }
     return { ok: false, error: message };
   }
