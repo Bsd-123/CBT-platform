@@ -41,13 +41,19 @@ export async function getProfessionalRequestById(
   return request ? pickPublicProfessionalRequestFields(request) : null;
 }
 
+export async function countProfessionalRequests(include_hidden = false): Promise<number> {
+  return prisma.professionalRequest.count({ where: visibleContentWhere(include_hidden) });
+}
+
 export async function listProfessionalRequests(
   include_hidden = false,
+  options: { skip?: number; take?: number } = {},
 ): Promise<PublicProfessionalRequest[]> {
   const requests = await prisma.professionalRequest.findMany({
     where: visibleContentWhere(include_hidden),
     include: { user: true, _count: { select: { comments: true } } },
     orderBy: { created_at: "desc" },
+    ...(options.take !== undefined && { skip: options.skip ?? 0, take: options.take }),
   });
   return requests.map(pickPublicProfessionalRequestFields);
 }

@@ -19,6 +19,8 @@ export type CreateForumAnswerInput = {
 export type SearchForumQuestionsFilter = {
   query?: string;
   include_hidden?: boolean;
+  skip?: number;
+  take?: number;
 };
 
 export function pickPublicForumQuestionFields(

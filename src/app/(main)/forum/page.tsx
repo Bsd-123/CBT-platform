@@ -6,19 +6,25 @@ import { ContentCard } from "@/components/ui/ContentCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ModalButton } from "@/components/ui/Modal";
 import { PageHero } from "@/components/ui/PageHero";
+import { Pagination } from "@/components/ui/Pagination";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
-import { fetchEntityTagsForEntities, searchForum } from "@/lib/data";
+import { fetchEntityTagsForEntities, fetchForumQuestionCount, searchForum } from "@/lib/data";
 import { enrichForumQuestionsWithLikes } from "@/lib/services/forum-likes";
 import { countLabel, formatDate } from "@/lib/utils/format";
+import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
 type ForumPageProps = {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 };
 
 export default async function ForumPage({ searchParams }: ForumPageProps) {
-  const { q } = await searchParams;
+  const { q, page: pageParam } = await searchParams;
+  const page = parsePage(pageParam);
   const auth = await fetchAuthenticatedProfile();
-  const questionsRaw = await searchForum({ query: q });
+  const [questionsRaw, total] = await Promise.all([
+    searchForum({ query: q, ...pageWindow(page) }),
+    fetchForumQuestionCount({ query: q }),
+  ]);
   const [questions, tagsByQuestion] = await Promise.all([
     enrichForumQuestionsWithLikes(questionsRaw, auth?.userId),
     fetchEntityTagsForEntities("forum", questionsRaw.map((question) => question.id)),
@@ -44,7 +50,7 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
 
       {q && (
         <p className="muted">
-          {countLabel(questions.length, "תוצאה", "תוצאות")} עבור &quot;{q}&quot;
+          {countLabel(total, "תוצאה", "תוצאות")} עבור &quot;{q}&quot;
         </p>
       )}
 
@@ -84,6 +90,8 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
           ))}
         </ul>
       )}
+
+      <Pagination basePath="/forum" params={{ q }} page={page} totalPages={totalPages(total)} />
     </>
   );
 }

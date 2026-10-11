@@ -23,6 +23,8 @@ export {
 export {
   getMaterialById,
   listMaterials,
+  countMaterials,
+  countMaterialsByType,
   createMaterial,
   deleteMaterial,
 } from "./material.repository";
@@ -40,6 +42,7 @@ export {
 export {
   getMaterialRequestById,
   listMaterialRequests,
+  countMaterialRequests,
   createMaterialRequest,
   createMaterialResponse,
   listMaterialResponsesByRequest,
@@ -48,6 +51,7 @@ export {
 export {
   getForumQuestionById,
   searchForumQuestions,
+  countForumQuestions,
   createForumQuestion,
   createForumAnswer,
   listForumAnswersByQuestion,
@@ -72,6 +76,7 @@ export {
 export {
   getEventById,
   listEvents,
+  countEvents,
   createEvent,
   updateEvent,
   createEventComment,
@@ -81,6 +86,7 @@ export {
 export {
   getProfessionalRequestById,
   listProfessionalRequests,
+  countProfessionalRequests,
   createProfessionalRequest,
   createProfessionalRequestComment,
   listProfessionalRequestComments,
@@ -102,6 +108,7 @@ export {
   getMaterialRating,
   listMaterialRatingsByMaterial,
   getMaterialAverageRating,
+  getMaterialAverageRatings,
   createMaterialRating,
   updateMaterialRating,
   deleteMaterialRating,

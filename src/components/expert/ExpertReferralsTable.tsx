@@ -13,6 +13,7 @@ import {
   getInitials,
   matchesApprovalSearch,
 } from "@/lib/utils/expert-approval-ui";
+import { unwrap } from "@/lib/actions/result";
 
 const PAGE_SIZE = 10;
 
@@ -56,7 +57,7 @@ export function ExpertReferralsTable({ expertId, approvals }: ExpertReferralsTab
     setLoadingKey(approval.user_id);
 
     try {
-      await decideReferralApproval(expertId, approval.user_id, { status });
+      unwrap(await decideReferralApproval(expertId, approval.user_id, { status }));
       router.refresh();
     } catch (decisionError) {
       setError(decisionError instanceof Error ? decisionError.message : "הפעולה נכשלה");

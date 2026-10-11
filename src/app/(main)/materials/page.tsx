@@ -2,8 +2,11 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { MaterialTypeKey } from "@prisma/client";
 import {
-  fetchEntityTags,
-  fetchMaterialAverageRating,
+  fetchEntityTagsForEntities,
+  fetchMaterialAverageRatings,
+  fetchMaterialCount,
+  fetchMaterialCountsByType,
+  fetchMaterialRequestCount,
   fetchMaterials,
   fetchMaterialRequests,
   fetchMaterialTypes,
@@ -16,9 +19,11 @@ import { MaterialsLibraryTabs, type MaterialsLibraryTab } from "@/components/mat
 import { MaterialsSearchBar } from "@/components/materials/MaterialsSearchBar";
 import { MaterialsSidebar } from "@/components/materials/MaterialsSidebar";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
+import { Pagination } from "@/components/ui/Pagination";
+import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
 type MaterialsPageProps = {
-  searchParams: Promise<{ type?: string; q?: string; tags?: string; tab?: string }>;
+  searchParams: Promise<{ type?: string; q?: string; tags?: string; tab?: string; page?: string }>;
 };
 
 function parseTab(tab?: string): MaterialsLibraryTab {
@@ -26,11 +31,16 @@ function parseTab(tab?: string): MaterialsLibraryTab {
 }
 
 export default async function MaterialsPage({ searchParams }: MaterialsPageProps) {
-  const { type, q, tags, tab: tabParam } = await searchParams;
+  const { type, q, tags, tab: tabParam, page: pageParam } = await searchParams;
   const activeTab = parseTab(tabParam);
+  const page = parsePage(pageParam);
 
-  const materialTypes = await fetchMaterialTypes();
-  const availableTags = await fetchTags();
+  const [materialTypes, availableTags, typeCounts, requestsCount] = await Promise.all([
+    fetchMaterialTypes(),
+    fetchTags(),
+    fetchMaterialCountsByType(),
+    fetchMaterialRequestCount(),
+  ]);
 
   const typeKey = materialTypes.some((item) => item.key === type)
     ? (type as MaterialTypeKey)
@@ -40,40 +50,35 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
     ? tags.split(",").map((item) => item.trim()).filter(Boolean)
     : [];
 
-  const [allMaterials, materials, requests] = await Promise.all([
-    fetchMaterials({}),
-    activeTab === "materials"
-      ? fetchMaterials({
-          material_type_key: typeKey,
-          search: q,
-          tag_ids: tagIds,
-        })
-      : Promise.resolve([]),
-    fetchMaterialRequests(),
-  ]);
+  const totalMaterials = Object.values(typeCounts).reduce((sum, count) => sum + count, 0);
+  const filter = { material_type_key: typeKey, search: q, tag_ids: tagIds };
 
-  const typeCounts = Object.fromEntries(
-    materialTypes.map((materialType) => [
-      materialType.id,
-      allMaterials.filter((item) => item.material_type_id === materialType.id).length,
-    ]),
-  );
+  const [materials, filteredTotal, requests] = await Promise.all([
+    activeTab === "materials"
+      ? fetchMaterials({ ...filter, ...pageWindow(page) })
+      : Promise.resolve([]),
+    activeTab === "materials" ? fetchMaterialCount(filter) : Promise.resolve(0),
+    activeTab === "requests"
+      ? fetchMaterialRequests(pageWindow(page))
+      : Promise.resolve([]),
+  ]);
 
   const selectedTags = availableTags.filter((tag) => tagIds.includes(tag.id));
 
-  const materialsWithMeta =
-    activeTab === "materials"
-      ? await Promise.all(
-          materials.map(async (material) => {
-            const [entityTags, averageRating] = await Promise.all([
-              fetchEntityTags("material", material.id),
-              fetchMaterialAverageRating(material.id),
-            ]);
+  const materialIds = materials.map((material) => material.id);
+  const [tagsByMaterial, averageRatings] = await Promise.all([
+    fetchEntityTagsForEntities("material", materialIds),
+    fetchMaterialAverageRatings(materialIds),
+  ]);
 
-            return { material, tags: entityTags, averageRating };
-          }),
-        )
-      : [];
+  const materialsWithMeta = materials.map((material) => ({
+    material,
+    tags: tagsByMaterial.get(material.id) ?? [],
+    averageRating: averageRatings.get(material.id) ?? null,
+  }));
+
+  const paginationParams = { type: typeKey, q, tags, tab: activeTab === "requests" ? "requests" : undefined };
+  const pages = totalPages(activeTab === "materials" ? filteredTotal : requestsCount);
 
   return (
     <>
@@ -97,8 +102,8 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
       <Suspense fallback={<div className="materials-library-tabs" />}>
         <MaterialsLibraryTabs
           activeTab={activeTab}
-          materialsCount={allMaterials.length}
-          requestsCount={requests.length}
+          materialsCount={totalMaterials}
+          requestsCount={requestsCount}
         />
       </Suspense>
 
@@ -116,7 +121,7 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
             <MaterialsSidebar
               materialTypes={materialTypes}
               typeCounts={typeCounts}
-              totalCount={allMaterials.length}
+              totalCount={totalMaterials}
               tags={availableTags}
               currentType={typeKey}
               currentTagIds={tagIds}
@@ -151,6 +156,8 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
                 ))
               )}
             </div>
+
+            <Pagination basePath="/materials" params={paginationParams} page={page} totalPages={pages} />
           </div>
         </div>
       ) : (
@@ -170,6 +177,8 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
               ))}
             </div>
           )}
+
+          <Pagination basePath="/materials" params={paginationParams} page={page} totalPages={pages} />
         </div>
       )}
     </>

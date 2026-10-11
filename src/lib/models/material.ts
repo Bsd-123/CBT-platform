@@ -23,6 +23,8 @@ export type ListMaterialsFilter = {
   include_hidden?: boolean;
   search?: string;
   tag_ids?: string[];
+  skip?: number;
+  take?: number;
 };
 
 export function pickPublicMaterialFields(
