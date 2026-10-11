@@ -261,3 +261,59 @@
     font-size: 1.25rem;
   }
 }
+
+/* ---------- Comment composer: hidden until "add comment" is pressed ---------- */
+
+.event-comment-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Height animates between 0fr and 1fr; visibility removes the collapsed fields from tab order. */
+.event-comment-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.25s ease,
+    opacity 0.2s ease,
+    visibility 0s linear 0.25s;
+}
+
+.event-comment-panel.is-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  opacity: 1;
+  transition:
+    grid-template-rows 0.25s ease,
+    opacity 0.2s ease,
+    visibility 0s;
+}
+
+.event-comment-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.event-comment-panel.is-open .event-comment-panel-inner {
+  padding-top: 0.25rem;
+}
+
+.event-comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.event-comment-composer textarea {
+  resize: vertical;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-comment-panel,
+  .event-comment-panel.is-open {
+    transition: none;
+  }
+}
