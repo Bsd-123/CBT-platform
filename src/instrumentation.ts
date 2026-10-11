@@ -16,3 +16,21 @@ export async function register() {
     validateEnv();
   }
 }
+
+/** Next.js calls this for every unhandled server-side request error. */
+export async function onRequestError(
+  error: unknown,
+  request: { path: string; method: string },
+  context: { routerKind: string; routePath: string; routeType: string },
+) {
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
+
+  const { logger } = await import("@/lib/logger");
+  logger.error("unhandled request error", error, {
+    path: request.path,
+    method: request.method,
+    routeType: context.routeType,
+    routePath: context.routePath,
+    digest: (error as { digest?: string } | null)?.digest,
+  });
+}
