@@ -256,6 +256,13 @@ select t_run('pending user sees expert name through my_registration_state', :pen
 select t_run('state names the referring expert', :pending, $q$select * from (select (public.my_registration_state()->>'expert_name') as n) s where n = 'Expert'$q$, 'rows:1');
 select t_run('user without approval gets no state', :m2, $q$select * from (select public.my_registration_state() as s) x where s is not null$q$, 'rows:0');
 
+-- ===================== function execute privileges =====================
+select t_run('anon cannot call moderate_delete_content', null, format($q$select public.moderate_delete_content('event', %L)$q$, '44444444-0000-4000-8000-000000000001'), 'error:permission denied', 'anon');
+select t_run('anon cannot call is_admin', null, 'select public.is_admin()', 'error:permission denied', 'anon');
+select t_run('anon cannot call register_profile', null, $q$select public.register_profile('x', null, null)$q$, 'error:permission denied', 'anon');
+select t_run('anon can still ask whether a referral code is required', null, 'select public.is_referral_code_required()', 'ok', 'anon');
+select t_run('trigger functions cannot be called directly', :m1, 'select public.notify_on_insert()', 'error:permission denied');
+
 -- ===================== report =====================
 \echo
 \echo === FAILURES ===

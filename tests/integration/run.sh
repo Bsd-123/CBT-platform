@@ -24,6 +24,7 @@ docker exec $PG psql -U postgres -q -c "grant anon, authenticated to authenticat
 sed -e '/^create role/d' tests/db/00_supabase_stub.sql | psql -d $DB
 psql -d $DB < tests/db/01_base_schema.sql
 psql -d $DB < supabase/migrations/20261011120000_data_access_without_prisma.sql
+psql -d $DB < supabase/migrations/20261011184504_restrict_function_execute_to_authenticated.sql
 psql -d $DB < tests/integration/seed.sql
 
 docker run -d --name $REST --network $NET -p 54330:3000 \
