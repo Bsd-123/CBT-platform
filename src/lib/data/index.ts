@@ -67,6 +67,7 @@ import {
   getExpertApprovalByExpertAndUser,
   getForumQuestionById,
   getMaterialAverageRating,
+  getMaterialAverageRatings,
   getMaterialById,
   getMaterialRating,
   getMaterialRequestById,
@@ -79,16 +80,21 @@ import {
   listEntityTagsForEntities,
   listEventComments,
   listEvents,
+  countEvents,
   listForumAnswersByQuestion,
   listMaterialRatingsByMaterial,
   listMaterialRequests,
+  countMaterialRequests,
   listMaterialResponsesByRequest,
   listMaterialTypes,
   listMaterials,
+  countMaterials,
+  countMaterialsByType,
   listNotificationsForUser,
   listPendingApprovalsForExpert,
   listProfessionalRequestComments,
   listProfessionalRequests,
+  countProfessionalRequests,
   listRecommendationComments,
   listRecommendations,
   listRecommendationsFeed,
@@ -97,6 +103,7 @@ import {
   markAllNotificationsAsRead,
   markNotificationAsRead,
   searchForumQuestions,
+  countForumQuestions,
   toggleForumLike as toggleForumLikeInRepo,
   updateEvent,
   updateExpertApprovalStatus,
@@ -125,6 +132,18 @@ export async function fetchMaterialTypes() {
 
 export async function fetchMaterials(filter: ListMaterialsFilter = {}) {
   return listMaterials(filter);
+}
+
+export async function fetchMaterialCount(filter: ListMaterialsFilter = {}) {
+  return countMaterials(filter);
+}
+
+export async function fetchMaterialCountsByType() {
+  return countMaterialsByType();
+}
+
+export async function fetchMaterialAverageRatings(material_ids: string[]) {
+  return getMaterialAverageRatings(material_ids);
 }
 
 export async function fetchMaterialById(id: string) {
@@ -185,8 +204,12 @@ export async function decideReferralApproval(
 }
 
 // Material requests
-export async function fetchMaterialRequests() {
-  return listMaterialRequests();
+export async function fetchMaterialRequests(options: { skip?: number; take?: number } = {}) {
+  return listMaterialRequests(options);
+}
+
+export async function fetchMaterialRequestCount() {
+  return countMaterialRequests();
 }
 
 export async function fetchMaterialRequestById(id: string) {
@@ -212,6 +235,10 @@ export async function fetchForumQuestionById(id: string) {
 
 export async function searchForum(filter: SearchForumQuestionsFilter = {}) {
   return searchForumQuestions(filter);
+}
+
+export async function fetchForumQuestionCount(filter: SearchForumQuestionsFilter = {}) {
+  return countForumQuestions(filter);
 }
 
 export async function postForumQuestion(input: CreateForumQuestionInput) {
@@ -264,6 +291,10 @@ export async function fetchEvents(filter: ListEventsFilter = {}) {
   return listEvents(filter);
 }
 
+export async function fetchEventCount(filter: ListEventsFilter = {}) {
+  return countEvents(filter);
+}
+
 export async function fetchEventById(id: string) {
   return getEventById(id);
 }
@@ -285,8 +316,14 @@ export async function fetchEventComments(event_id: string) {
 }
 
 // Professional requests
-export async function fetchProfessionalRequests() {
-  return listProfessionalRequests();
+export async function fetchProfessionalRequests(
+  options: { skip?: number; take?: number } = {},
+) {
+  return listProfessionalRequests(false, options);
+}
+
+export async function fetchProfessionalRequestCount() {
+  return countProfessionalRequests();
 }
 
 export async function fetchProfessionalRequestById(id: string) {

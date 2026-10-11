@@ -3,11 +3,24 @@ import { ContentCard } from "@/components/ui/ContentCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ModalButton } from "@/components/ui/Modal";
 import { PageHero } from "@/components/ui/PageHero";
-import { fetchProfessionalRequests } from "@/lib/data";
+import { Pagination } from "@/components/ui/Pagination";
+import { fetchProfessionalRequestCount, fetchProfessionalRequests } from "@/lib/data";
 import { countLabel, formatDate } from "@/lib/utils/format";
+import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
-export default async function ProfessionalRequestsPage() {
-  const requests = await fetchProfessionalRequests();
+type ProfessionalRequestsPageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function ProfessionalRequestsPage({
+  searchParams,
+}: ProfessionalRequestsPageProps) {
+  const { page: pageParam } = await searchParams;
+  const page = parsePage(pageParam);
+  const [requests, total] = await Promise.all([
+    fetchProfessionalRequests(pageWindow(page)),
+    fetchProfessionalRequestCount(),
+  ]);
 
   return (
     <>
@@ -48,6 +61,8 @@ export default async function ProfessionalRequestsPage() {
           ))}
         </ul>
       )}
+
+      <Pagination basePath="/professional-requests" page={page} totalPages={totalPages(total)} />
     </>
   );
 }

@@ -81,9 +81,24 @@ export async function listMaterials(
     where: await buildMaterialsWhere(filter),
     include: materialInclude,
     orderBy: { created_at: "desc" },
+    ...(filter.take !== undefined && { skip: filter.skip ?? 0, take: filter.take }),
   });
 
   return materials.map(pickPublicMaterialFields);
+}
+
+export async function countMaterials(filter: ListMaterialsFilter = {}): Promise<number> {
+  return prisma.material.count({ where: await buildMaterialsWhere(filter) });
+}
+
+/** Visible material count per material type id, in one grouped query. */
+export async function countMaterialsByType(): Promise<Record<string, number>> {
+  const groups = await prisma.material.groupBy({
+    by: ["material_type_id"],
+    where: visibleContentWhere(),
+    _count: { _all: true },
+  });
+  return Object.fromEntries(groups.map((group) => [group.material_type_id, group._count._all]));
 }
 
 export async function createMaterial(

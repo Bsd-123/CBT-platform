@@ -18,6 +18,7 @@ export function MaterialsSearchBar({ defaultValue = "" }: MaterialsSearchBarProp
     const params = new URLSearchParams(searchParams.toString());
     const trimmed = query.trim();
 
+    params.delete("page");
     if (trimmed) params.set("q", trimmed);
     else params.delete("q");
 

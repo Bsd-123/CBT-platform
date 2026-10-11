@@ -6,6 +6,7 @@ import type { ExpertApprovalStatus } from "@prisma/client";
 import { adminDecideExpertApproval } from "@/lib/actions/admin";
 import type { PublicExpertApproval } from "@/lib/models/expert-approval";
 import { EXPERT_APPROVAL_STATUSES } from "@/lib/models/expert-approval";
+import { unwrap } from "@/lib/actions/result";
 
 const PAGE_SIZE = 10;
 
@@ -92,7 +93,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
     setLoadingKey(key);
 
     try {
-      await adminDecideExpertApproval(approval.expert_id, approval.user_id, { status });
+      unwrap(await adminDecideExpertApproval(approval.expert_id, approval.user_id, { status }));
       router.refresh();
     } catch (decisionError) {
       setError(decisionError instanceof Error ? decisionError.message : "הפעולה נכשלה");

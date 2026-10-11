@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitProfessionalRequestComment } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type ProfessionalRequestCommentFormProps = {
   requestId: string;
@@ -26,11 +27,11 @@ export function ProfessionalRequestCommentForm({
     setLoading(true);
 
     try {
-      await submitProfessionalRequestComment({
+      unwrap(await submitProfessionalRequestComment({
         request_id: requestId,
         content,
         parent_comment_id: parentCommentId,
-      });
+      }));
       setContent("");
       router.refresh();
     } catch (submitError) {
