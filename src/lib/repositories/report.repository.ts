@@ -22,6 +22,73 @@ const TARGET_TABLES: Record<ReportTargetType, string> = {
   professional_request: "professional_requests",
 };
 
+/** What an admin sees of a reported item, even when it is hidden. `found` is false once it was deleted. */
+export type ReportedContent = {
+  found: boolean;
+  title: string | null;
+  excerpt: string;
+  is_hidden: boolean;
+  /** For forum answers: the question that contains them. */
+  parent_id: string | null;
+};
+
+type TargetRow = {
+  id: string;
+  title?: string;
+  description?: string;
+  content?: string;
+  is_hidden: boolean;
+  question_id?: string;
+};
+
+const PREVIEW_COLUMNS: Record<ReportTargetType, string> = {
+  material: "id, title, description, is_hidden",
+  forum_question: "id, title, content, is_hidden",
+  forum_answer: "id, content, is_hidden, question_id",
+  recommendation: "id, content, is_hidden",
+  event: "id, title, description, is_hidden",
+  professional_request: "id, title, description, is_hidden",
+};
+
+const EXCERPT_LENGTH = 280;
+
+export const reportContentKey = (target_type: ReportTargetType, target_id: string) =>
+  `${target_type}:${target_id}`;
+
+/**
+ * Loads the reported items in one query per content type. Admins may read hidden rows
+ * (Row Level Security), so hidden and pending content is included.
+ */
+export async function getReportedContent(
+  targets: { target_type: ReportTargetType; target_id: string }[],
+): Promise<Map<string, ReportedContent>> {
+  const db = await getDb();
+  const idsByType = new Map<ReportTargetType, string[]>();
+  for (const { target_type, target_id } of targets) {
+    idsByType.set(target_type, [...(idsByType.get(target_type) ?? []), target_id]);
+  }
+
+  const result = new Map<string, ReportedContent>();
+  await Promise.all(
+    [...idsByType].map(async ([type, ids]) => {
+      const found = rows<TargetRow>(
+        await db.from(TARGET_TABLES[type]).select(PREVIEW_COLUMNS[type]).in("id", [...new Set(ids)]),
+      );
+      for (const item of found) {
+        const text = (item.description ?? item.content ?? "").trim();
+        result.set(reportContentKey(type, item.id), {
+          found: true,
+          title: item.title ?? null,
+          excerpt: text.length > EXCERPT_LENGTH ? `${text.slice(0, EXCERPT_LENGTH)}…` : text,
+          is_hidden: item.is_hidden,
+          parent_id: item.question_id ?? null,
+        });
+      }
+    }),
+  );
+  return result;
+}
+
 export async function getReportById(id: string): Promise<PublicReport | null> {
   const db = await getDb();
   const report = row<ReportRow>(await db.from("reports").select(REPORT_SELECT).eq("id", id).maybeSingle());

@@ -19,6 +19,8 @@ export const REPORT_TARGET_LABELS: Record<ReportTargetType, string> = {
 export function getReportTargetHref(
   targetType: ReportTargetType,
   targetId: string,
+  /** For forum answers: the question page that shows them. */
+  parentId?: string | null,
 ): string | null {
   switch (targetType) {
     case "material":
@@ -32,6 +34,6 @@ export function getReportTargetHref(
     case "professional_request":
       return `/professional-requests/${targetId}`;
     case "forum_answer":
-      return null;
+      return parentId ? `/forum/${parentId}#answer-${targetId}` : null;
   }
 }

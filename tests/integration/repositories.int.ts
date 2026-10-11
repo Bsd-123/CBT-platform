@@ -397,10 +397,22 @@ describe("repositories against PostgREST + RLS", () => {
     expect((await reports.updateReportStatus(report.id, { status: "resolved" })).status).toBe("resolved");
 
     await moderation.hideReportedContent("event", eventId);
+    // an admin can still read a hidden item (and its deep-link parent for answers); members cannot
+    const key = reports.reportContentKey("event", eventId);
+    const adminView = (await reports.getReportedContent([{ target_type: "event", target_id: eventId }])).get(key);
+    expect(adminView).toMatchObject({ found: true, is_hidden: true });
+    expect(adminView?.title).toBeTruthy();
+    const answerId = (await forum.getForumQuestionById(shared.question, true))!.answers![0].id;
+    const answerView = (await reports.getReportedContent([{ target_type: "forum_answer", target_id: answerId }]))
+      .get(reports.reportContentKey("forum_answer", answerId));
+    expect(answerView).toMatchObject({ found: true, parent_id: shared.question });
+    expect(answerView?.excerpt).toBeTruthy();
     as("m2");
+    expect((await reports.getReportedContent([{ target_type: "event", target_id: eventId }])).has(key)).toBe(false);
     expect((await events.listEvents()).some((event) => event.id === eventId)).toBe(false);
     await expect(moderation.hideReportedContent("event", eventId)).rejects.toThrow("Forbidden");
     as("admin");
+    expect(await events.getEventById(eventId, true)).toMatchObject({ is_hidden: true });
     await moderation.restoreReportedContent("event", eventId);
     as("m2");
     expect((await events.listEvents()).some((event) => event.id === eventId)).toBe(true);

@@ -2,7 +2,7 @@ import { assertAdminAccess } from "@/lib/auth";
 import type { ListExpertApprovalsFilter } from "@/lib/models/expert-approval";
 import type { ListReportsFilter } from "@/lib/models/report";
 import { listExpertApprovals } from "@/lib/repositories/expert-approval.repository";
-import { listReports } from "@/lib/repositories/report.repository";
+import { getReportedContent, listReports, reportContentKey } from "@/lib/repositories/report.repository";
 import {
   getAdminUsersPageStats,
   listAdminUsersDirectory,
@@ -18,7 +18,12 @@ import { listMaterialsForAdmin } from "@/lib/repositories/material.repository";
 
 export async function loadAdminReports(filter: ListReportsFilter = {}) {
   await assertAdminAccess();
-  return listReports(filter);
+  const reports = await listReports(filter);
+  const content = await getReportedContent(reports);
+  return reports.map((report) => ({
+    ...report,
+    content: content.get(reportContentKey(report.target_type, report.target_id)) ?? null,
+  }));
 }
 
 export async function loadAdminUsers() {

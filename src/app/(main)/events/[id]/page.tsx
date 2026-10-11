@@ -19,12 +19,12 @@ export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
   if (!isUuid(id)) notFound();
   const auth = await fetchAuthenticatedProfile();
-  const [event, comments] = await Promise.all([fetchEventById(id), fetchEventComments(id)]);
+  const isAdmin = auth?.profile.role === "admin";
+  const [event, comments] = await Promise.all([fetchEventById(id, isAdmin), fetchEventComments(id)]);
 
   if (!event) notFound();
 
   const isOwner = auth?.userId === event.user_id;
-  const isAdmin = auth?.profile.role === "admin";
 
   return (
     <>
@@ -33,6 +33,12 @@ export default async function EventPage({ params }: EventPageProps) {
           <MaterialIcon name="arrow_forward" /> חזרה לאירועים
         </Link>
       </p>
+
+      {event.is_hidden && (
+        <p className="banner-warning" role="status">
+          האירוע מוסתר ואינו מוצג למשתמשים. רק מנהלים רואים אותו.
+        </p>
+      )}
 
       <section className="ui-section">
         <h1>

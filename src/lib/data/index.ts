@@ -147,8 +147,8 @@ export async function fetchMaterialAverageRatings(material_ids: string[]) {
 }
 
 /** Includes pending/rejected materials: callers must apply canViewMaterial(). */
-export async function fetchMaterialById(id: string) {
-  return getMaterialById(id, false, true);
+export async function fetchMaterialById(id: string, include_hidden = false) {
+  return getMaterialById(id, include_hidden, true);
 }
 
 export async function fetchPendingMaterialCount() {
@@ -241,8 +241,8 @@ export async function fetchMaterialResponses(request_id: string) {
 }
 
 // Forum
-export async function fetchForumQuestionById(id: string) {
-  return getForumQuestionById(id);
+export async function fetchForumQuestionById(id: string, include_hidden = false) {
+  return getForumQuestionById(id, include_hidden);
 }
 
 export async function searchForum(filter: SearchForumQuestionsFilter = {}) {
@@ -307,8 +307,8 @@ export async function fetchEventCount(filter: ListEventsFilter = {}) {
   return countEvents(filter);
 }
 
-export async function fetchEventById(id: string) {
-  return getEventById(id);
+export async function fetchEventById(id: string, include_hidden = false) {
+  return getEventById(id, include_hidden);
 }
 
 export async function postEvent(input: CreateEventInput) {
@@ -338,8 +338,8 @@ export async function fetchProfessionalRequestCount() {
   return countProfessionalRequests();
 }
 
-export async function fetchProfessionalRequestById(id: string) {
-  return getProfessionalRequestById(id);
+export async function fetchProfessionalRequestById(id: string, include_hidden = false) {
+  return getProfessionalRequestById(id, include_hidden);
 }
 
 export async function postProfessionalRequest(input: CreateProfessionalRequestInput) {

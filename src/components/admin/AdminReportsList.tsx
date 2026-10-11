@@ -13,6 +13,7 @@ import { unwrap, type ActionResult } from "@/lib/actions/result";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { PublicReport, ReportStatus } from "@/lib/models/report";
+import type { ReportedContent } from "@/lib/repositories/report.repository";
 import {
   REPORT_STATUS_LABELS,
   REPORT_TARGET_LABELS,
@@ -20,8 +21,10 @@ import {
 } from "@/lib/utils/admin-labels";
 import { formatDate } from "@/lib/utils/format";
 
+type AdminReport = PublicReport & { content: ReportedContent | null };
+
 type AdminReportsListProps = {
-  reports: PublicReport[];
+  reports: AdminReport[];
 };
 
 export function AdminReportsList({ reports }: AdminReportsListProps) {
@@ -46,7 +49,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
     }
   }
 
-  async function handleDelete(report: PublicReport) {
+  async function handleDelete(report: AdminReport) {
     const approved = await confirm({
       title: "מחיקת התוכן המדווח",
       message: "התוכן וכל מה שמשויך אליו יימחקו לצמיתות. לא ניתן לבטל פעולה זו.",
@@ -78,6 +81,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
         <thead>
           <tr>
             <th>סוג תוכן</th>
+            <th>התוכן המדווח</th>
             <th>סיבה</th>
             <th>דווח על ידי</th>
             <th>תאריך</th>
@@ -87,7 +91,8 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
         </thead>
         <tbody>
           {reports.map((report) => {
-            const href = getReportTargetHref(report.target_type, report.target_id);
+            const content = report.content;
+            const href = getReportTargetHref(report.target_type, report.target_id, content?.parent_id);
             const busy = loadingId === report.id;
 
             return (
@@ -97,6 +102,21 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                     <Link href={href}>{REPORT_TARGET_LABELS[report.target_type]}</Link>
                   ) : (
                     REPORT_TARGET_LABELS[report.target_type]
+                  )}
+                </td>
+                <td className="admin-report-content">
+                  {content?.found ? (
+                    <>
+                      {content.title && <strong>{content.title}</strong>}
+                      {content.excerpt && <p>{content.excerpt}</p>}
+                      {content.is_hidden && (
+                        <span className="ui-badge" data-kind="danger">
+                          מוסתר
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="muted">התוכן נמחק או שאינו זמין.</span>
                   )}
                 </td>
                 <td>{report.reason}</td>

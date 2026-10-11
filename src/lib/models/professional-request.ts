@@ -32,6 +32,7 @@ export function pickPublicProfessionalRequestFields(
     title: request.title,
     description: request.description,
     created_at: request.created_at,
+    is_hidden: request.is_hidden,
     user: request.user ? pickPublicUserFields(request.user) : undefined,
     comments: request.comments?.map(pickPublicProfessionalRequestCommentFields),
     comment_count: request._count?.comments,

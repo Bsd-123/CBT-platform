@@ -25,11 +25,11 @@ type MaterialDetailPageProps = {
 export default async function MaterialDetailPage({ params }: MaterialDetailPageProps) {
   const { id } = await params;
   if (!isUuid(id)) notFound();
-  const [material, tags, averageRating, auth] = await Promise.all([
-    fetchMaterialById(id),
+  const auth = await fetchAuthenticatedProfile();
+  const [material, tags, averageRating] = await Promise.all([
+    fetchMaterialById(id, auth?.profile.role === "admin"),
     fetchEntityTags("material", id),
     fetchMaterialAverageRating(id),
-    fetchAuthenticatedProfile(),
   ]);
 
   if (!material) notFound();
@@ -60,6 +60,11 @@ export default async function MaterialDetailPage({ params }: MaterialDetailPageP
         חזרה לספריית חומרים
       </Link>
 
+      {material.is_hidden && (
+        <div className="banner-warning" role="status">
+          <p>חומר זה מוסתר ואינו מוצג למשתמשים. רק מנהלים רואים אותו.</p>
+        </div>
+      )}
       {material.approval_status === "pending" && (
         <div className="banner-warning" role="status">
           <p>

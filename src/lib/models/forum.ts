@@ -36,6 +36,7 @@ export function pickPublicForumQuestionFields(
     title: question.title,
     content: question.content,
     created_at: question.created_at,
+    is_hidden: question.is_hidden,
     user: question.user ? pickPublicUserFields(question.user) : undefined,
     answers: question.answers?.map(pickPublicForumAnswerFields),
     answer_count: question._count?.answers,
@@ -49,6 +50,7 @@ export type PublicForumAnswer = {
   content: string;
   parent_answer_id: string | null;
   created_at: Date;
+  is_hidden: boolean;
   user?: ReturnType<typeof pickPublicUserFields>;
   replies?: PublicForumAnswer[];
 };
@@ -66,6 +68,7 @@ export function pickPublicForumAnswerFields(
     content: answer.content,
     parent_answer_id: answer.parent_answer_id,
     created_at: answer.created_at,
+    is_hidden: answer.is_hidden,
     user: answer.user ? pickPublicUserFields(answer.user) : undefined,
     replies: answer.replies?.map(pickPublicForumAnswerFields),
   };

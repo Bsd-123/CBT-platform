@@ -23,5 +23,6 @@ describe("admin labels", () => {
 
   it("has no standalone page for forum answers", () => {
     expect(getReportTargetHref("forum_answer", id)).toBeNull();
+    expect(getReportTargetHref("forum_answer", id, "q1")).toBe(`/forum/q1#answer-${id}`);
   });
 });

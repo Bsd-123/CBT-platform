@@ -55,6 +55,7 @@ export function pickPublicMaterialFields(
     file_url: material.file_url,
     material_type_id: material.material_type_id,
     created_at: material.created_at,
+    is_hidden: material.is_hidden,
     approval_status: material.approval_status,
     reviewed_at: material.reviewed_at,
     rejection_reason: material.rejection_reason,

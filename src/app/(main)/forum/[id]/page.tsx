@@ -22,8 +22,10 @@ export default async function ForumQuestionPage({ params, searchParams }: ForumQ
   if (!isUuid(id)) notFound();
   const sort = parseAnswerSort((await searchParams).sort);
   const auth = await fetchAuthenticatedProfile();
+  // Admins may open hidden questions (and see hidden answers) to review reports.
+  const isAdmin = auth?.profile.role === "admin";
   const [questionRaw, tags, allTags] = await Promise.all([
-    fetchForumQuestionById(id),
+    fetchForumQuestionById(id, isAdmin),
     fetchEntityTags("forum", id),
     fetchTags(),
   ]);
@@ -64,6 +66,12 @@ export default async function ForumQuestionPage({ params, searchParams }: ForumQ
           <PostForumQuestionForm tags={allTags} />
         </ModalButton>
       </div>
+
+      {question.is_hidden && (
+        <p className="banner-warning" role="status">
+          השאלה מוסתרת ואינה מוצגת למשתמשים. רק מנהלים רואים אותה.
+        </p>
+      )}
 
       {/* Main question */}
       <ForumQuestionCard

@@ -8,6 +8,7 @@ import {
   fetchProfessionalRequestById,
   fetchProfessionalRequestComments,
 } from "@/lib/data";
+import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { formatDate } from "@/lib/utils/format";
 import { isUuid } from "@/lib/utils/ids";
 
@@ -20,8 +21,9 @@ export default async function ProfessionalRequestDetailPage({
 }: ProfessionalRequestDetailPageProps) {
   const { id } = await params;
   if (!isUuid(id)) notFound();
+  const auth = await fetchAuthenticatedProfile();
   const [request, comments] = await Promise.all([
-    fetchProfessionalRequestById(id),
+    fetchProfessionalRequestById(id, auth?.profile.role === "admin"),
     fetchProfessionalRequestComments(id),
   ]);
 
@@ -34,6 +36,12 @@ export default async function ProfessionalRequestDetailPage({
           <MaterialIcon name="arrow_forward" /> חזרה לפניות מקצועיות
         </Link>
       </p>
+
+      {request.is_hidden && (
+        <p className="banner-warning" role="status">
+          הפנייה מוסתרת ואינה מוצגת למשתמשים. רק מנהלים רואים אותה.
+        </p>
+      )}
 
       <section className="ui-section">
         <h1>{request.title}</h1>

@@ -49,6 +49,11 @@ export function ForumAnswerCard({
         className={`fq-answer${isReply ? " fq-answer--reply" : ""}${highlighted ? " fq-answer--top" : ""}`}
         aria-label={`${isReply ? "תגובה" : "תשובה"} של ${author?.full_name ?? "משתמש"}`}
       >
+        {answer.is_hidden && (
+          <p className="banner-warning" role="status">
+            תשובה מוסתרת, מוצגת למנהלים בלבד.
+          </p>
+        )}
         {highlighted && (
           <p className="fq-top-label">
             <MaterialIcon name="military_tech" filled />

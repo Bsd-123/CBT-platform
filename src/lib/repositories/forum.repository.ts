@@ -18,16 +18,11 @@ const WITH_AUTHOR = "*, user:users(*)";
 type AnswerRow = ForumAnswer & { user: User };
 type QuestionRow = ForumQuestion & { user: User };
 
-async function loadVisibleAnswers(question_id: string): Promise<AnswerRow[]> {
+async function loadAnswers(question_id: string, include_hidden: boolean): Promise<AnswerRow[]> {
   const db = await getDb();
-  return rows<AnswerRow>(
-    await db
-      .from("forum_answers")
-      .select(WITH_AUTHOR)
-      .eq("question_id", question_id)
-      .eq("is_hidden", false)
-      .order("created_at", { ascending: true }),
-  );
+  let query = db.from("forum_answers").select(WITH_AUTHOR).eq("question_id", question_id);
+  if (!include_hidden) query = query.eq("is_hidden", false);
+  return rows<AnswerRow>(await query.order("created_at", { ascending: true }));
 }
 
 export async function getForumQuestionById(
@@ -41,7 +36,7 @@ export async function getForumQuestionById(
   const question = row<QuestionRow>(await query.maybeSingle());
   if (!question) return null;
 
-  const answers = await loadVisibleAnswers(id);
+  const answers = await loadAnswers(id, include_hidden);
   return pickPublicForumQuestionFields({
     ...question,
     answers: buildReplyTree(answers, (answer) => answer.parent_answer_id),
@@ -135,6 +130,6 @@ export async function createForumAnswer(input: CreateForumAnswerInput): Promise<
 }
 
 export async function listForumAnswersByQuestion(question_id: string): Promise<PublicForumAnswer[]> {
-  const answers = await loadVisibleAnswers(question_id);
+  const answers = await loadAnswers(question_id, false);
   return buildReplyTree(answers, (answer) => answer.parent_answer_id).map(pickPublicForumAnswerFields);
 }

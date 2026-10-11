@@ -47,6 +47,7 @@ export function pickPublicEventFields(
     event_date: event.event_date,
     event_time: event.event_time,
     is_cancelled: event.is_cancelled,
+    is_hidden: event.is_hidden,
     created_at: event.created_at,
     user: event.user ? pickPublicUserFields(event.user) : undefined,
     comments: event.comments?.map(pickPublicEventCommentFields),

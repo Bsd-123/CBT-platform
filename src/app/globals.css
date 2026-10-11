@@ -750,3 +750,15 @@ main {
     align-self: center;
   }
 }
+
+/* Admin reports: preview of the reported item */
+.admin-report-content {
+  max-width: 26rem;
+}
+
+.admin-report-content p {
+  margin: 0.25rem 0;
+  color: var(--cc-on-surface-variant);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
