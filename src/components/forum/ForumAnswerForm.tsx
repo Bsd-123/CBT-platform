@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitForumAnswer } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type ForumAnswerFormProps = {
   questionId: string;
@@ -26,11 +27,11 @@ export function ForumAnswerForm({
     setLoading(true);
 
     try {
-      await submitForumAnswer({
+      unwrap(await submitForumAnswer({
         question_id: questionId,
         content,
         parent_answer_id: parentAnswerId,
-      });
+      }));
       setContent("");
       router.refresh();
     } catch (submitError) {

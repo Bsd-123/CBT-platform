@@ -10,4 +10,4 @@ export {
   type SignedUploadUrlInput,
   type SignedDownloadUrlInput,
 } from "./signed-url";
-export { uploadObjectToR2 } from "./upload";
+export { deleteObjectFromR2, uploadObjectToR2 } from "./upload";

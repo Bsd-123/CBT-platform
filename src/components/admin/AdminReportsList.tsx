@@ -9,6 +9,7 @@ import {
   adminRestoreReportedContent,
   resolveReport,
 } from "@/lib/actions/admin";
+import { unwrap, type ActionResult } from "@/lib/actions/result";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { PublicReport, ReportStatus } from "@/lib/models/report";
@@ -28,10 +29,14 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
   const { toast, confirm } = useUi();
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  async function run(reportId: string, task: () => Promise<unknown>, success: string) {
+  async function run(
+    reportId: string,
+    task: () => Promise<ActionResult<unknown>>,
+    success: string,
+  ) {
     setLoadingId(reportId);
     try {
-      await task();
+      unwrap(await task());
       toast(success);
       router.refresh();
     } catch (error) {

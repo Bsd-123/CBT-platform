@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitEvent } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 export function CreateEventForm() {
   const router = useRouter();
@@ -19,12 +20,12 @@ export function CreateEventForm() {
     setLoading(true);
 
     try {
-      const created = await submitEvent({
+      const created = unwrap(await submitEvent({
         title,
         description,
         event_date: eventDate,
         event_time: eventTime || undefined,
-      });
+      }));
       setTitle("");
       setDescription("");
       setEventDate("");

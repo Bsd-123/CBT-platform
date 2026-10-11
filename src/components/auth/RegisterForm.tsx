@@ -6,6 +6,7 @@ import { useState } from "react";
 import { completeRegistration } from "@/lib/actions/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatReferralInputForDisplay } from "@/lib/utils/expert-code";
+import { unwrap } from "@/lib/actions/result";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -46,12 +47,12 @@ export function RegisterForm() {
         return;
       }
 
-      const result = await completeRegistration({
+      const result = unwrap(await completeRegistration({
         id: data.user.id,
         full_name: fullName,
         title: title || null,
         expert_code: expertCode || null,
-      });
+      }));
 
       router.refresh();
       router.push(result.pending_expert_approval ? "/pending-approval" : "/");
