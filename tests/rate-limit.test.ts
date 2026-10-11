@@ -40,11 +40,14 @@ describe("enforceRateLimit", () => {
     vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://redis.example");
     vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "t");
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify([{ result: 6 }, { result: 1 }])),
+      new Response(JSON.stringify([{ result: "OK" }, { result: 6 }])),
     );
     vi.stubGlobal("fetch", fetchMock);
     await expect(enforceRateLimit("register", "u1")).rejects.toThrow();
     expect(fetchMock).toHaveBeenCalledOnce();
+    const commands = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(commands[0].slice(0, 1)).toEqual(["SET"]);
+    expect(commands[1][0]).toBe("INCR");
   });
 
   it("falls back to memory when Upstash is unreachable", async () => {
