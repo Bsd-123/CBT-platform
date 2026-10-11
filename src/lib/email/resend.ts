@@ -50,10 +50,12 @@ async function post(config: EmailConfig, path: string, body: unknown): Promise<b
 
       // Retry once on rate limiting or a server hiccup; anything else will not get better.
       const retryable = response.status === 429 || response.status >= 500;
-      logger.warn("Resend rejected the request", { path, status: response.status, attempt });
+      // Resend explains refusals ("domain not verified", "invalid API key"...) in the body.
+      const detail = (await response.text().catch(() => "")).slice(0, 300);
+      logger.warn("Resend rejected the request", { path, status: response.status, attempt, detail });
       if (!retryable) return false;
     } catch (error) {
-      logger.warn("Resend request failed", { path, attempt, error });
+      logger.warn("Resend request failed", { path, attempt }, error);
     }
     if (attempt === 1) await new Promise((resolve) => setTimeout(resolve, 500));
   }

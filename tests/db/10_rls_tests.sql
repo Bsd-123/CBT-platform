@@ -284,6 +284,15 @@ select t_run('re-favorite after removal works', :m2, format($q$insert into publi
 select t_run('deleting an event removes its favorites', :admin, format($q$select public.moderate_delete_content('event', %L)$q$, '44444444-0000-4000-8000-000000000009'), 'ok');
 select t_run('favorites are gone with the event', :m2, 'select * from public.event_favorites', 'rows:0');
 
+-- ===================== service role (email lookups) =====================
+select t_run('service role can read the content the email code looks up', null, 'select * from public.recommendations', 'rows:1', 'service_role');
+select t_run('service role can read users', null, 'select id, full_name from public.users', 'ok', 'service_role');
+select t_run('service role can read event favorites', null, 'select user_id from public.event_favorites', 'ok', 'service_role');
+select t_run('service role is read-only: no insert', null, format($q$insert into public.event_favorites (user_id, event_id) values (%L, %L)$q$, :m1, '44444444-0000-4000-8000-000000000001'), 'denied', 'service_role');
+select t_run('service role is read-only: no update', null, $q$update public.users set full_name = 'x'$q$, 'denied', 'service_role');
+select t_run('service role is read-only: no delete', null, 'delete from public.events', 'denied', 'service_role');
+select t_run('service role cannot read tables the emails do not need', null, 'select * from public.notifications', 'denied', 'service_role');
+
 -- ===================== report =====================
 \echo
 \echo === FAILURES ===

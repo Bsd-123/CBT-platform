@@ -272,7 +272,7 @@ export async function captureModerationTarget(
   try {
     return await snapshotContent(config, kind, id);
   } catch (error) {
-    logger.warn("Could not read content before moderation", { kind, id, error });
+    logger.warn("Could not read content before moderation", { kind, id }, error);
     return null;
   }
 }

@@ -58,7 +58,7 @@ function write(level: Level, message: string, error?: unknown, context?: LogCont
  */
 export const logger = {
   info: (message: string, context?: LogContext) => write("info", message, undefined, context),
-  warn: (message: string, context?: LogContext) => write("warn", message, undefined, context),
+  warn: (message: string, context?: LogContext, error?: unknown) => write("warn", message, error, context),
   error: (message: string, error?: unknown, context?: LogContext) =>
     write("error", message, error, context),
 };

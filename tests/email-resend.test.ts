@@ -95,3 +95,23 @@ describe("resend client", () => {
     expect(await sendEmail(config, message("a@x.test"))).toBe(false);
   });
 });
+
+describe("diagnostics", () => {
+  it("logs why Resend refused a request, including the error it returned", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal("fetch", vi.fn(async () => new Response('{"message":"The domain is not verified"}', { status: 403 })));
+    await sendEmail(config, message("a@x.test"));
+    const line = String(warn.mock.calls[0][0]);
+    expect(line).toContain("403");
+    expect(line).toContain("domain is not verified");
+    expect(line).not.toContain("a@x.test"); // never log addresses
+    expect(line).not.toContain("re_test_key");
+  });
+
+  it("keeps the underlying error when a warning is logged with one", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new Error("socket hang up"); }));
+    await sendEmail(config, message("a@x.test"));
+    expect(String(warn.mock.calls[0][0])).toContain("socket hang up");
+  });
+});

@@ -11,7 +11,7 @@ export function runInBackground(label: string, task: () => Promise<void>): void 
     try {
       await task();
     } catch (error) {
-      logger.error("Background email task failed", { label, error });
+      logger.error("Background email task failed", error, { label });
     }
   };
 
