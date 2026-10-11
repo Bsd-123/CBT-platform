@@ -117,6 +117,7 @@ export function EventsCalendar({ events, initialYear, initialMonth }: EventsCale
                       <Link
                         href={`/events/${event.id}`}
                         className="calendar-event-link"
+                        title={event.title}
                         onClick={(eventClick) => eventClick.stopPropagation()}
                       >
                         {event.event_time && (
