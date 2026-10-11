@@ -7,7 +7,7 @@ import { PostForumQuestionForm } from "@/components/forum/PostForumQuestionForm"
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { ModalButton } from "@/components/ui/Modal";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
-import { fetchEntityTags, fetchForumQuestionById } from "@/lib/data";
+import { fetchEntityTags, fetchForumQuestionById, fetchTags } from "@/lib/data";
 import { parseAnswerSort } from "@/lib/forum/thread";
 import { enrichForumQuestionWithLikes } from "@/lib/services/forum-likes";
 import { isUuid } from "@/lib/utils/ids";
@@ -22,9 +22,10 @@ export default async function ForumQuestionPage({ params, searchParams }: ForumQ
   if (!isUuid(id)) notFound();
   const sort = parseAnswerSort((await searchParams).sort);
   const auth = await fetchAuthenticatedProfile();
-  const [questionRaw, tags] = await Promise.all([
+  const [questionRaw, tags, domains] = await Promise.all([
     fetchForumQuestionById(id),
     fetchEntityTags("forum", id),
+    fetchTags(),
   ]);
 
   if (!questionRaw) notFound();
@@ -46,6 +47,14 @@ export default async function ForumQuestionPage({ params, searchParams }: ForumQ
           <li>
             <Link href="/forum">פורום</Link>
           </li>
+          {question.domain && (
+            <>
+              <li aria-hidden="true">
+                <MaterialIcon name="chevron_left" />
+              </li>
+              <li>{question.domain.name}</li>
+            </>
+          )}
           <li aria-hidden="true">
             <MaterialIcon name="chevron_left" />
           </li>
@@ -60,7 +69,7 @@ export default async function ForumQuestionPage({ params, searchParams }: ForumQ
           <MaterialIcon name="arrow_forward" /> חזרה לפורום
         </Link>
         <ModalButton label="שאלה חדשה" icon="add" title="פרסום שאלה">
-          <PostForumQuestionForm />
+          <PostForumQuestionForm domains={domains} />
         </ModalButton>
       </div>
 

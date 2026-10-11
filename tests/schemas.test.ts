@@ -50,3 +50,21 @@ describe("input schemas", () => {
     expect(() => parseInput(approvalDecisionSchema, { status: "admin" })).toThrow();
   });
 });
+
+import { forumQuestionSchema } from "@/lib/validation/schemas";
+
+describe("forumQuestionSchema", () => {
+  const base = { title: "Title", content: "Body", tags: "" };
+  const domain = "0b9f2b1e-7c1d-4c55-9c0a-5a1b2c3d4e5f";
+
+  it("requires a domain id that is a uuid", () => {
+    expect(forumQuestionSchema.safeParse({ ...base, domain_tag_id: domain }).success).toBe(true);
+    expect(forumQuestionSchema.safeParse(base).success).toBe(false);
+    expect(forumQuestionSchema.safeParse({ ...base, domain_tag_id: "" }).success).toBe(false);
+    expect(forumQuestionSchema.safeParse({ ...base, domain_tag_id: "anxiety" }).success).toBe(false);
+  });
+
+  it("allows an empty extra-tags string", () => {
+    expect(forumQuestionSchema.safeParse({ ...base, domain_tag_id: domain, tags: "" }).success).toBe(true);
+  });
+});

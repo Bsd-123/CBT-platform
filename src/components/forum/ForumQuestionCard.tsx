@@ -1,5 +1,6 @@
 import { AuthorBadges } from "@/components/forum/AuthorBadges";
 import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
+import { DomainBadge } from "@/components/shared/DomainBadge";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { ReportForm } from "@/components/shared/ReportForm";
 import { ShareButton } from "@/components/shared/ShareButton";
@@ -28,6 +29,12 @@ export function ForumQuestionCard({ question, tags, answerCount }: ForumQuestion
   return (
     <article className="fq-card fq-question" aria-labelledby="question-title">
       <header>
+        {question.domain && (
+          <p className="fq-domain">
+            <span className="fq-domain-label">תחום</span>
+            <DomainBadge domain={question.domain} />
+          </p>
+        )}
         <h1 id="question-title">{question.title}</h1>
         <div className="fq-author fq-author--meta">
           <UserAvatar name={author?.full_name} size="md" />

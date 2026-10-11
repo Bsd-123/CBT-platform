@@ -10,13 +10,15 @@ import { pickPublicForumAnswerFields, pickPublicForumQuestionFields } from "@/li
 import { countOf, getDb, row, rows } from "@/lib/db/client";
 import { ilikeAny } from "@/lib/db/search";
 import { buildReplyTree } from "@/lib/db/tree";
-import type { ForumAnswer, ForumQuestion, User } from "@/lib/db/types";
+import type { ForumAnswer, ForumQuestion, Tag, User } from "@/lib/db/types";
 
 // The forum_answers author (user_id) is the only foreign key to users, so the embed is unambiguous.
 const WITH_AUTHOR = "*, user:users(*)";
 
 type AnswerRow = ForumAnswer & { user: User };
-type QuestionRow = ForumQuestion & { user: User };
+// Questions embed their domain (the tag referenced by domain_tag_id).
+const QUESTION_SELECT = "*, user:users(*), domain:tags!domain_tag_id(*)";
+type QuestionRow = ForumQuestion & { user: User; domain: Tag | null };
 
 async function loadVisibleAnswers(question_id: string): Promise<AnswerRow[]> {
   const db = await getDb();
@@ -35,7 +37,7 @@ export async function getForumQuestionById(
   include_hidden = false,
 ): Promise<PublicForumQuestion | null> {
   const db = await getDb();
-  let query = db.from("forum_questions").select(WITH_AUTHOR).eq("id", id);
+  let query = db.from("forum_questions").select(QUESTION_SELECT).eq("id", id);
   if (!include_hidden) query = query.eq("is_hidden", false);
 
   const question = row<QuestionRow>(await query.maybeSingle());
@@ -52,7 +54,7 @@ export async function searchForumQuestions(
   filter: SearchForumQuestionsFilter = {},
 ): Promise<PublicForumQuestion[]> {
   const db = await getDb();
-  let query = db.from("forum_questions").select(WITH_AUTHOR);
+  let query = db.from("forum_questions").select(QUESTION_SELECT);
   if (!filter.include_hidden) query = query.eq("is_hidden", false);
   const text = filter.query?.trim();
   if (text) query = query.or(ilikeAny(["title", "content"], text));
@@ -97,8 +99,13 @@ export async function createForumQuestion(
   const question = row<QuestionRow>(
     await db
       .from("forum_questions")
-      .insert({ user_id: input.user_id, title: input.title, content: input.content })
-      .select(WITH_AUTHOR)
+      .insert({
+        user_id: input.user_id,
+        title: input.title,
+        content: input.content,
+        domain_tag_id: input.domain_tag_id,
+      })
+      .select(QUESTION_SELECT)
       .single(),
   );
   return pickPublicForumQuestionFields(question!);

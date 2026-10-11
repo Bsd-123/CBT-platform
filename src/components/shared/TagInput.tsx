@@ -4,6 +4,8 @@ type TagInputProps = {
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
+  /** Overrides the default label text. */
+  label?: string;
 };
 
 export function TagInput({
@@ -12,11 +14,12 @@ export function TagInput({
   value,
   onChange,
   required = false,
+  label = "תגיות",
 }: TagInputProps) {
   return (
     <div className="form-field">
       <label htmlFor={id}>
-        תגיות{required ? " (חובה)" : ""}
+        {label}{required ? " (חובה)" : ""}
       </label>
       <input
         id={id}

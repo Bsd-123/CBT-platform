@@ -262,9 +262,18 @@ describe("repositories against PostgREST + RLS", () => {
 
   it("forum: questions, nested answers, search, likes, notifications", async () => {
     as("m1");
-    const question = await forum.createForumQuestion({ user_id: ID.m1, title: "How to treat panic?", content: "Looking for CBT tips" });
+    await expect(
+      forum.createForumQuestion({ user_id: ID.m1, title: "No domain", content: "x" } as never),
+    ).rejects.toThrow(); // a question must name a domain
+    await expect(
+      forum.createForumQuestion({ user_id: ID.m1, title: "Bad domain", content: "x", domain_tag_id: ID.m1 }),
+    ).rejects.toThrow(); // ... and it must be an existing tag
+    const question = await forum.createForumQuestion({
+      user_id: ID.m1, title: "How to treat panic?", content: "Looking for CBT tips", domain_tag_id: shared.tagAnxiety,
+    });
     shared.question = question.id;
     expect(question.user?.full_name).toBe("Member One");
+    expect(question.domain).toMatchObject({ id: shared.tagAnxiety, name: "anxiety" });
 
     as("m2");
     const answer = await forum.createForumAnswer({ question_id: question.id, user_id: ID.m2, content: "Try exposure" });
@@ -277,6 +286,7 @@ describe("repositories against PostgREST + RLS", () => {
 
     const loaded = await forum.getForumQuestionById(question.id);
     expect(loaded?.answers).toHaveLength(1);
+    expect(loaded?.domain?.name).toBe("anxiety");
     expect(loaded?.answers?.[0].replies?.[0].replies?.[0].content).toBe("Welcome");
     expect((await forum.listForumAnswersByQuestion(question.id))[0].id).toBe(answer.id);
 
@@ -287,6 +297,7 @@ describe("repositories against PostgREST + RLS", () => {
     const found = await forum.searchForumQuestions({ query: "panic" });
     expect(found).toHaveLength(1);
     expect(found[0].answer_count).toBe(3);
+    expect(found[0].domain?.name).toBe("anxiety");
     expect(await forum.searchForumQuestions({ query: 'p%"),x' })).toHaveLength(0);
     expect(await forum.countForumQuestions({ query: "cbt" })).toBe(1);
     expect(await forum.searchForumQuestions({ take: 1, skip: 1 })).toHaveLength(0);

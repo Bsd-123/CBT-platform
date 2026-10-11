@@ -267,3 +267,5 @@ Public queries exclude rows where `is_hidden = true` unless explicitly requested
 ---
 
 *Schema Version: 1.1 | Updated: ForumLikes + is_hidden moderation + admin category/tag management*
+
+> **Forum question domain:** `forum_questions.domain_tag_id` references `tags.id` (on delete set null). New questions must have one (enforced by the insert policy); questions created before the column existed were backfilled from their first tag.

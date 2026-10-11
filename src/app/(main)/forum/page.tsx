@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
+import { DomainBadge } from "@/components/shared/DomainBadge";
 import { ForumSearchForm } from "@/components/forum/ForumSearchForm";
 import { PostForumQuestionForm } from "@/components/forum/PostForumQuestionForm";
 import { ContentCard } from "@/components/ui/ContentCard";
@@ -8,7 +9,7 @@ import { ModalButton } from "@/components/ui/Modal";
 import { PageHero } from "@/components/ui/PageHero";
 import { Pagination } from "@/components/ui/Pagination";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
-import { fetchEntityTagsForEntities, fetchForumQuestionCount, searchForum } from "@/lib/data";
+import { fetchEntityTagsForEntities, fetchForumQuestionCount, fetchTags, searchForum } from "@/lib/data";
 import { enrichForumQuestionsWithLikes } from "@/lib/services/forum-likes";
 import { countLabel, formatDate } from "@/lib/utils/format";
 import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
@@ -21,9 +22,10 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
   const { q, page: pageParam } = await searchParams;
   const page = parsePage(pageParam);
   const auth = await fetchAuthenticatedProfile();
-  const [questionsRaw, total] = await Promise.all([
+  const [questionsRaw, total, domains] = await Promise.all([
     searchForum({ query: q, ...pageWindow(page) }),
     fetchForumQuestionCount({ query: q }),
+    fetchTags(),
   ]);
   const [questions, tagsByQuestion] = await Promise.all([
     enrichForumQuestionsWithLikes(questionsRaw, auth?.userId),
@@ -37,7 +39,7 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
         subtitle="התייעצו עם עמיתים, שאלו ושתפו ידע מקצועי."
         actions={
           <ModalButton label="שאלה חדשה" icon="add" title="פרסום שאלה">
-            <PostForumQuestionForm />
+            <PostForumQuestionForm domains={domains} />
           </ModalButton>
         }
       />
@@ -70,6 +72,7 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
                 excerpt={question.content}
                 author={question.user?.full_name}
                 dateLabel={formatDate(question.created_at)}
+                badges={<DomainBadge domain={question.domain} />}
                 tags={tagsByQuestion.get(question.id)}
                 stats={[
                   {

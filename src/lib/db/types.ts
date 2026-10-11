@@ -131,6 +131,8 @@ export type ForumQuestion = {
   content: string;
   created_at: Date;
   is_hidden: boolean;
+  /** The question's domain (one of the existing tags); null only for questions older than the feature. */
+  domain_tag_id: string | null;
 };
 
 export type ForumAnswer = {
