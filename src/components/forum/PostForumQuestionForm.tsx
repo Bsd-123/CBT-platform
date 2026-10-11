@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TagInput } from "@/components/shared/TagInput";
 import { submitForumQuestion } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 export function PostForumQuestionForm() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function PostForumQuestionForm() {
     setLoading(true);
 
     try {
-      const question = await submitForumQuestion({ title, content, tags });
+      const question = unwrap(await submitForumQuestion({ title, content, tags }));
       setTitle("");
       setContent("");
       setTags("");
@@ -34,7 +35,6 @@ export function PostForumQuestionForm() {
 
   return (
     <form className="stack" onSubmit={handleSubmit}>
-      <h2>פרסום שאלה</h2>
       <div className="form-field">
         <label htmlFor="question-title">כותרת</label>
         <input id="question-title" required value={title} onChange={(e) => setTitle(e.target.value)} />

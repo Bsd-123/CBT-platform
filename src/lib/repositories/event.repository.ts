@@ -49,8 +49,13 @@ export async function listEvents(
     where: buildEventsWhere(filter),
     include: eventInclude,
     orderBy: [{ event_date: "asc" }, { event_time: "asc" }],
+    ...(filter.take !== undefined && { skip: filter.skip ?? 0, take: filter.take }),
   });
   return events.map(pickPublicEventFields);
+}
+
+export async function countEvents(filter: ListEventsFilter = {}): Promise<number> {
+  return prisma.event.count({ where: buildEventsWhere(filter) });
 }
 
 export async function createEvent(input: CreateEventInput): Promise<PublicEvent> {

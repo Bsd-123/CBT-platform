@@ -67,3 +67,25 @@ export async function listEntityTags(
   });
   return entityTags.map(pickPublicEntityTagFields);
 }
+
+/** Tags for many entities in one query, keyed by entity id (avoids N+1 in list pages). */
+export async function listEntityTagsForEntities(
+  entity_type: EntityType,
+  entity_ids: string[],
+): Promise<Map<string, PublicTag[]>> {
+  const result = new Map<string, PublicTag[]>();
+  if (entity_ids.length === 0) return result;
+
+  const entityTags = await prisma.entityTag.findMany({
+    where: { entity_type, entity_id: { in: entity_ids } },
+    include: { tag: true },
+    orderBy: { tag: { name: "asc" } },
+  });
+
+  for (const entityTag of entityTags) {
+    const list = result.get(entityTag.entity_id) ?? [];
+    list.push(pickPublicTagFields(entityTag.tag));
+    result.set(entityTag.entity_id, list);
+  }
+  return result;
+}

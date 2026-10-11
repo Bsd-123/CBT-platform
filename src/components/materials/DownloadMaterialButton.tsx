@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { requestFileDownloadUrl } from "@/lib/actions/auth";
+import { unwrap } from "@/lib/actions/result";
 
 type DownloadMaterialButtonProps = {
   fileKey: string;
@@ -20,7 +21,7 @@ export function DownloadMaterialButton({
     setLoading(true);
 
     try {
-      const url = await requestFileDownloadUrl(fileKey);
+      const url = unwrap(await requestFileDownloadUrl(fileKey));
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (downloadError) {
       setError(downloadError instanceof Error ? downloadError.message : "ההורדה נכשלה");

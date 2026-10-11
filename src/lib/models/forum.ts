@@ -19,12 +19,15 @@ export type CreateForumAnswerInput = {
 export type SearchForumQuestionsFilter = {
   query?: string;
   include_hidden?: boolean;
+  skip?: number;
+  take?: number;
 };
 
 export function pickPublicForumQuestionFields(
   question: ForumQuestion & {
     user?: Parameters<typeof pickPublicUserFields>[0];
     answers?: Parameters<typeof pickPublicForumAnswerFields>[0][];
+    _count?: { answers: number };
   },
 ) {
   return {
@@ -35,6 +38,7 @@ export function pickPublicForumQuestionFields(
     created_at: question.created_at,
     user: question.user ? pickPublicUserFields(question.user) : undefined,
     answers: question.answers?.map(pickPublicForumAnswerFields),
+    answer_count: question._count?.answers,
   };
 }
 

@@ -39,7 +39,6 @@ export function TagSelect({
           className="tag-select"
           role="group"
           aria-labelledby={`${id}-label`}
-          aria-required={required}
         >
           {tags.map((tag) => {
             const selected = value.includes(tag.id);

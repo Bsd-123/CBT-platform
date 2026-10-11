@@ -42,6 +42,24 @@ export async function getMaterialAverageRating(
   return result._avg.rating;
 }
 
+/** Average rating per material id in one grouped query (materials without ratings are absent). */
+export async function getMaterialAverageRatings(
+  material_ids: string[],
+): Promise<Map<string, number>> {
+  const result = new Map<string, number>();
+  if (material_ids.length === 0) return result;
+
+  const groups = await prisma.materialRating.groupBy({
+    by: ["material_id"],
+    where: { material_id: { in: material_ids } },
+    _avg: { rating: true },
+  });
+  for (const group of groups) {
+    if (group._avg.rating !== null) result.set(group.material_id, group._avg.rating);
+  }
+  return result;
+}
+
 export async function createMaterialRating(
   input: CreateMaterialRatingInput,
 ): Promise<PublicMaterialRating> {

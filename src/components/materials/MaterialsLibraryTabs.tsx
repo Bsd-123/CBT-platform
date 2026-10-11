@@ -29,7 +29,7 @@ export function MaterialsLibraryTabs({
     }
 
     searchParams.forEach((value, key) => {
-      if (key !== "tab") {
+      if (key !== "tab" && key !== "page") {
         params.set(key, value);
       }
     });

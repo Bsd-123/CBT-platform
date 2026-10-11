@@ -1,5 +1,7 @@
 "use server";
 
+import { ForbiddenError } from "@/lib/auth/errors";
+import { runAction } from "@/lib/actions/result";
 import type { UpdateExpertApprovalStatusInput } from "@/lib/models/expert-approval";
 import {
   listExpertApprovalsForExpert,
@@ -25,12 +27,15 @@ export async function decideReferralApproval(
   user_id: string,
   input: UpdateExpertApprovalStatusInput,
 ) {
-  const auth = await requireRole("expert", "admin");
-  const decision = parseInput(approvalDecisionSchema, input);
+  return runAction(async () => {
+    const auth = await requireRole("expert", "admin");
+    const decision = parseInput(approvalDecisionSchema, input);
 
-  if (auth.profile.role === "expert" && auth.userId !== expert_id) {
-    throw new Error("Forbidden");
-  }
+    if (auth.profile.role === "expert" && auth.userId !== expert_id) {
+      throw new ForbiddenError();
+    }
 
-  return updateExpertApprovalStatus(expert_id, user_id, decision);
+    return updateExpertApprovalStatus(expert_id, user_id, decision);
+
+  });
 }
