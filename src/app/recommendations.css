@@ -409,3 +409,12 @@
   padding-top: 0.75rem;
   border-top: 1px solid var(--rc-border);
 }
+
+.rec-chat-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--rc-text);
+  overflow-wrap: anywhere;
+}
