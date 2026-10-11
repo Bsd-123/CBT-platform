@@ -11,5 +11,5 @@ docker exec "$C" psql -U postgres -tAc "select 1 from pg_roles where rolname='an
   docker exec -i "$C" psql -U postgres -q -c "create role anon nologin" -c "create role authenticated nologin" -c "create role service_role nologin bypassrls"
 sed -e '/^create role/d' tests/db/00_supabase_stub.sql | psql -d rlstest
 psql -d rlstest < tests/db/01_base_schema.sql
-for f in supabase/migrations/20261011120000_data_access_without_prisma.sql supabase/migrations/20261011184504_restrict_function_execute_to_authenticated.sql supabase/migrations/20261011190000_forum_question_domain.sql; do psql -d rlstest < "$f"; done
+for f in supabase/migrations/20261011120000_data_access_without_prisma.sql supabase/migrations/20261011184504_restrict_function_execute_to_authenticated.sql supabase/migrations/20261011192205_forum_question_domain.sql; do psql -d rlstest < "$f"; done
 psql -d rlstest < tests/db/10_rls_tests.sql
