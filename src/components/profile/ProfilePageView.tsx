@@ -16,6 +16,7 @@ import {
   EditEventForm,
   buildEditEventInitial,
 } from "@/components/events/EditEventForm";
+import { unwrap } from "@/lib/actions/result";
 
 type ProfileTab = "materials" | "recommendations" | "forum" | "events";
 
@@ -146,7 +147,7 @@ export function ProfilePageView({
     setEditLoading(true);
 
     try {
-      await updateMyProfile({ full_name: fullName, title });
+      unwrap(await updateMyProfile({ full_name: fullName, title }));
       setShowEditProfile(false);
       router.refresh();
     } catch (saveError) {

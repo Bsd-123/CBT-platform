@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ForumLikeTargetType } from "@prisma/client";
 import { submitForumLikeToggle } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 type ForumLikeButtonProps = {
   targetType: ForumLikeTargetType;
@@ -29,7 +30,7 @@ export function ForumLikeButton({
     setLoading(true);
 
     try {
-      const result = await submitForumLikeToggle(targetType, targetId);
+      const result = unwrap(await submitForumLikeToggle(targetType, targetId));
       setCount(result.count);
       setLiked(result.liked);
       router.refresh();

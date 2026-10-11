@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { submitEvent } from "@/lib/actions/submit";
+import { unwrap } from "@/lib/actions/result";
 
 export function CreateEventForm() {
   const router = useRouter();
@@ -19,12 +20,12 @@ export function CreateEventForm() {
     setLoading(true);
 
     try {
-      const created = await submitEvent({
+      const created = unwrap(await submitEvent({
         title,
         description,
         event_date: eventDate,
         event_time: eventTime || undefined,
-      });
+      }));
       setTitle("");
       setDescription("");
       setEventDate("");
@@ -40,7 +41,6 @@ export function CreateEventForm() {
 
   return (
     <form className="stack" onSubmit={handleSubmit}>
-      <h2>יצירת אירוע / סדנה</h2>
       <div className="form-field">
         <label htmlFor="event-title">כותרת</label>
         <input id="event-title" required value={title} onChange={(e) => setTitle(e.target.value)} />

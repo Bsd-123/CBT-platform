@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { PublicMaterial } from "@/lib/models/material";
-import type { PublicEntityTag } from "@/lib/models/tag";
+import type { PublicTag } from "@/lib/models/tag";
 import { TagList } from "@/components/shared/TagList";
 import { getMaterialTypeBadgeVariant } from "@/lib/utils/material-type-ui";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 
 type MaterialCardProps = {
   material: PublicMaterial;
-  tags: PublicEntityTag[];
+  tags: PublicTag[];
   averageRating: number | null;
 };
 
