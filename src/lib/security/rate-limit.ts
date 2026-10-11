@@ -64,13 +64,15 @@ async function checkSharedLimit(
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify([
+        // Create the key with its TTL first so a failed command can never leave a counter
+        // without an expiry (which would block the user permanently).
+        ["SET", `rl:${key}`, "0", "EX", String(windowSeconds), "NX"],
         ["INCR", `rl:${key}`],
-        ["EXPIRE", `rl:${key}`, String(windowSeconds), "NX"],
       ]),
       signal: AbortSignal.timeout(1500),
     });
     if (!response.ok) return null;
-    const [incr] = (await response.json()) as { result?: number }[];
+    const [, incr] = (await response.json()) as { result?: number }[];
     return typeof incr?.result === "number" ? incr.result <= max : null;
   } catch {
     return null;
