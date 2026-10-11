@@ -62,12 +62,14 @@ describe("ilikeAny", () => {
   });
 
   it("cannot be broken out of by quotes, wildcards or commas in the search text", () => {
-    const filter = ilikeAny(["title"], 'a",id.eq.1,"b%_\');
+    const evil = 'a",id.eq.1,"b%_' + String.fromCharCode(92);
+    const filter = ilikeAny(["title"], evil);
     expect(filter.startsWith('title.ilike."%')).toBe(true);
     expect(filter.endsWith('%"')).toBe(true);
     // Only the surrounding pair of quotes remains: no quote or wildcard survives in the text.
     expect(filter.slice(0, -2).split('"').length).toBe(2);
-    expect(filter).not.toMatch(/[_\]/);
+    expect(filter.includes("_")).toBe(false);
+    expect(filter.includes(String.fromCharCode(92))).toBe(false);
   });
 });
 
