@@ -60,7 +60,7 @@ function token(sub: string): string {
 
 /** Subsequent repository calls run as this user. */
 function as(who: Who) {
-  const headers = who === "anon" ? {} : { Authorization: `Bearer ${token(ID[who])}` };
+  const headers: Record<string, string> = who === "anon" ? {} : { Authorization: `Bearer ${token(ID[who])}` };
   state.client = new PostgrestClient(URL_BASE, { headers });
 }
 
