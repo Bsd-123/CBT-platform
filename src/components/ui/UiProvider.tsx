@@ -1,5 +1,6 @@
 "use client";
 
+import { useFocusTrap } from "@/components/ui/useFocusTrap";
 import {
   createContext,
   useCallback,
@@ -42,6 +43,10 @@ export function UiProvider({ children }: { children: ReactNode }) {
   >(null);
   const nextId = useRef(1);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmDialogRef = useRef<HTMLDivElement>(null);
+  // Source of truth for the open dialog, updated synchronously so back-to-back confirm()
+  // calls in one tick still settle the earlier promise.
+  const pendingRef = useRef<typeof pending>(null);
 
   const toast = useCallback((message: string, kind: ToastKind = "success") => {
     const id = nextId.current++;
@@ -54,22 +59,30 @@ export function UiProvider({ children }: { children: ReactNode }) {
   const confirm = useCallback(
     (options: ConfirmOptions) =>
       new Promise<boolean>((resolve) => {
-        setPending({ ...options, resolve });
+        // A newer confirm replaces an open one: settle the older promise as "cancelled".
+        pendingRef.current?.resolve(false);
+        const entry = { ...options, resolve };
+        pendingRef.current = entry;
+        setPending(entry);
       }),
     [],
   );
 
   function settle(result: boolean) {
-    pending?.resolve(result);
+    pendingRef.current?.resolve(result);
+    pendingRef.current = null;
     setPending(null);
   }
+
+  useFocusTrap(confirmDialogRef, pending !== null);
 
   useEffect(() => {
     if (!pending) return;
     confirmButtonRef.current?.focus();
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        pending?.resolve(false);
+        pendingRef.current?.resolve(false);
+        pendingRef.current = null;
         setPending(null);
       }
     }
@@ -98,7 +111,7 @@ export function UiProvider({ children }: { children: ReactNode }) {
             if (event.target === event.currentTarget) settle(false);
           }}
         >
-          <div className="ui-dialog ui-dialog-small" role="alertdialog" aria-modal="true" aria-label={pending.title}>
+          <div ref={confirmDialogRef} className="ui-dialog ui-dialog-small" role="alertdialog" aria-modal="true" aria-label={pending.title}>
             <div className="ui-dialog-body">
               <h2>{pending.title}</h2>
               {pending.message && <p className="muted">{pending.message}</p>}

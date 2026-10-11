@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "dev:insecure-tls": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

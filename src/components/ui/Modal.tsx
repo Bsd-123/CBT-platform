@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
+import { useFocusTrap } from "@/components/ui/useFocusTrap";
 
 type ModalButtonProps = {
   /** Text of the button that opens the dialog. */
@@ -28,11 +29,11 @@ export function ModalButton({
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
+  useFocusTrap(dialogRef, open);
+
   useEffect(() => {
     if (!open) return;
 
-    const trigger = triggerRef.current;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
     dialogRef.current?.focus();
     document.body.style.overflow = "hidden";
 
@@ -44,7 +45,6 @@ export function ModalButton({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
-      (previouslyFocused ?? trigger)?.focus();
     };
   }, [open]);
 

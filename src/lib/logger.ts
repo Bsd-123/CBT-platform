@@ -5,6 +5,12 @@ export type LogContext = Record<string, unknown>;
 function serializeError(error: unknown): LogContext | undefined {
   if (error === undefined || error === null) return undefined;
   if (error instanceof Error) {
+    // Prisma messages echo the failing query, including user-supplied values: log the
+    // code and affected fields instead.
+    if (error.name.startsWith("PrismaClient")) {
+      const { code, meta } = error as { code?: string; meta?: unknown };
+      return { name: error.name, code, meta, message: "[redacted: database error]", stack: error.stack?.replace(error.message, "[redacted]") };
+    }
     return { name: error.name, message: error.message, stack: error.stack };
   }
   return { message: String(error) };
