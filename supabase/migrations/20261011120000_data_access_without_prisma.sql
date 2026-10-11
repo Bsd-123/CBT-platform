@@ -288,6 +288,8 @@ create policy professional_request_comments_insert on public.professional_reques
 -- notifications: read and mark-read your own; rows are created by triggers/functions only.
 grant select on public.notifications to authenticated;
 grant update (is_read) on public.notifications to authenticated;
+-- (this policy already exists in production from an earlier migration: replace it)
+drop policy if exists "Users can read their own notifications" on public.notifications;
 create policy "Users can read their own notifications" on public.notifications
   for select to authenticated using (auth.uid() = user_id);
 create policy notifications_mark_read on public.notifications for update to authenticated
