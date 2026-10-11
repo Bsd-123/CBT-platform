@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { fetchEventById, fetchEventComments } from "@/lib/data";
 import { EventCommentForm } from "@/components/events/EventCommentForm";
-import { EditEventForm, buildEditEventInitial } from "@/components/events/EditEventForm";
+import { EditEventForm } from "@/components/events/EditEventForm";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { ReportForm } from "@/components/shared/ReportForm";
 import { Disclosure } from "@/components/ui/Disclosure";
 import { formatEventDate, formatEventTimeValue } from "@/lib/utils/calendar";
+import { buildEditEventInitial } from "@/lib/utils/event-form";
 import { formatDate } from "@/lib/utils/format";
 import { isUuid } from "@/lib/utils/ids";
 

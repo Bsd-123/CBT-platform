@@ -12,10 +12,8 @@ import type { PublicUser } from "@/lib/models/user";
 import type { ProfileForumAnswer, ProfileForumQuestion } from "@/lib/repositories/profile.repository";
 import { updateMyProfile } from "@/lib/actions/profile";
 import { getInitials } from "@/lib/utils/expert-approval-ui";
-import {
-  EditEventForm,
-  buildEditEventInitial,
-} from "@/components/events/EditEventForm";
+import { EditEventForm } from "@/components/events/EditEventForm";
+import { buildEditEventInitial } from "@/lib/utils/event-form";
 import { unwrap } from "@/lib/actions/result";
 import { APPROVAL_LABELS } from "@/lib/materials/approval";
 
