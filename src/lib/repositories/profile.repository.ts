@@ -101,7 +101,7 @@ export async function getUserProfilePageData(user_id: string): Promise<UserProfi
       .order("created_at", newestFirst),
     db
       .from("forum_answers")
-      .select("*, user:users(*), replies:forum_answers!forum_answers_parent_answer_id_fkey(*)")
+      .select("*, user:users(*), replies:forum_answers!parent_answer_id(*)")
       .eq("user_id", user_id)
       .order("created_at", newestFirst),
     db
