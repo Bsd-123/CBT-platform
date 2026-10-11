@@ -11,7 +11,7 @@ import { UserFacingError } from "@/lib/errors";
 import { isFileKeyOwnedBy } from "@/lib/r2";
 import { initialApprovalFor } from "@/lib/materials/approval";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
-import { parseTagNames, syncEntityTags, syncEntityTagsByIds } from "@/lib/services/tags";
+import { syncEntityTagsByIds } from "@/lib/services/tags";
 import {
   eventCommentSchema,
   eventSchema,
@@ -33,7 +33,6 @@ import {
 import {
   editEvent,
   fetchEventById,
-  fetchTagById,
   postEvent,
   postEventComment,
   postForumAnswer,
@@ -144,34 +143,20 @@ export async function submitMaterialRating(material_id: string, rating: number) 
 export async function submitForumQuestion(raw: {
   title: string;
   content: string;
-  domain_tag_id: string;
-  tags: string;
+  tag_ids: string[];
 }) {
   return runAction(async () => {
     const auth = await authorizeWrite();
     const input = parseInput(forumQuestionSchema, raw);
 
-    // The domain must be one of the existing tags (the form offers exactly that list).
-    const domain = await fetchTagById(input.domain_tag_id);
-    if (!domain) {
-      throw new UserFacingError("יש לבחור תחום מהרשימה.");
-    }
-
-    const tagNames = parseTagNames(input.tags);
-    if (tagNames.length > 10 || tagNames.some((name) => name.length > 40)) {
-      throw new UserFacingError("עד 10 תגיות, עד 40 תווים לכל תגית.");
-    }
-
     const question = await postForumQuestion({
       user_id: auth.userId,
       title: input.title,
       content: input.content,
-      domain_tag_id: domain.id,
     });
 
-    // The domain is also a regular tag on the question, so tag filters and profiles keep working.
-    await syncEntityTagsByIds("forum", question.id, [domain.id]);
-    await syncEntityTags("forum", question.id, tagNames);
+    // Tags are optional; an empty selection simply leaves the question untagged.
+    await syncEntityTagsByIds("forum", question.id, input.tag_ids);
     return question;
   });
 }

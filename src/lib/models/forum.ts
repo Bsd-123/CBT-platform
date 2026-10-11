@@ -1,5 +1,4 @@
-import type { ForumAnswer, ForumQuestion, Tag } from "@/lib/db/types";
-import { pickPublicTagFields } from "@/lib/models/tag";
+import type { ForumAnswer, ForumQuestion } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { ForumQuestion, ForumAnswer };
@@ -8,8 +7,6 @@ export type CreateForumQuestionInput = {
   user_id: string;
   title: string;
   content: string;
-  /** Id of the tag chosen as the question's domain. */
-  domain_tag_id: string;
 };
 
 export type CreateForumAnswerInput = {
@@ -29,7 +26,6 @@ export type SearchForumQuestionsFilter = {
 export function pickPublicForumQuestionFields(
   question: ForumQuestion & {
     user?: Parameters<typeof pickPublicUserFields>[0];
-    domain?: Tag | null;
     answers?: Parameters<typeof pickPublicForumAnswerFields>[0][];
     _count?: { answers: number };
   },
@@ -41,7 +37,6 @@ export function pickPublicForumQuestionFields(
     content: question.content,
     created_at: question.created_at,
     user: question.user ? pickPublicUserFields(question.user) : undefined,
-    domain: question.domain ? pickPublicTagFields(question.domain) : null,
     answers: question.answers?.map(pickPublicForumAnswerFields),
     answer_count: question._count?.answers,
   };

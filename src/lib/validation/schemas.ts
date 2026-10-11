@@ -47,10 +47,8 @@ export const materialRatingSchema = z.object({
 export const forumQuestionSchema = z.object({
   title,
   content: longText,
-  /** The domain: required, one of the existing tags. */
-  domain_tag_id: uuid,
-  /** Extra free-text tags, comma separated; optional because the domain is already a tag. */
-  tags: z.string().max(500),
+  /** Optional: any number of existing tags, up to 10. */
+  tag_ids: z.array(uuid).max(10),
 });
 
 export const forumAnswerSchema = z.object({

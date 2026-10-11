@@ -88,7 +88,7 @@ select t_run('anon can read referral-required flag', null, 'select public.is_ref
 select t_run('stranger (no profile) sees no users', :stranger, 'select * from public.users', 'rows:0');
 select t_run('stranger sees no materials', :stranger, 'select * from public.materials', 'rows:0');
 select t_run('stranger cannot post a question', :stranger,
-  format($q$insert into public.forum_questions (user_id, title, content, domain_tag_id) values (%L, 't', 'c', (select id from public.tags limit 1))$q$, :stranger), 'denied');
+  format($q$insert into public.forum_questions (user_id, title, content) values (%L, 't', 'c')$q$, :stranger), 'denied');
 select t_run('authenticated cannot TRUNCATE', :m1, 'truncate public.tags', 'denied');
 
 -- ===================== users =====================
@@ -163,11 +163,9 @@ select t_run('cannot update others rating', :m1, format('update public.materials
 -- ===================== forum + notifications + depth rules =====================
 select t_run('member sees visible question only', :m1, 'select * from public.forum_questions', 'rows:1');
 select t_run('admin sees hidden question', :admin, 'select * from public.forum_questions', 'rows:2');
-select t_run('member posts question with a domain', :m1, format($q$insert into public.forum_questions (user_id, title, content, domain_tag_id) values (%L, 't', 'c', (select id from public.tags where name = 'anxiety'))$q$, :m1), 'ok');
-select t_run('question without a domain is rejected', :m1, format($q$insert into public.forum_questions (user_id, title, content) values (%L, 'no domain', 'c')$q$, :m1), 'denied');
-select t_run('question with an unknown domain is rejected', :m1, format($q$insert into public.forum_questions (user_id, title, content, domain_tag_id) values (%L, 'bad domain', 'c', 'ffffffff-0000-4000-8000-000000000009')$q$, :m1), 'denied');
-select t_run('cannot post as someone else', :m1, format($q$insert into public.forum_questions (user_id, title, content, domain_tag_id) values (%L, 't', 'c', (select id from public.tags limit 1))$q$, :m2), 'denied');
-select t_run('cannot post pre-hidden', :m1, format($q$insert into public.forum_questions (user_id, title, content, is_hidden, domain_tag_id) values (%L, 't', 'c', true, (select id from public.tags limit 1))$q$, :m1), 'denied');
+select t_run('member posts question', :m1, format($q$insert into public.forum_questions (user_id, title, content) values (%L, 't', 'c')$q$, :m1), 'ok');
+select t_run('cannot post as someone else', :m1, format($q$insert into public.forum_questions (user_id, title, content) values (%L, 't', 'c')$q$, :m2), 'denied');
+select t_run('cannot post pre-hidden', :m1, format($q$insert into public.forum_questions (user_id, title, content, is_hidden) values (%L, 't', 'c', true)$q$, :m1), 'denied');
 select t_run('cannot answer hidden question', :m1, format($q$insert into public.forum_answers (question_id, user_id, content) values (%L, %L, 'a')$q$, '22222222-0000-4000-8000-000000000002', :m1), 'denied');
 select t_run('answer ok', :m1, format($q$insert into public.forum_answers (id, question_id, user_id, content) values ('77777777-0000-4000-8000-000000000001', %L, %L, 'a')$q$, '22222222-0000-4000-8000-000000000001', :m1), 'ok');
 select t_run('question owner notified of answer', :expert, $q$select * from public.notifications where type = 'forum_answer'$q$, 'rows:1');
@@ -182,10 +180,6 @@ select t_run('duplicate like blocked', :m2, format($q$insert into public.forum_l
 select t_run('like on behalf of another denied', :m2, format($q$insert into public.forum_likes (user_id, target_type, target_id) values (%L, 'answer', %L)$q$, :m1, '77777777-0000-4000-8000-000000000001'), 'denied');
 select t_run('cannot remove others like', :m1, format('delete from public.forum_likes where user_id = %L', :m2), 'affected:0');
 select t_run('remove own like', :m2, format('delete from public.forum_likes where user_id = %L', :m2), 'affected:1');
-
--- ===================== forum question domain =====================
-select t_run('members cannot change a question domain afterwards', :m1, format($q$update public.forum_questions set domain_tag_id = null where user_id = %L$q$, :m1), 'denied');
-select t_run('domain is readable with the question', :m2, $q$select * from public.forum_questions where domain_tag_id is not null$q$, 'rows:1');
 
 -- ===================== recommendations =====================
 select t_run('comment ok', :m2, format($q$insert into public.recommendation_comments (id, recommendation_id, user_id, content, depth) values ('88888888-0000-4000-8000-000000000001', %L, %L, 'c', 5)$q$, '33333333-0000-4000-8000-000000000001', :m2), 'ok');

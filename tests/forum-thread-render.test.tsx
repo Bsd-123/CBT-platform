@@ -48,7 +48,6 @@ const question = {
   id: "q1", user_id: asker, title: "איך בונים היררכיית חשיפה לנערה עם הפרעת פאניקה?",
   content: "היא מסרבת לתרגילים אינטרוצפטיביים.\nמה ניסיתם?", created_at: day(1),
   user: user(asker, "נועה פרץ"), answers, answer_count: 3, like_count: 4, user_liked: true,
-  domain: { id: "t-domain", name: "חרדה", color: "#ec4899" },
 };
 
 function thread(sort: "top" | "newest" | "oldest") {
@@ -102,20 +101,6 @@ describe("forum thread rendering", () => {
     expect(html).toContain('data-kind="admin"');
     expect(html.match(/<h1/g)).toHaveLength(1);
     expect(html).toContain("3 תשובות");
-  });
-
-  it("shows the question's domain in the header card", () => {
-    const html = thread("top");
-    expect(html).toContain("fq-domain");
-    expect(html).toContain("domain-badge");
-    expect(html).toContain("חרדה");
-  });
-
-  it("shows no domain row for questions without one", () => {
-    const html = renderToStaticMarkup(
-      <ForumQuestionCard question={{ ...question, domain: null } as never} tags={[]} answerCount={0} />,
-    );
-    expect(html).not.toContain("fq-domain");
   });
 
   it("renders the sort select and the composer", () => {

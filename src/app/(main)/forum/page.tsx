@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { ForumLikeButton } from "@/components/forum/ForumLikeButton";
-import { DomainBadge } from "@/components/shared/DomainBadge";
 import { ForumSearchForm } from "@/components/forum/ForumSearchForm";
 import { PostForumQuestionForm } from "@/components/forum/PostForumQuestionForm";
 import { ContentCard } from "@/components/ui/ContentCard";
@@ -22,7 +21,7 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
   const { q, page: pageParam } = await searchParams;
   const page = parsePage(pageParam);
   const auth = await fetchAuthenticatedProfile();
-  const [questionsRaw, total, domains] = await Promise.all([
+  const [questionsRaw, total, allTags] = await Promise.all([
     searchForum({ query: q, ...pageWindow(page) }),
     fetchForumQuestionCount({ query: q }),
     fetchTags(),
@@ -39,7 +38,7 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
         subtitle="התייעצו עם עמיתים, שאלו ושתפו ידע מקצועי."
         actions={
           <ModalButton label="שאלה חדשה" icon="add" title="פרסום שאלה">
-            <PostForumQuestionForm domains={domains} />
+            <PostForumQuestionForm tags={allTags} />
           </ModalButton>
         }
       />
@@ -72,7 +71,6 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
                 excerpt={question.content}
                 author={question.user?.full_name}
                 dateLabel={formatDate(question.created_at)}
-                badges={<DomainBadge domain={question.domain} />}
                 tags={tagsByQuestion.get(question.id)}
                 stats={[
                   {

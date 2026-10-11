@@ -9,6 +9,8 @@ type TagSelectProps = {
   value: string[];
   onChange: (value: string[]) => void;
   required?: boolean;
+  /** Marks the field as skippable in its label and hint. */
+  optional?: boolean;
 };
 
 export function TagSelect({
@@ -17,6 +19,7 @@ export function TagSelect({
   value,
   onChange,
   required = false,
+  optional = false,
 }: TagSelectProps) {
   function toggleTag(tagId: string) {
     if (value.includes(tagId)) {
@@ -29,7 +32,7 @@ export function TagSelect({
   return (
     <div className="form-field">
       <label id={`${id}-label`}>
-        תגיות{required ? " (חובה)" : ""}
+        תגיות{required ? " (חובה)" : optional ? " (לא חובה)" : ""}
       </label>
       {tags.length === 0 ? (
         <p className="muted">אין תגיות זמינות. פנו למנהל המערכת.</p>
@@ -57,7 +60,9 @@ export function TagSelect({
           })}
         </div>
       )}
-      <p className="muted">לחצו לבחירת תגית אחת או יותר.</p>
+      <p className="muted">
+        {optional ? "לחצו על תגית כדי לבחור או לבטל. אפשר לבחור כמה תגיות, או לדלג." : "לחצו לבחירת תגית אחת או יותר."}
+      </p>
     </div>
   );
 }
