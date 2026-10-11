@@ -1,4 +1,4 @@
-import type { ExpertApproval, ExpertApprovalStatus } from "@prisma/client";
+import type { ExpertApproval, ExpertApprovalStatus } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { ExpertApproval, ExpertApprovalStatus };

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { UserRole } from "@prisma/client";
+import type { UserRole } from "@/lib/db/types";
 import type { PublicEvent } from "@/lib/models/event";
 import type { PublicMaterial } from "@/lib/models/material";
 import type { PublicRecommendation } from "@/lib/models/recommendation";

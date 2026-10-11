@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { MaterialApprovalStatus } from "@prisma/client";
+import type { MaterialApprovalStatus } from "@/lib/db/types";
 import type {
   CreateMaterialInput,
   ListMaterialsFilter,
@@ -39,7 +39,6 @@ import type {
   CreateMaterialRatingInput,
   UpdateMaterialRatingInput,
 } from "@/lib/models/material-rating";
-import type { CreateNotificationInput } from "@/lib/models/notification";
 import type {
   CreateReportInput,
   ListReportsFilter,
@@ -51,21 +50,18 @@ import {
   countUnreadNotifications,
   createEvent,
   createEventComment,
-  createExpertApproval,
   createForumAnswer,
   createForumQuestion,
   createMaterial,
   createMaterialRating,
   createMaterialRequest,
   createMaterialResponse,
-  createNotification,
   createProfessionalRequest,
   createProfessionalRequestComment,
   createRecommendation,
   createRecommendationComment,
   createReport,
   createTag,
-  createUser,
   deleteMaterialRating,
   detachEntityTag,
   getEventById,
@@ -123,10 +119,6 @@ import {
 // Users
 export async function fetchUserById(id: string) {
   return getUserById(id);
-}
-
-export async function registerUserProfile(input: CreateUserInput) {
-  return createUser(input);
 }
 
 export async function editUserProfile(id: string, input: UpdateUserInput) {
@@ -215,10 +207,6 @@ export async function fetchReferralApproval(expert_id: string, user_id: string) 
   return getExpertApprovalByExpertAndUser(expert_id, user_id);
 }
 
-export async function submitReferralApproval(input: CreateExpertApprovalInput) {
-  return createExpertApproval(input);
-}
-
 export async function decideReferralApproval(
   expert_id: string,
   user_id: string,
@@ -279,7 +267,7 @@ export async function fetchForumAnswers(question_id: string) {
 
 export async function toggleForumLike(
   user_id: string,
-  target_type: import("@prisma/client").ForumLikeTargetType,
+  target_type: import("@/lib/db/types").ForumLikeTargetType,
   target_id: string,
 ) {
   return toggleForumLikeInRepo(user_id, target_type, target_id);
@@ -403,10 +391,6 @@ export async function fetchEntityTags(entity_type: EntityType, entity_id: string
 // Notifications
 export async function fetchNotifications(user_id: string, unreadOnly = false) {
   return listNotificationsForUser(user_id, unreadOnly);
-}
-
-export async function notifyUser(input: CreateNotificationInput) {
-  return createNotification(input);
 }
 
 export async function readNotification(id: string, user_id: string) {

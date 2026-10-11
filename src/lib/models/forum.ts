@@ -1,4 +1,4 @@
-import type { ForumAnswer, ForumQuestion } from "@prisma/client";
+import type { ForumAnswer, ForumQuestion } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { ForumQuestion, ForumAnswer };

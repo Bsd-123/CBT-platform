@@ -1,4 +1,4 @@
-import type { Notification, NotificationType } from "@prisma/client";
+import type { Notification, NotificationType } from "@/lib/db/types";
 
 export type { Notification, NotificationType };
 

@@ -1,4 +1,4 @@
-import type { ExpertApprovalStatus } from "@prisma/client";
+import type { ExpertApprovalStatus } from "@/lib/db/types";
 import type { PublicExpertApproval } from "@/lib/models/expert-approval";
 
 export const EXPERT_APPROVAL_STATUS_LABELS: Record<ExpertApprovalStatus, string> = {

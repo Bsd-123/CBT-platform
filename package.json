@@ -5,25 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "dev:insecure-tls": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
-    "build": "prisma generate && next build",
-    "postinstall": "prisma generate",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
-    "db:seed": "prisma db seed"
-  },
-  "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
+    "test:db": "bash tests/db/run.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.828.0",
     "@aws-sdk/s3-request-presigner": "^3.828.0",
-    "@prisma/client": "6.12.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.0",
     "next": "^16.2.9",
@@ -42,8 +33,6 @@
     "cross-env": "^10.1.0",
     "eslint": "^9.28.0",
     "eslint-config-next": "^16.2.9",
-    "prisma": "6.12.0",
-    "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "vitest": "^5.0.3"
   }

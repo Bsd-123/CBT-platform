@@ -20,10 +20,15 @@ describe("KNOWN_MESSAGES", () => {
     const keys = [...block.matchAll(/^\s*(?:"([^"]+)"|(\w+)):\s*"/gm)].map((m) => m[1] ?? m[2]);
     expect(keys.length).toBeGreaterThan(5);
 
-    const others = sourceFiles("src")
-      .filter((file) => !file.endsWith("result.ts"))
-      .map((file) => readFileSync(file, "utf8"))
+    // Some messages are raised by database functions, so migrations count as sources too.
+    const migrations = readdirSync("supabase/migrations")
+      .map((name) => readFileSync(join("supabase/migrations", name), "utf8"))
       .join("\n");
+    const others =
+      sourceFiles("src")
+        .filter((file) => !file.endsWith("result.ts"))
+        .map((file) => readFileSync(file, "utf8"))
+        .join("\n") + migrations;
 
     const stale = keys.filter((key) => !others.includes(key));
     expect(stale).toEqual([]);

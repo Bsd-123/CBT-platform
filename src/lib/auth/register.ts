@@ -1,9 +1,7 @@
-import { prisma } from "@/lib/db";
+import { done, getDb, row } from "@/lib/db/client";
+import type { User } from "@/lib/db/types";
 import { UserFacingError } from "@/lib/errors";
 import { pickPublicUserFields, type PublicUser } from "@/lib/models/user";
-import { resolveExpertReferralId } from "@/lib/auth/resolve-expert-referral";
-
-const REGISTER_TIMEOUT_MS = 15_000;
 
 export type RegisterProfileInput = {
   id: string;
@@ -16,15 +14,6 @@ export type RegisterProfileResult = {
   profile: PublicUser;
   pending_expert_approval: boolean;
 };
-
-function normalizeRegisterInput(input: RegisterProfileInput): RegisterProfileInput {
-  return {
-    id: input.id,
-    full_name: input.full_name.trim(),
-    title: input.title?.trim() || null,
-    expert_code: input.expert_code?.trim() || null,
-  };
-}
 
 function mapRegistrationError(error: unknown): Error {
   if (error instanceof Error) {
@@ -40,14 +29,16 @@ function mapRegistrationError(error: unknown): Error {
     if (error.message === "Cannot refer yourself.") {
       return new UserFacingError("לא ניתן להפנות את עצמכם.");
     }
+    if (error.message === "Full name required.") {
+      return new UserFacingError("יש להזין שם מלא.");
+    }
 
     const message = error.message.toLowerCase();
     if (
       message.includes("timed out") ||
       message.includes("timeout") ||
-      message.includes("connect") ||
-      message.includes("econnrefused") ||
-      message.includes("can't reach database")
+      message.includes("fetch failed") ||
+      message.includes("econnrefused")
     ) {
       return new UserFacingError(
         "לא ניתן להתחבר למסד הנתונים. בדקו חיבור לאינטרנט ונסו שוב בעוד רגע.",
@@ -58,69 +49,31 @@ function mapRegistrationError(error: unknown): Error {
   return new UserFacingError("אירעה שגיאה בשמירת הפרופיל. נסו שוב.");
 }
 
-export async function registerProfile(
-  input: RegisterProfileInput,
-): Promise<RegisterProfileResult> {
-  const normalized = normalizeRegisterInput(input);
-
-  if (!normalized.full_name) {
+/**
+ * Creates the signed-in user's profile (and the pending referral approval) in one database
+ * call. `register_profile` always acts on the caller's own id, so `input.id` is only checked
+ * by the calling action; the role of a new profile is always "user".
+ */
+export async function registerProfile(input: RegisterProfileInput): Promise<RegisterProfileResult> {
+  if (!input.full_name.trim()) {
     throw new Error("יש להזין שם מלא.");
   }
 
   try {
-    return await prisma.$transaction(
-      async (tx) => {
-        const existing = await tx.user.findUnique({ where: { id: normalized.id } });
-        if (existing) {
-          const pendingApproval = await tx.expertApproval.findFirst({
-            where: { user_id: normalized.id, status: "pending" },
-          });
-          return {
-            profile: pickPublicUserFields(existing),
-            pending_expert_approval: pendingApproval !== null,
-          };
-        }
+    const db = await getDb();
+    const result = await db.rpc("register_profile", {
+      p_full_name: input.full_name.trim(),
+      p_title: input.title?.trim() || null,
+      p_expert_code: input.expert_code?.trim() || null,
+    });
+    if (result.error) throw new Error(result.error.message);
 
-        // A referral code is mandatory, except on a brand-new system with no experts
-        // yet (otherwise the very first expert/admin could never register).
-        if (!normalized.expert_code && (await tx.user.count({ where: { role: "expert" } })) > 0) {
-          throw new Error("Expert referral code required.");
-        }
-
-        const expertId = await resolveExpertReferralId(
-          tx,
-          normalized.expert_code,
-          normalized.id,
-        );
-
-        const user = await tx.user.create({
-          data: {
-            id: normalized.id,
-            full_name: normalized.full_name,
-            title: normalized.title ?? null,
-          },
-        });
-
-        let pendingExpertApproval = false;
-
-        if (expertId) {
-          await tx.expertApproval.create({
-            data: {
-              expert_id: expertId,
-              user_id: normalized.id,
-              status: "pending",
-            },
-          });
-          pendingExpertApproval = true;
-        }
-
-        return {
-          profile: pickPublicUserFields(user),
-          pending_expert_approval: pendingExpertApproval,
-        };
-      },
-      { maxWait: 5_000, timeout: REGISTER_TIMEOUT_MS },
-    );
+    const registered = row<{ profile: User; pending_expert_approval: boolean }>(result);
+    if (!registered) throw new Error("Registration returned no profile.");
+    return {
+      profile: pickPublicUserFields(registered.profile),
+      pending_expert_approval: registered.pending_expert_approval,
+    };
   } catch (error) {
     throw mapRegistrationError(error);
   }
@@ -128,24 +81,26 @@ export async function registerProfile(
 
 /** Whether registration needs a referral code (false only while no expert exists yet). */
 export async function isReferralCodeRequired(): Promise<boolean> {
-  return (await prisma.user.count({ where: { role: "expert" } })) > 0;
+  const db = await getDb();
+  const result = await db.rpc("is_referral_code_required");
+  if (result.error) throw new Error(result.error.message);
+  return result.data === true;
 }
 
 export type RegistrationStatus = "approved" | "pending" | "rejected" | "none";
 
-export async function getRegistrationStatus(
-  user_id: string,
-): Promise<RegistrationStatus> {
-  const approval = await prisma.expertApproval.findFirst({
-    where: { user_id },
-    orderBy: { created_at: "desc" },
-  });
-
-  if (!approval) {
-    return "none";
-  }
-
-  return approval.status;
+export async function getRegistrationStatus(user_id: string): Promise<RegistrationStatus> {
+  const db = await getDb();
+  const approval = row<{ status: Exclude<RegistrationStatus, "none"> }>(
+    await db
+      .from("expert_approvals")
+      .select("status")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  );
+  return approval?.status ?? "none";
 }
 
 export async function isRegistrationApproved(user_id: string): Promise<boolean> {
@@ -153,18 +108,10 @@ export async function isRegistrationApproved(user_id: string): Promise<boolean> 
   return status === "approved" || status === "none";
 }
 
-export async function getPendingApprovalState(user_id: string) {
-  const approval = await prisma.expertApproval.findFirst({
-    where: { user_id },
-    include: { expert: true },
-  });
-
-  if (!approval) {
-    return null;
-  }
-
-  return {
-    status: approval.status,
-    expert_name: approval.expert.full_name,
-  };
+/** The signed-in user's newest referral approval and the referring expert's name. */
+export async function getPendingApprovalState(_user_id: string) {
+  const db = await getDb();
+  const result = await db.rpc("my_registration_state");
+  done(result);
+  return row<{ status: Exclude<RegistrationStatus, "none">; expert_name: string }>(result);
 }

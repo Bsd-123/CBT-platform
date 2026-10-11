@@ -1,10 +1,22 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getDb, rows } from "@/lib/db/client";
+import type {
+  Event,
+  EventComment,
+  ForumAnswer,
+  ForumQuestion,
+  Material,
+  MaterialType,
+  Recommendation,
+  RecommendationComment,
+  User,
+} from "@/lib/db/types";
 import { pickPublicEventFields } from "@/lib/models/event";
 import { pickPublicForumAnswerFields, pickPublicForumQuestionFields } from "@/lib/models/forum";
 import { pickPublicMaterialFields } from "@/lib/models/material";
 import { pickPublicRecommendationFields } from "@/lib/models/recommendation";
-import { pickPublicTagFields, type PublicTag } from "@/lib/models/tag";
+import type { PublicTag } from "@/lib/models/tag";
+import { listEntityTagsForEntities } from "@/lib/repositories/tag.repository";
 
 export type ProfileForumQuestion = ReturnType<typeof pickPublicForumQuestionFields> & {
   like_count: number;
@@ -29,60 +41,37 @@ async function countForumLikes(
   target_type: "question" | "answer",
   target_ids: string[],
 ): Promise<Map<string, number>> {
-  if (target_ids.length === 0) return new Map();
+  const counts = new Map<string, number>();
+  if (target_ids.length === 0) return counts;
 
-  const rows = await prisma.forumLike.groupBy({
-    by: ["target_id"],
-    where: { target_type, target_id: { in: target_ids } },
-    _count: { _all: true },
-  });
-
-  return new Map(rows.map((row) => [row.target_id, row._count._all]));
+  const db = await getDb();
+  const likes = rows<{ target_id: string }>(
+    await db
+      .from("forum_likes")
+      .select("target_id")
+      .eq("target_type", target_type)
+      .in("target_id", target_ids),
+  );
+  for (const { target_id } of likes) counts.set(target_id, (counts.get(target_id) ?? 0) + 1);
+  return counts;
 }
 
-async function getUserFocusTags(user_id: string): Promise<PublicTag[]> {
-  const [materials, recommendations, forumQuestions] = await Promise.all([
-    prisma.material.findMany({ where: { user_id }, select: { id: true } }),
-    prisma.recommendation.findMany({ where: { user_id }, select: { id: true } }),
-    prisma.forumQuestion.findMany({ where: { user_id }, select: { id: true } }),
+/** Distinct tags across the user's materials, recommendations and forum questions. */
+async function getUserFocusTags(
+  materialIds: string[],
+  recommendationIds: string[],
+  forumQuestionIds: string[],
+): Promise<PublicTag[]> {
+  const [material, recommendation, forum] = await Promise.all([
+    listEntityTagsForEntities("material", materialIds),
+    listEntityTagsForEntities("recommendation", recommendationIds),
+    listEntityTagsForEntities("forum", forumQuestionIds),
   ]);
 
-  const materialIds = materials.map((item) => item.id);
-  const recommendationIds = recommendations.map((item) => item.id);
-  const forumQuestionIds = forumQuestions.map((item) => item.id);
-
-  if (
-    materialIds.length === 0 &&
-    recommendationIds.length === 0 &&
-    forumQuestionIds.length === 0
-  ) {
-    return [];
-  }
-
-  const entityTags = await prisma.entityTag.findMany({
-    where: {
-      OR: [
-        ...(materialIds.length
-          ? [{ entity_type: "material" as const, entity_id: { in: materialIds } }]
-          : []),
-        ...(recommendationIds.length
-          ? [{ entity_type: "recommendation" as const, entity_id: { in: recommendationIds } }]
-          : []),
-        ...(forumQuestionIds.length
-          ? [{ entity_type: "forum" as const, entity_id: { in: forumQuestionIds } }]
-          : []),
-      ],
-    },
-    include: { tag: true },
-  });
-
   const tagsById = new Map<string, PublicTag>();
-  for (const entityTag of entityTags) {
-    if (entityTag.tag) {
-      tagsById.set(entityTag.tag.id, pickPublicTagFields(entityTag.tag));
-    }
+  for (const tags of [...material.values(), ...recommendation.values(), ...forum.values()]) {
+    for (const tag of tags) tagsById.set(tag.id, tag);
   }
-
   return [...tagsById.values()].sort((a, b) => a.name.localeCompare(b.name, "he"));
 }
 
@@ -91,58 +80,67 @@ export async function getUserActivity(user_id: string) {
 }
 
 export async function getUserProfilePageData(user_id: string): Promise<UserProfilePageData> {
-  const [materials, recommendations, forumQuestions, forumAnswers, events, focus_tags] =
-    await Promise.all([
-      prisma.material.findMany({
-        where: { user_id },
-        include: { user: true, material_type: true },
-        orderBy: { created_at: "desc" },
-      }),
-      prisma.recommendation.findMany({
-        where: { user_id },
-        include: { user: true, comments: true },
-        orderBy: { created_at: "desc" },
-      }),
-      prisma.forumQuestion.findMany({
-        where: { user_id },
-        include: { user: true, answers: true },
-        orderBy: { created_at: "desc" },
-      }),
-      prisma.forumAnswer.findMany({
-        where: { user_id },
-        include: { user: true, replies: true },
-        orderBy: { created_at: "desc" },
-      }),
-      prisma.event.findMany({
-        where: { user_id },
-        include: { user: true, comments: { include: { user: true } } },
-        orderBy: { created_at: "desc" },
-      }),
-      getUserFocusTags(user_id),
-    ]);
+  const db = await getDb();
+  const newestFirst = { ascending: false } as const;
 
-  const questionIds = forumQuestions.map((item) => item.id);
-  const answerIds = forumAnswers.map((item) => item.id);
+  const [materials, recommendations, forumQuestions, forumAnswers, events] = await Promise.all([
+    db
+      .from("materials")
+      .select("*, user:users(*), material_type:material_types!inner(*)")
+      .eq("user_id", user_id)
+      .order("created_at", newestFirst),
+    db
+      .from("recommendations")
+      .select("*, user:users(*), comments:recommendation_comments(*)")
+      .eq("user_id", user_id)
+      .order("created_at", newestFirst),
+    db
+      .from("forum_questions")
+      .select("*, user:users(*), answers:forum_answers(*)")
+      .eq("user_id", user_id)
+      .order("created_at", newestFirst),
+    db
+      .from("forum_answers")
+      .select("*, user:users(*), replies:forum_answers!forum_answers_parent_answer_id_fkey(*)")
+      .eq("user_id", user_id)
+      .order("created_at", newestFirst),
+    db
+      .from("events")
+      .select("*, user:users(*), comments:event_comments(*, user:users(*))")
+      .eq("user_id", user_id)
+      .order("created_at", newestFirst),
+  ]);
 
-  const [questionLikes, answerLikes] = await Promise.all([
-    countForumLikes("question", questionIds),
-    countForumLikes("answer", answerIds),
+  const materialRows = rows<Material & { user: User; material_type: MaterialType }>(materials);
+  const recommendationRows = rows<Recommendation & { user: User; comments: RecommendationComment[] }>(recommendations);
+  const questionRows = rows<ForumQuestion & { user: User; answers: ForumAnswer[] }>(forumQuestions);
+  const answerRows = rows<ForumAnswer & { user: User; replies: ForumAnswer[] }>(forumAnswers);
+  const eventRows = rows<Event & { user: User; comments: (EventComment & { user: User })[] }>(events);
+
+  const [questionLikes, answerLikes, focus_tags] = await Promise.all([
+    countForumLikes("question", questionRows.map((item) => item.id)),
+    countForumLikes("answer", answerRows.map((item) => item.id)),
+    getUserFocusTags(
+      materialRows.map((item) => item.id),
+      recommendationRows.map((item) => item.id),
+      questionRows.map((item) => item.id),
+    ),
   ]);
 
   return {
-    materials: materials.map(pickPublicMaterialFields),
-    recommendations: recommendations.map(pickPublicRecommendationFields),
-    forum_questions: forumQuestions.map((question) => ({
+    materials: materialRows.map(pickPublicMaterialFields),
+    recommendations: recommendationRows.map(pickPublicRecommendationFields),
+    forum_questions: questionRows.map((question) => ({
       ...pickPublicForumQuestionFields(question),
       like_count: questionLikes.get(question.id) ?? 0,
       answer_count: question.answers.length,
     })),
-    forum_answers: forumAnswers.map((answer) => ({
+    forum_answers: answerRows.map((answer) => ({
       ...pickPublicForumAnswerFields(answer),
       like_count: answerLikes.get(answer.id) ?? 0,
       reply_count: answer.replies.length,
     })),
-    events: events.map(pickPublicEventFields),
+    events: eventRows.map(pickPublicEventFields),
     focus_tags,
   };
 }

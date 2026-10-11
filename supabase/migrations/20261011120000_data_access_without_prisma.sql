@@ -488,6 +488,18 @@ returns boolean language sql stable security definer set search_path = public as
   select exists (select 1 from public.users where role = 'expert')
 $$;
 
+-- The caller's newest referral approval with the referring expert's name, for the "waiting for
+-- approval" page (a member who is not yet approved cannot read other users' rows directly).
+create or replace function public.my_registration_state()
+returns json language sql stable security definer set search_path = public as $$
+  select json_build_object('status', a.status, 'expert_name', u.full_name)
+  from public.expert_approvals a
+  join public.users u on u.id = a.expert_id
+  where a.user_id = auth.uid()
+  order by a.created_at desc
+  limit 1
+$$;
+
 -- Admin changes a role; the last admin cannot be demoted (serialised against races).
 create or replace function public.admin_set_user_role(p_user_id uuid, p_role "UserRole")
 returns json language plpgsql security definer set search_path = public as $$
@@ -610,6 +622,7 @@ begin
 end $$;
 
 grant execute on function public.register_profile(text, text, text) to authenticated;
+grant execute on function public.my_registration_state() to authenticated;
 grant execute on function public.is_referral_code_required() to authenticated, anon;
 grant execute on function public.admin_set_user_role(uuid, "UserRole") to authenticated;
 grant execute on function public.review_material(uuid, "MaterialApprovalStatus", text) to authenticated;

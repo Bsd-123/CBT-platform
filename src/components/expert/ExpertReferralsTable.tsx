@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ExpertApprovalStatus } from "@prisma/client";
+import type { ExpertApprovalStatus } from "@/lib/db/types";
 import { decideReferralApproval } from "@/lib/actions/expert";
 import type { PublicExpertApproval } from "@/lib/models/expert-approval";
 import { EXPERT_APPROVAL_STATUSES } from "@/lib/models/expert-approval";

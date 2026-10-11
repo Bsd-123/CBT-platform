@@ -2,7 +2,7 @@ import { AdminReportsList } from "@/components/admin/AdminReportsList";
 import { TabNav } from "@/components/ui/TabNav";
 import { loadAdminReports } from "@/lib/admin/data";
 import { REPORT_STATUS_LABELS } from "@/lib/utils/admin-labels";
-import type { ReportStatus } from "@prisma/client";
+import type { ReportStatus } from "@/lib/db/types";
 
 type AdminReportsPageProps = {
   searchParams: Promise<{ status?: string }>;

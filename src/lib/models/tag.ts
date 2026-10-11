@@ -1,4 +1,4 @@
-import type { EntityTag, EntityType, Tag } from "@prisma/client";
+import type { EntityTag, EntityType, Tag } from "@/lib/db/types";
 
 export type { Tag, EntityTag, EntityType };
 

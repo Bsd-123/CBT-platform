@@ -1,5 +1,5 @@
-import type { MaterialApprovalStatus, MaterialTypeKey } from "@prisma/client";
-import type { Material } from "@prisma/client";
+import type { MaterialApprovalStatus, MaterialTypeKey } from "@/lib/db/types";
+import type { Material } from "@/lib/db/types";
 import {
   pickPublicMaterialTypeFields,
   type PublicMaterialType,

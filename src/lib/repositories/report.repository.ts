@@ -6,52 +6,43 @@ import type {
   UpdateReportStatusInput,
 } from "@/lib/models/report";
 import { pickPublicReportFields } from "@/lib/models/report";
-import { prisma } from "@/lib/db";
+import { countOf, getDb, row, rows } from "@/lib/db/client";
+import type { Report, ReportTargetType, User } from "@/lib/db/types";
 
-function buildReportsWhere(filter: ListReportsFilter) {
-  return {
-    ...(filter.status && { status: filter.status }),
-  };
-}
+type ReportRow = Report & { user: User };
+
+const REPORT_SELECT = "*, user:users!reports_user_id_fkey(*)";
+
+const TARGET_TABLES: Record<ReportTargetType, string> = {
+  material: "materials",
+  forum_question: "forum_questions",
+  forum_answer: "forum_answers",
+  recommendation: "recommendations",
+  event: "events",
+  professional_request: "professional_requests",
+};
 
 export async function getReportById(id: string): Promise<PublicReport | null> {
-  const report = await prisma.report.findUnique({
-    where: { id },
-    include: { user: true },
-  });
+  const db = await getDb();
+  const report = row<ReportRow>(await db.from("reports").select(REPORT_SELECT).eq("id", id).maybeSingle());
   return report ? pickPublicReportFields(report) : null;
 }
 
-export async function listReports(
-  filter: ListReportsFilter = {},
-): Promise<PublicReport[]> {
-  const reports = await prisma.report.findMany({
-    where: buildReportsWhere(filter),
-    include: { user: true },
-    orderBy: { created_at: "desc" },
-  });
-  return reports.map(pickPublicReportFields);
+/** Admins see every report; other users only their own (Row Level Security). */
+export async function listReports(filter: ListReportsFilter = {}): Promise<PublicReport[]> {
+  const db = await getDb();
+  let query = db.from("reports").select(REPORT_SELECT).order("created_at", { ascending: false });
+  if (filter.status) query = query.eq("status", filter.status);
+  return rows<ReportRow>(await query).map(pickPublicReportFields);
 }
 
-async function reportTargetExists(
-  target_type: CreateReportInput["target_type"],
-  id: string,
-): Promise<boolean> {
-  const where = { id };
-  switch (target_type) {
-    case "material":
-      return (await prisma.material.count({ where })) > 0;
-    case "forum_question":
-      return (await prisma.forumQuestion.count({ where })) > 0;
-    case "forum_answer":
-      return (await prisma.forumAnswer.count({ where })) > 0;
-    case "recommendation":
-      return (await prisma.recommendation.count({ where })) > 0;
-    case "event":
-      return (await prisma.event.count({ where })) > 0;
-    case "professional_request":
-      return (await prisma.professionalRequest.count({ where })) > 0;
-  }
+async function reportTargetExists(target_type: ReportTargetType, id: string): Promise<boolean> {
+  const db = await getDb();
+  const result = await db
+    .from(TARGET_TABLES[target_type])
+    .select("id", { count: "exact", head: true })
+    .eq("id", id);
+  return countOf(result) > 0;
 }
 
 export async function createReport(input: CreateReportInput): Promise<PublicReport> {
@@ -59,34 +50,43 @@ export async function createReport(input: CreateReportInput): Promise<PublicRepo
     throw new Error("Report target not found.");
   }
 
-  const existing = await prisma.report.findFirst({
-    where: {
-      user_id: input.user_id,
-      target_type: input.target_type,
-      target_id: input.target_id,
-      status: { not: "resolved" },
-    },
-    include: { user: true },
-  });
-  if (existing) {
-    return pickPublicReportFields(existing);
-  }
+  const db = await getDb();
+  const existing = row<ReportRow>(
+    await db
+      .from("reports")
+      .select(REPORT_SELECT)
+      .eq("user_id", input.user_id)
+      .eq("target_type", input.target_type)
+      .eq("target_id", input.target_id)
+      .neq("status", "resolved")
+      .limit(1)
+      .maybeSingle(),
+  );
+  if (existing) return pickPublicReportFields(existing);
 
-  const report = await prisma.report.create({
-    data: input,
-    include: { user: true },
-  });
-  return pickPublicReportFields(report);
+  const report = row<ReportRow>(
+    await db
+      .from("reports")
+      .insert({
+        user_id: input.user_id,
+        target_type: input.target_type,
+        target_id: input.target_id,
+        reason: input.reason,
+      })
+      .select(REPORT_SELECT)
+      .single(),
+  );
+  return pickPublicReportFields(report!);
 }
 
 export async function updateReportStatus(
   id: string,
   input: UpdateReportStatusInput,
 ): Promise<PublicReport> {
-  const report = await prisma.report.update({
-    where: { id },
-    data: { status: input.status },
-    include: { user: true },
-  });
+  const db = await getDb();
+  const report = row<ReportRow>(
+    await db.from("reports").update({ status: input.status }).eq("id", id).select(REPORT_SELECT).maybeSingle(),
+  );
+  if (!report) throw new Error("Forbidden");
   return pickPublicReportFields(report);
 }

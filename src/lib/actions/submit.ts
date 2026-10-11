@@ -5,7 +5,7 @@ import type {
   ForumLikeTargetType,
   RecommendationType,
   ReportTargetType,
-} from "@prisma/client";
+} from "@/lib/db/types";
 import { requireApprovedRegistration } from "@/lib/auth";
 import { UserFacingError } from "@/lib/errors";
 import { isFileKeyOwnedBy } from "@/lib/r2";

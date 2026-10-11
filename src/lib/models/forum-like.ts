@@ -1,4 +1,4 @@
-import type { ForumLike, ForumLikeTargetType } from "@prisma/client";
+import type { ForumLike, ForumLikeTargetType } from "@/lib/db/types";
 
 export type { ForumLike, ForumLikeTargetType };
 

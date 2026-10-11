@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { MaterialTypeKey } from "@prisma/client";
+import type { MaterialTypeKey } from "@/lib/db/types";
 import type { PublicMaterialType } from "@/lib/models/material-type";
 import type { PublicTag } from "@/lib/models/tag";
 import { getTagBadgeStyle } from "@/lib/utils/tag-colors";

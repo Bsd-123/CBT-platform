@@ -1,4 +1,4 @@
-import type { ReportStatus, ReportTargetType } from "@prisma/client";
+import type { ReportStatus, ReportTargetType } from "@/lib/db/types";
 
 export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
   open: "פתוח",

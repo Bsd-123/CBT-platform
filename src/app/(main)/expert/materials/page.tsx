@@ -1,4 +1,4 @@
-import type { MaterialApprovalStatus } from "@prisma/client";
+import type { MaterialApprovalStatus } from "@/lib/db/types";
 import Link from "next/link";
 import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";
 import { MaterialReviewActions } from "@/components/materials/MaterialReviewActions";

@@ -251,6 +251,11 @@ select t_run('referral by expert uuid works', 'd2000000-0000-4000-8000-000000000
 select t_run('blank name rejected', 'd3000000-0000-4000-8000-00000000000a', $q$select public.register_profile('   ', null, '#E0000000')$q$, 'error:Full name required');
 select t_run('unauthenticated cannot register', null, $q$select public.register_profile('Z', null, '#E0000000')$q$, 'denied', 'anon');
 
+-- ===================== registration state (pending user) =====================
+select t_run('pending user sees expert name through my_registration_state', :pending, 'select public.my_registration_state()', 'ok');
+select t_run('state names the referring expert', :pending, $q$select * from (select (public.my_registration_state()->>'expert_name') as n) s where n = 'Expert'$q$, 'rows:1');
+select t_run('user without approval gets no state', :m2, $q$select * from (select public.my_registration_state() as s) x where s is not null$q$, 'rows:0');
+
 -- ===================== report =====================
 \echo
 \echo === FAILURES ===

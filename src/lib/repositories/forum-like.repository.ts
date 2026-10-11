@@ -1,29 +1,49 @@
 import "server-only";
-import type { ForumLikeTargetType } from "@prisma/client";
 import type {
   CreateForumLikeInput,
   ForumLikeSummary,
   ForumLikeTarget,
 } from "@/lib/models/forum-like";
 import { forumLikeKey } from "@/lib/models/forum-like";
-import { prisma } from "@/lib/db";
+import { countOf, done, getDb, isUniqueViolation, rows, toError } from "@/lib/db/client";
+import type { ForumLikeTargetType } from "@/lib/db/types";
 
 async function assertLikeTargetExists(
   target_type: ForumLikeTargetType,
   target_id: string,
 ): Promise<void> {
-  if (target_type === "question") {
-    const question = await prisma.forumQuestion.findFirst({
-      where: { id: target_id, is_hidden: false },
-    });
-    if (!question) throw new Error("Forum question not found.");
-    return;
+  const db = await getDb();
+  const table = target_type === "question" ? "forum_questions" : "forum_answers";
+  const found = countOf(
+    await db.from(table).select("id", { count: "exact", head: true }).eq("id", target_id).eq("is_hidden", false),
+  );
+  if (found === 0) {
+    throw new Error(target_type === "question" ? "Forum question not found." : "Forum answer not found.");
   }
+}
 
-  const answer = await prisma.forumAnswer.findFirst({
-    where: { id: target_id, is_hidden: false },
-  });
-  if (!answer) throw new Error("Forum answer not found.");
+function idsOfType(targets: ForumLikeTarget[], type: ForumLikeTargetType): string[] {
+  return targets.filter((target) => target.target_type === type).map((target) => target.target_id);
+}
+
+type LikeRow = { target_type: ForumLikeTargetType; target_id: string; user_id: string };
+
+/** Likes for the given targets, fetched with one query per target type. */
+async function loadLikes(targets: ForumLikeTarget[], user_id?: string): Promise<LikeRow[]> {
+  const db = await getDb();
+  const queries = (["question", "answer"] as const)
+    .map((type) => ({ type, ids: idsOfType(targets, type) }))
+    .filter(({ ids }) => ids.length > 0)
+    .map(async ({ type, ids }) => {
+      let query = db
+        .from("forum_likes")
+        .select("target_type, target_id, user_id")
+        .eq("target_type", type)
+        .in("target_id", ids);
+      if (user_id) query = query.eq("user_id", user_id);
+      return rows<LikeRow>(await query);
+    });
+  return (await Promise.all(queries)).flat();
 }
 
 export async function getForumLikeCounts(
@@ -31,23 +51,10 @@ export async function getForumLikeCounts(
 ): Promise<Record<string, number>> {
   if (targets.length === 0) return {};
 
-  const counts = await prisma.forumLike.groupBy({
-    by: ["target_type", "target_id"],
-    where: {
-      OR: targets.map((target) => ({
-        target_type: target.target_type,
-        target_id: target.target_id,
-      })),
-    },
-    _count: { _all: true },
-  });
-
   const result: Record<string, number> = {};
-  for (const target of targets) {
-    result[forumLikeKey(target.target_type, target.target_id)] = 0;
-  }
-  for (const row of counts) {
-    result[forumLikeKey(row.target_type, row.target_id)] = row._count._all;
+  for (const target of targets) result[forumLikeKey(target.target_type, target.target_id)] = 0;
+  for (const like of await loadLikes(targets)) {
+    result[forumLikeKey(like.target_type, like.target_id)] += 1;
   }
   return result;
 }
@@ -57,18 +64,7 @@ export async function getUserForumLikes(
   targets: ForumLikeTarget[],
 ): Promise<Set<string>> {
   if (targets.length === 0) return new Set();
-
-  const likes = await prisma.forumLike.findMany({
-    where: {
-      user_id,
-      OR: targets.map((target) => ({
-        target_type: target.target_type,
-        target_id: target.target_id,
-      })),
-    },
-    select: { target_type: true, target_id: true },
-  });
-
+  const likes = await loadLikes(targets, user_id);
   return new Set(likes.map((like) => forumLikeKey(like.target_type, like.target_id)));
 }
 
@@ -84,17 +80,15 @@ export async function getForumLikeSummaries(
   const result: Record<string, ForumLikeSummary> = {};
   for (const target of targets) {
     const key = forumLikeKey(target.target_type, target.target_id);
-    result[key] = {
-      count: counts[key] ?? 0,
-      liked: likedKeys.has(key),
-    };
+    result[key] = { count: counts[key] ?? 0, liked: likedKeys.has(key) };
   }
   return result;
 }
 
 export async function createForumLike(input: CreateForumLikeInput) {
   await assertLikeTargetExists(input.target_type, input.target_id);
-  await prisma.forumLike.create({ data: input });
+  const db = await getDb();
+  done(await db.from("forum_likes").insert(input));
 }
 
 export async function deleteForumLike(
@@ -102,11 +96,15 @@ export async function deleteForumLike(
   target_type: ForumLikeTargetType,
   target_id: string,
 ): Promise<void> {
-  await prisma.forumLike.delete({
-    where: {
-      user_id_target_type_target_id: { user_id, target_type, target_id },
-    },
-  });
+  const db = await getDb();
+  done(
+    await db
+      .from("forum_likes")
+      .delete()
+      .eq("user_id", user_id)
+      .eq("target_type", target_type)
+      .eq("target_id", target_id),
+  );
 }
 
 export async function toggleForumLike(
@@ -115,29 +113,25 @@ export async function toggleForumLike(
   target_id: string,
 ): Promise<ForumLikeSummary> {
   await assertLikeTargetExists(target_type, target_id);
+  const db = await getDb();
 
-  const existing = await prisma.forumLike.findUnique({
-    where: {
-      user_id_target_type_target_id: { user_id, target_type, target_id },
-    },
-  });
+  const existing = rows<{ id: string }>(
+    await db
+      .from("forum_likes")
+      .select("id")
+      .eq("user_id", user_id)
+      .eq("target_type", target_type)
+      .eq("target_id", target_id),
+  );
 
-  if (existing) {
-    await prisma.forumLike.deleteMany({ where: { id: existing.id } });
+  if (existing.length > 0) {
+    done(await db.from("forum_likes").delete().eq("id", existing[0].id));
   } else {
-    try {
-      await prisma.forumLike.create({
-        data: { user_id, target_type, target_id },
-      });
-    } catch (error) {
-      // A concurrent request already created the like (unique violation).
-      if ((error as { code?: string }).code !== "P2002") throw error;
-    }
+    const inserted = await db.from("forum_likes").insert({ user_id, target_type, target_id });
+    // A concurrent request already created the like (unique violation): that is the same outcome.
+    if (inserted.error && !isUniqueViolation(inserted.error)) throw toError(inserted.error);
   }
 
-  const summaries = await getForumLikeSummaries(
-    [{ target_type, target_id }],
-    user_id,
-  );
+  const summaries = await getForumLikeSummaries([{ target_type, target_id }], user_id);
   return summaries[forumLikeKey(target_type, target_id)]!;
 }

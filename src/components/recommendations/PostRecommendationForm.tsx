@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { RecommendationType } from "@prisma/client";
+import type { RecommendationType } from "@/lib/db/types";
 import { TagSelect } from "@/components/shared/TagSelect";
 import type { PublicTag } from "@/lib/models/tag";
 import { submitRecommendation } from "@/lib/actions/submit";

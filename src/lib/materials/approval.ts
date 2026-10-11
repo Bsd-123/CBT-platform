@@ -1,4 +1,4 @@
-import type { MaterialApprovalStatus, UserRole } from "@prisma/client";
+import type { MaterialApprovalStatus, UserRole } from "@/lib/db/types";
 
 /** Roles that may approve or reject uploaded materials. */
 export const REVIEWER_ROLES: readonly UserRole[] = ["expert", "admin"];

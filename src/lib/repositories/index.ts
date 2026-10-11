@@ -1,13 +1,11 @@
 import "server-only";
 export {
   getUserById,
-  createUser,
   updateUser,
   listUsers,
   listAdminUsersDirectory,
   getAdminUsersPageStats,
   listExpertDirectory,
-  deleteUser,
 } from "./user.repository";
 
 export {
@@ -29,7 +27,6 @@ export {
   countMaterials,
   countMaterialsByType,
   createMaterial,
-  deleteMaterial,
 } from "./material.repository";
 
 export {
@@ -38,7 +35,6 @@ export {
   listPendingApprovalsForExpert,
   listExpertApprovals,
   listExpertApprovalsForExpert,
-  createExpertApproval,
   updateExpertApprovalStatus,
 } from "./expert-approval.repository";
 
@@ -119,7 +115,6 @@ export {
 
 export {
   listNotificationsForUser,
-  createNotification,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   countUnreadNotifications,

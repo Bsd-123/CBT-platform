@@ -1,4 +1,4 @@
-import type { MaterialRequest, MaterialResponse } from "@prisma/client";
+import type { MaterialRequest, MaterialResponse } from "@/lib/db/types";
 import { pickPublicUserFields } from "@/lib/models/user";
 
 export type { MaterialRequest, MaterialResponse };

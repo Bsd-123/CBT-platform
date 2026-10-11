@@ -5,7 +5,6 @@ import { requireRole } from "@/lib/auth";
 import { UserFacingError } from "@/lib/errors";
 import { decideMaterial } from "@/lib/data";
 import { enforceRateLimit } from "@/lib/security/rate-limit";
-import { notifyMaterialReviewed } from "@/lib/services/notifications";
 import { materialReviewSchema, parseInput } from "@/lib/validation/schemas";
 
 /** Experts and admins approve or reject a pending material; the first decision wins. */
@@ -34,12 +33,7 @@ export async function reviewMaterialUpload(raw: {
       throw error;
     }
 
-    await notifyMaterialReviewed(
-      result.owner_id,
-      input.material_id,
-      input.decision,
-      auth.userId,
-    );
+    // The uploader is notified by `review_material` in the database.
     return { decision: input.decision };
   });
 }

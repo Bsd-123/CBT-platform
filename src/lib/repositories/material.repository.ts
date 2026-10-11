@@ -1,31 +1,33 @@
 import "server-only";
-import type { MaterialApprovalStatus } from "@prisma/client";
 import type {
   CreateMaterialInput,
   ListMaterialsFilter,
   PublicMaterial,
   ReviewMaterialInput,
 } from "@/lib/models/material";
-import { pickPublicTagFields, type PublicTag } from "@/lib/models/tag";
 import { pickPublicMaterialFields } from "@/lib/models/material";
-import { prisma } from "@/lib/db";
-import { visibleContentWhere } from "@/lib/db/visibility";
+import type { PublicTag } from "@/lib/models/tag";
+import { countOf, getDb, row, rows } from "@/lib/db/client";
+import { ilikeAny } from "@/lib/db/search";
+import type { EntityTag, Material, MaterialApprovalStatus, MaterialType, User } from "@/lib/db/types";
+import { listEntityTagsForEntities } from "@/lib/repositories/tag.repository";
 
-const materialInclude = {
-  user: true,
-  material_type: true,
-} as const;
+type MaterialRow = Material & { user: User; material_type: MaterialType };
+
+// `!inner` lets a query filter on the material type (e.g. by key) as well as embed it.
+const MATERIAL_SELECT = "*, user:users(*), material_type:material_types!inner(*)";
 
 async function getMaterialIdsWithAllTags(tagIds: string[]): Promise<string[]> {
   if (tagIds.length === 0) return [];
 
-  const entityTags = await prisma.entityTag.findMany({
-    where: {
-      entity_type: "material",
-      tag_id: { in: tagIds },
-    },
-    select: { entity_id: true, tag_id: true },
-  });
+  const db = await getDb();
+  const entityTags = rows<Pick<EntityTag, "entity_id" | "tag_id">>(
+    await db
+      .from("entity_tags")
+      .select("entity_id, tag_id")
+      .eq("entity_type", "material")
+      .in("tag_id", tagIds),
+  );
 
   const tagsByMaterial = new Map<string, Set<string>>();
   for (const entityTag of entityTags) {
@@ -39,36 +41,33 @@ async function getMaterialIdsWithAllTags(tagIds: string[]): Promise<string[]> {
     .map(([materialId]) => materialId);
 }
 
-async function buildMaterialsWhere(filter: ListMaterialsFilter) {
+/** Starts a materials query with `filter` applied; callers add ordering/paging. */
+async function filteredMaterials(
+  filter: ListMaterialsFilter,
+  select: string,
+  options?: { count: "exact"; head?: boolean },
+) {
+  const db = await getDb();
   const tagIds = filter.tag_ids?.filter(Boolean) ?? [];
-  const materialIdsForTags =
-    tagIds.length > 0 ? await getMaterialIdsWithAllTags(tagIds) : undefined;
+  const idsForTags = tagIds.length > 0 ? await getMaterialIdsWithAllTags(tagIds) : undefined;
 
-  return {
-    ...visibleContentWhere(filter.include_hidden),
-    // Public lists show approved materials only; callers opt in to the rest.
-    ...(filter.approval_status
-      ? { approval_status: filter.approval_status }
-      : filter.include_unapproved
-        ? {}
-        : { approval_status: "approved" as const }),
-    ...(filter.material_type_id && {
-      material_type_id: filter.material_type_id,
-    }),
-    ...(filter.material_type_key && {
-      material_type: { key: filter.material_type_key },
-    }),
-    ...(filter.user_id && { user_id: filter.user_id }),
-    ...(filter.search?.trim() && {
-      OR: [
-        { title: { contains: filter.search.trim(), mode: "insensitive" as const } },
-        { description: { contains: filter.search.trim(), mode: "insensitive" as const } },
-      ],
-    }),
-    ...(materialIdsForTags !== undefined && {
-      id: { in: materialIdsForTags.length > 0 ? materialIdsForTags : [] },
-    }),
-  };
+  let query = db.from("materials").select(select, options);
+  if (!filter.include_hidden) query = query.eq("is_hidden", false);
+
+  // Public lists show approved materials only; callers opt in to the rest.
+  if (filter.approval_status) {
+    query = query.eq("approval_status", filter.approval_status);
+  } else if (!filter.include_unapproved) {
+    query = query.eq("approval_status", "approved");
+  }
+
+  if (filter.material_type_id) query = query.eq("material_type_id", filter.material_type_id);
+  if (filter.material_type_key) query = query.eq("material_type.key", filter.material_type_key);
+  if (filter.user_id) query = query.eq("user_id", filter.user_id);
+  if (filter.search?.trim()) query = query.or(ilikeAny(["title", "description"], filter.search));
+  if (idsForTags !== undefined) query = query.in("id", idsForTags);
+  // Wrapped: returning the (thenable) builder itself from an async function would run it.
+  return { query };
 }
 
 export async function getMaterialById(
@@ -76,101 +75,98 @@ export async function getMaterialById(
   include_hidden = false,
   include_unapproved = false,
 ): Promise<PublicMaterial | null> {
-  const material = await prisma.material.findFirst({
-    where: {
-      id,
-      ...visibleContentWhere(include_hidden),
-      ...(include_unapproved ? {} : { approval_status: "approved" as const }),
-    },
-    include: materialInclude,
-  });
+  const db = await getDb();
+  let query = db.from("materials").select(MATERIAL_SELECT).eq("id", id);
+  if (!include_hidden) query = query.eq("is_hidden", false);
+  if (!include_unapproved) query = query.eq("approval_status", "approved");
 
+  const material = row<MaterialRow>(await query.maybeSingle());
   return material ? pickPublicMaterialFields(material) : null;
 }
 
-export async function listMaterials(
-  filter: ListMaterialsFilter = {},
-): Promise<PublicMaterial[]> {
-  const materials = await prisma.material.findMany({
-    where: await buildMaterialsWhere(filter),
-    include: materialInclude,
-    orderBy: { created_at: "desc" },
-    ...(filter.take !== undefined && { skip: filter.skip ?? 0, take: filter.take }),
-  });
-
-  return materials.map(pickPublicMaterialFields);
+export async function listMaterials(filter: ListMaterialsFilter = {}): Promise<PublicMaterial[]> {
+  let { query } = await filteredMaterials(filter, MATERIAL_SELECT);
+  query = query.order("created_at", { ascending: false });
+  if (filter.take !== undefined) {
+    const skip = filter.skip ?? 0;
+    query = query.range(skip, skip + filter.take - 1);
+  }
+  return rows<MaterialRow>(await query).map(pickPublicMaterialFields);
 }
 
 export async function countMaterials(filter: ListMaterialsFilter = {}): Promise<number> {
-  return prisma.material.count({ where: await buildMaterialsWhere(filter) });
+  const select = filter.material_type_key ? "id, material_type:material_types!inner(key)" : "id";
+  const { query } = await filteredMaterials(filter, select, { count: "exact", head: true });
+  return countOf(await query);
 }
 
-/** Visible material count per material type id, in one grouped query. */
+/** Visible material count per material type id. */
 export async function countMaterialsByType(): Promise<Record<string, number>> {
-  const groups = await prisma.material.groupBy({
-    by: ["material_type_id"],
-    where: { ...visibleContentWhere(), approval_status: "approved" },
-    _count: { _all: true },
-  });
-  return Object.fromEntries(groups.map((group) => [group.material_type_id, group._count._all]));
-}
-
-export async function createMaterial(
-  input: CreateMaterialInput,
-): Promise<PublicMaterial> {
-  const material = await prisma.material.create({
-    data: {
-      user_id: input.user_id,
-      title: input.title,
-      description: input.description,
-      file_url: input.file_url,
-      material_type_id: input.material_type_id,
-      ...(input.approval_status && { approval_status: input.approval_status }),
-      reviewed_by: input.reviewed_by ?? null,
-      reviewed_at: input.reviewed_at ?? null,
-    },
-    include: materialInclude,
-  });
-
-  return pickPublicMaterialFields(material);
+  const db = await getDb();
+  const materials = rows<{ material_type_id: string }>(
+    await db
+      .from("materials")
+      .select("material_type_id")
+      .eq("is_hidden", false)
+      .eq("approval_status", "approved"),
+  );
+  const counts: Record<string, number> = {};
+  for (const { material_type_id } of materials) counts[material_type_id] = (counts[material_type_id] ?? 0) + 1;
+  return counts;
 }
 
 /**
- * Records a decision on a pending material. The conditional update means that when
- * several experts act at once only the first decision applies; later ones fail.
+ * Row Level Security decides what the uploader may set: regular members can only create
+ * pending materials; experts and admins may create approved ones with themselves as reviewer.
  */
-export async function reviewMaterial(input: ReviewMaterialInput): Promise<{
-  owner_id: string;
-  title: string;
-}> {
-  const material = await prisma.material.findUnique({
-    where: { id: input.material_id },
-    select: { user_id: true, title: true },
-  });
-  if (!material) {
-    throw new Error("Material not found.");
-  }
+export async function createMaterial(input: CreateMaterialInput): Promise<PublicMaterial> {
+  const db = await getDb();
+  const material = row<MaterialRow>(
+    await db
+      .from("materials")
+      .insert({
+        user_id: input.user_id,
+        title: input.title,
+        description: input.description,
+        file_url: input.file_url,
+        material_type_id: input.material_type_id,
+        ...(input.approval_status && { approval_status: input.approval_status }),
+        reviewed_by: input.reviewed_by ?? null,
+        reviewed_at: input.reviewed_at?.toISOString() ?? null,
+      })
+      .select(MATERIAL_SELECT)
+      .single(),
+  );
+  return pickPublicMaterialFields(material!);
+}
 
-  const result = await prisma.material.updateMany({
-    where: { id: input.material_id, approval_status: "pending" },
-    data: {
-      approval_status: input.decision,
-      reviewed_by: input.reviewer_id,
-      reviewed_at: new Date(),
-      rejection_reason: input.decision === "rejected" ? (input.rejection_reason ?? null) : null,
-    },
+/**
+ * Records a decision on a pending material through `review_material`, which checks the
+ * caller is an expert/admin, applies only the first decision, and notifies the uploader.
+ */
+export async function reviewMaterial(
+  input: ReviewMaterialInput,
+): Promise<{ owner_id: string; title: string }> {
+  const db = await getDb();
+  const result = await db.rpc("review_material", {
+    p_material_id: input.material_id,
+    p_decision: input.decision,
+    p_reason: input.decision === "rejected" ? (input.rejection_reason ?? null) : null,
   });
-  if (result.count === 0) {
-    throw new Error("Material already reviewed.");
-  }
-
-  return { owner_id: material.user_id, title: material.title };
+  const decided = row<{ owner_id: string; title: string }>(result);
+  if (!decided) throw new Error("Material not found.");
+  return decided;
 }
 
 export async function countPendingMaterials(): Promise<number> {
-  return prisma.material.count({
-    where: { approval_status: "pending", is_hidden: false },
-  });
+  const db = await getDb();
+  return countOf(
+    await db
+      .from("materials")
+      .select("id", { count: "exact", head: true })
+      .eq("approval_status", "pending")
+      .eq("is_hidden", false),
+  );
 }
 
 export type ReviewQueueItem = PublicMaterial & { tags: PublicTag[] };
@@ -180,41 +176,32 @@ export async function listMaterialsForReview(
   status: MaterialApprovalStatus,
   options: { skip?: number; take?: number } = {},
 ): Promise<{ items: ReviewQueueItem[]; total: number }> {
-  const where = { approval_status: status, is_hidden: false };
-
-  const [rows, total] = await prisma.$transaction([
-    prisma.material.findMany({
-      where,
-      include: materialInclude,
-      orderBy: { created_at: status === "pending" ? "asc" : "desc" },
-      ...(options.take !== undefined && { skip: options.skip ?? 0, take: options.take }),
-    }),
-    prisma.material.count({ where }),
-  ]);
-
-  const links = await prisma.entityTag.findMany({
-    where: { entity_type: "material", entity_id: { in: rows.map((row) => row.id) } },
-    include: { tag: true },
-    orderBy: { tag: { name: "asc" } },
-  });
-  const tagsByMaterial = new Map<string, PublicTag[]>();
-  for (const link of links) {
-    const list = tagsByMaterial.get(link.entity_id) ?? [];
-    list.push(pickPublicTagFields(link.tag));
-    tagsByMaterial.set(link.entity_id, list);
+  const db = await getDb();
+  let query = db
+    .from("materials")
+    .select(MATERIAL_SELECT, { count: "exact" })
+    .eq("approval_status", status)
+    .eq("is_hidden", false)
+    .order("created_at", { ascending: status === "pending" });
+  if (options.take !== undefined) {
+    const skip = options.skip ?? 0;
+    query = query.range(skip, skip + options.take - 1);
   }
 
-  return {
-    items: rows.map((row) => ({
-      ...pickPublicMaterialFields(row),
-      tags: tagsByMaterial.get(row.id) ?? [],
-    })),
-    total,
-  };
-}
+  const result = await query;
+  const materials = rows<MaterialRow>(result);
+  const tagsByMaterial = await listEntityTagsForEntities(
+    "material",
+    materials.map((material) => material.id),
+  );
 
-export async function deleteMaterial(id: string): Promise<void> {
-  await prisma.material.delete({ where: { id } });
+  return {
+    items: materials.map((material) => ({
+      ...pickPublicMaterialFields(material),
+      tags: tagsByMaterial.get(material.id) ?? [],
+    })),
+    total: result.count ?? materials.length,
+  };
 }
 
 // Admin-facing listing with pagination and hidden content included
@@ -233,45 +220,28 @@ export async function listMaterialsForAdmin(
   limit = 50,
   offset = 0,
 ): Promise<{ items: AdminMaterialItem[]; total: number }> {
-  const where = await buildMaterialsWhere({
-    ...filter,
-    include_hidden: true,
-    include_unapproved: true,
-  });
+  const { query } = await filteredMaterials(
+    { ...filter, include_hidden: true, include_unapproved: true },
+    MATERIAL_SELECT,
+    { count: "exact" },
+  );
+  const result = await query.order("created_at", { ascending: false }).range(offset, offset + limit - 1);
+  const materials = rows<MaterialRow>(result);
 
-  const [items, total] = await prisma.$transaction([
-    prisma.material.findMany({
-      where,
-      take: limit,
-      skip: offset,
-      orderBy: { created_at: "desc" },
-      include: {
-        user: { select: { id: true, full_name: true } },
-      },
-    }),
-    prisma.material.count({ where }),
-  ]);
+  const tagsByMaterial = await listEntityTagsForEntities(
+    "material",
+    materials.map((material) => material.id),
+  );
 
-  const tagLinks = await prisma.entityTag.findMany({
-    where: { entity_type: "material", entity_id: { in: items.map((m) => m.id) } },
-    include: { tag: { select: { id: true, name: true } } },
-  });
-  const tagsByMaterial = new Map<string, { id: string; name: string }[]>();
-  for (const link of tagLinks) {
-    const list = tagsByMaterial.get(link.entity_id) ?? [];
-    list.push(link.tag);
-    tagsByMaterial.set(link.entity_id, list);
-  }
-
-  const normalized: AdminMaterialItem[] = items.map((m) => ({
-    id: m.id,
-    title: m.title,
-    createdAt: m.created_at,
-    isHidden: m.is_hidden,
-    approvalStatus: m.approval_status,
-    uploader: m.user ? { id: m.user.id, full_name: m.user.full_name } : null,
-    tags: tagsByMaterial.get(m.id) ?? [],
+  const items: AdminMaterialItem[] = materials.map((material) => ({
+    id: material.id,
+    title: material.title,
+    createdAt: material.created_at,
+    isHidden: material.is_hidden,
+    approvalStatus: material.approval_status,
+    uploader: material.user ? { id: material.user.id, full_name: material.user.full_name } : null,
+    tags: (tagsByMaterial.get(material.id) ?? []).map((tag) => ({ id: tag.id, name: tag.name })),
   }));
 
-  return { items: normalized, total };
+  return { items, total: result.count ?? items.length };
 }

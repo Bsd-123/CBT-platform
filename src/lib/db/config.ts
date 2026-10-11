@@ -1,14 +1,11 @@
 /**
- * Database configuration — validated environment variables for Prisma and Supabase.
+ * Supabase configuration - validated environment variables. The app talks to the database
+ * only through Supabase (PostgREST, as the signed-in user), so no database URL is needed.
  */
 
 const ENV_MAP: Record<string, string | undefined> = {
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  DATABASE_URL: process.env.DATABASE_URL,
-  DIRECT_URL: process.env.DIRECT_URL,
-  
-
 };
 
 function requireEnv(name: string): string {
@@ -19,22 +16,6 @@ function requireEnv(name: string): string {
   return value;
 }
 
-function optionalEnv(name: string): string | undefined {
-  return process.env[name];
-}
-
-export const dbConfig = {
-  /** Pooled PostgreSQL URL — used by Prisma at runtime (Supabase connection pooler). */
-  get databaseUrl(): string {
-    return requireEnv("DATABASE_URL");
-  },
-
-  /** Direct PostgreSQL URL — used by Prisma for migrations. */
-  get directUrl(): string {
-    return requireEnv("DIRECT_URL");
-  },
-} as const;
-
 export const supabaseConfig = {
   get url(): string {
     return requireEnv("NEXT_PUBLIC_SUPABASE_URL");
@@ -43,12 +24,6 @@ export const supabaseConfig = {
   get anonKey(): string {
     return requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   },
-
-  /** Server-side only — never expose to the client. */
-  get serviceRoleKey(): string | undefined {
-    return optionalEnv("SUPABASE_SERVICE_ROLE_KEY");
-  },
 } as const;
 
-export type DbConfig = typeof dbConfig;
 export type SupabaseConfig = typeof supabaseConfig;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { MaterialTypeKey } from "@prisma/client";
+import type { MaterialTypeKey } from "@/lib/db/types";
 import type { PublicTag } from "@/lib/models/tag";
 import { getTagBadgeStyle } from "@/lib/utils/tag-colors";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";

@@ -1,8 +1,7 @@
 import "server-only";
-import type { EntityType } from "@prisma/client";
-import { prisma } from "@/lib/db";
+import { done, getDb, rows } from "@/lib/db/client";
+import type { EntityType } from "@/lib/db/types";
 import {
-  attachEntityTag,
   createTag,
   getTagById,
   getTagByName,
@@ -45,23 +44,26 @@ export async function syncEntityTagsByIds(
   const uniqueTagIds = [...new Set(tag_ids)];
 
   for (const tag_id of uniqueTagIds) {
-    const tag = await getTagById(tag_id);
-    if (!tag) {
+    if (!(await getTagById(tag_id))) {
       throw new Error("אחת התגיות שנבחרו אינה קיימת.");
     }
+  }
 
-    const exists = await prisma.entityTag.findUnique({
-      where: {
-        tag_id_entity_type_entity_id: {
-          tag_id,
-          entity_type,
-          entity_id,
-        },
-      },
-    });
+  // Only the content owner (or an admin) may attach tags: Row Level Security enforces it.
+  const db = await getDb();
+  const attached = new Set(
+    rows<{ tag_id: string }>(
+      await db
+        .from("entity_tags")
+        .select("tag_id")
+        .eq("entity_type", entity_type)
+        .eq("entity_id", entity_id)
+        .in("tag_id", uniqueTagIds),
+    ).map((item) => item.tag_id),
+  );
 
-    if (!exists) {
-      await attachEntityTag({ tag_id, entity_type, entity_id });
-    }
+  const missing = uniqueTagIds.filter((tag_id) => !attached.has(tag_id));
+  if (missing.length > 0) {
+    done(await db.from("entity_tags").insert(missing.map((tag_id) => ({ tag_id, entity_type, entity_id }))));
   }
 }

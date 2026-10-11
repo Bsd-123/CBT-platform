@@ -2,11 +2,11 @@
 
 import { UserFacingError } from "@/lib/errors";
 import { runAction } from "@/lib/actions/result";
-import type { ReportTargetType, UserRole } from "@prisma/client";
+import type { ReportTargetType, UserRole } from "@/lib/db/types";
 import type { UpdateReportStatusInput } from "@/lib/models/report";
 import type { CreateTagInput } from "@/lib/models/tag";
-import { isUserRole, pickPublicUserFields, type UpdateUserInput } from "@/lib/models/user";
-import { prisma } from "@/lib/db";
+import { isUserRole } from "@/lib/models/user";
+import { setUserRole } from "@/lib/repositories/user.repository";
 import {
   approvalDecisionSchema,
   parseInput,
@@ -81,26 +81,15 @@ export async function adminUpdateUserRole(user_id: string, role: UserRole) {
       throw new Error("Invalid role.");
     }
 
-    const user = await prisma.$transaction(async (tx) => {
-      if (role !== "admin") {
-        // Serialise role changes so two admins cannot demote each other concurrently.
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('admin-role-change'))`;
-        const target = await tx.user.findUnique({
-          where: { id: user_id },
-          select: { role: true },
-        });
-        if (target?.role === "admin") {
-          const otherAdmins = await tx.user.count({
-            where: { role: "admin", id: { not: user_id } },
-          });
-          if (otherAdmins === 0) {
-            throw new UserFacingError("לא ניתן להסיר את מנהל המערכת האחרון.");
-          }
-        }
+    try {
+      // The database function checks the caller is an admin and keeps at least one admin.
+      return await setUserRole(user_id, role);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("מנהל המערכת האחרון")) {
+        throw new UserFacingError(error.message);
       }
-      return tx.user.update({ where: { id: user_id }, data: { role } satisfies UpdateUserInput });
-    });
-    return pickPublicUserFields(user);
+      throw error;
+    }
   });
 }
 

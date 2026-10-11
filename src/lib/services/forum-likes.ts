@@ -1,5 +1,5 @@
 import "server-only";
-import type { ForumLikeTargetType } from "@prisma/client";
+import type { ForumLikeTargetType } from "@/lib/db/types";
 import type { PublicForumAnswer, PublicForumQuestion } from "@/lib/models/forum";
 import type { ForumLikeSummary } from "@/lib/models/forum-like";
 import { forumLikeKey } from "@/lib/models/forum-like";
