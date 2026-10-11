@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_SUPABASE_URL=https://ywdxabrpljigkmczkgrw.supabase.co NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint .",
     "db:generate": "prisma generate",
