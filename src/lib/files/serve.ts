@@ -2,6 +2,7 @@ import "server-only";
 import { AuthError } from "@/lib/auth/errors";
 import { RateLimitError } from "@/lib/errors";
 import { authorizeFileDownload, FileNotFoundError } from "@/lib/files/access";
+import { tryServeEncodedImage } from "@/lib/files/encoded-serve";
 import { fileNameFromKey } from "@/lib/files/path";
 import { logger } from "@/lib/logger";
 import { getObjectFromR2 } from "@/lib/r2/download";
@@ -42,7 +43,15 @@ function contentDisposition(disposition: "attachment" | "inline", fileName: stri
 export async function serveFile(request: Request, key: string, head: boolean): Promise<Response> {
   const fail = failFor(request);
   try {
-    await authorizeFileDownload(key);
+    const auth = await authorizeFileDownload(key);
+    const fileName = fileNameFromKey(key);
+
+    // Allow-listed members get images as JSON Data URLs so a client-side image filter cannot
+    // match the response. Oversized or non-image files fall through to the normal stream.
+    if (!head) {
+      const encoded = await tryServeEncodedImage(request, key, auth.userId, fileName);
+      if (encoded) return encoded;
+    }
 
     const object = await getObjectFromR2(key, {
       head,
@@ -50,8 +59,6 @@ export async function serveFile(request: Request, key: string, head: boolean): P
       ifNoneMatch: request.headers.get("if-none-match") ?? undefined,
     });
     if (!object) return fail(404, "הקובץ לא נמצא.");
-
-    const fileName = fileNameFromKey(key);
     const wantsInline = new URL(request.url).searchParams.get("inline") === "1";
     const disposition = wantsInline && canViewInline(fileName) ? "inline" : "attachment";
 
