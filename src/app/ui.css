@@ -438,14 +438,15 @@
 .ui-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--sh-1);
 }
 
 .ui-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
 }
 
 .ui-table th,
@@ -457,9 +458,14 @@
 
 .ui-table th {
   background: var(--surface-2);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.ui-table tbody tr:hover {
+  background: color-mix(in srgb, var(--surface-2) 50%, var(--surface));
 }
 
 .ui-table tbody tr:last-child td {
@@ -468,8 +474,9 @@
 
 .ui-table-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
 }
 
 .ui-pagination {
@@ -509,15 +516,17 @@
 
 .ui-section {
   margin-bottom: 1.5rem;
-  padding: 1.25rem;
+  padding: 1.25rem 1.5rem;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
 }
 
 .ui-section h2 {
   margin: 0 0 1rem;
-  font-size: 1.125rem;
+  font-size: var(--fs-lg);
+  font-weight: 700;
 }
 
 /* ---------- Admin / form helpers ---------- */
@@ -591,4 +600,66 @@ a.ui-stat {
 
 a.ui-stat:hover {
   border-color: var(--primary-600);
+}
+
+/* ---------- Admin dashboard ---------- */
+
+.attention-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+}
+
+.attention-panel {
+  margin: 0;
+}
+
+.attention-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.attention-head h2 {
+  margin: 0;
+}
+
+.attention-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attention-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+}
+
+.attention-main {
+  flex: 1;
+  min-width: 10rem;
+  font-weight: 500;
+}
+
+.attention-meta,
+.attention-date {
+  color: var(--ink-3);
+}
+
+.attention-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1rem 0;
+  color: var(--success);
+  font-size: var(--fs-sm);
 }

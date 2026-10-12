@@ -8,10 +8,13 @@ import {
   adminDeleteMaterialType,
   adminUpdateMaterialType,
 } from "@/lib/actions/admin";
+import { IconPicker } from "@/components/shared/IconPicker";
+import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useUi } from "@/components/ui/UiProvider";
 import type { PublicMaterialType } from "@/lib/models/material-type";
 import { unwrap } from "@/lib/actions/result";
+import { getMaterialTypeIcon } from "@/lib/utils/material-type-ui";
 
 const KEY_LABELS: Record<MaterialTypeKey, string> = {
   game: "משחק (game)",
@@ -144,11 +147,12 @@ export function AdminMaterialTypesManager({
               />
             </div>
             <div className="form-field">
-              <label htmlFor="material-type-icon">אייקון (אופציונלי)</label>
-              <input
-                id="material-type-icon"
+              <span className="form-label">אייקון</span>
+              <IconPicker
+                label="אייקון לקטגוריה החדשה"
                 value={newIcon}
-                onChange={(event) => setNewIcon(event.target.value)}
+                fallback={newKey ? getMaterialTypeIcon(newKey) : "category"}
+                onChange={setNewIcon}
               />
             </div>
             <button type="submit" className="btn btn-primary" disabled={creating}>
@@ -170,7 +174,7 @@ export function AdminMaterialTypesManager({
                   <th>מפתח</th>
                   <th>תווית</th>
                   <th>אייקון</th>
-                  <th>פעולות</th>
+                  <th className="ui-th-actions">פעולות</th>
                 </tr>
               </thead>
               <tbody>
@@ -181,35 +185,40 @@ export function AdminMaterialTypesManager({
                       <td>{KEY_LABELS[type.key]}</td>
                       <td>
                         <input
+                          className="input"
                           aria-label={`תווית עבור ${type.key}`}
                           value={edit.label}
                           onChange={(event) => setEdit(type, { label: event.target.value })}
                         />
                       </td>
                       <td>
-                        <input
-                          aria-label={`אייקון עבור ${type.key}`}
+                        <IconPicker
+                          label={`אייקון עבור ${type.label}`}
                           value={edit.icon}
-                          onChange={(event) => setEdit(type, { icon: event.target.value })}
+                          fallback={getMaterialTypeIcon(type.key)}
+                          onChange={(icon) => setEdit(type, { icon })}
                         />
                       </td>
                       <td>
                         <div className="ui-table-actions">
                           <button
                             type="button"
-                            className="btn btn-secondary"
+                            className="btn btn-secondary btn-sm"
                             disabled={loadingId === type.id}
                             onClick={() => void handleUpdate(type)}
                           >
+                            <MaterialIcon name="check" />
                             שמירה
                           </button>
                           <button
                             type="button"
-                            className="btn btn-danger-quiet btn-sm"
+                            className="btn btn-danger-quiet btn-icon btn-sm"
+                            aria-label={`מחיקת הקטגוריה ${type.label}`}
+                            title="מחיקה"
                             disabled={loadingId === type.id}
                             onClick={() => void handleDelete(type)}
                           >
-                            מחיקה
+                            <MaterialIcon name="delete" />
                           </button>
                         </div>
                       </td>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -129,7 +130,9 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                   <div className="ui-table-actions">
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-ghost btn-icon btn-sm"
+                      aria-label="הסתרה"
+                      title="הסתרה"
                       disabled={busy}
                       onClick={() =>
                         void run(
@@ -139,11 +142,13 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                         )
                       }
                     >
-                      הסתרה
+                      <MaterialIcon name="visibility_off" />
                     </button>
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-ghost btn-icon btn-sm"
+                      aria-label="שחזור"
+                      title="שחזור"
                       disabled={busy}
                       onClick={() =>
                         void run(
@@ -153,15 +158,17 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                         )
                       }
                     >
-                      שחזור
+                      <MaterialIcon name="restore" />
                     </button>
                     <button
                       type="button"
-                      className="btn btn-danger-quiet btn-sm"
+                      className="btn btn-danger-quiet btn-icon btn-sm"
+                      aria-label="מחיקה"
+                      title="מחיקה"
                       disabled={busy}
                       onClick={() => void handleDelete(report)}
                     >
-                      מחיקה
+                      <MaterialIcon name="delete" />
                     </button>
                   </div>
                 </td>
