@@ -17,7 +17,14 @@ const SHARE_LINKS = [
   { href: "/profile", icon: "person", label: "הפרופיל שלי" },
 ] as const;
 
-/** Site-wide footer: brand, the five spaces, quick contribution links. */
+const LEGAL_LINKS = [
+  { href: "/terms", icon: "gavel", label: "תנאי שימוש" },
+  { href: "/privacy", icon: "shield", label: "מדיניות פרטיות" },
+  { href: "/accessibility", icon: "accessibility_new", label: "הצהרת נגישות" },
+  { href: "/contact", icon: "support_agent", label: "יצירת קשר ותמיכה" },
+] as const;
+
+/** Site-wide footer: brand, the five spaces, contribution links, legal and support pages. */
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
@@ -57,6 +64,20 @@ export function SiteFooter() {
           <h2 id="footer-share">שיתוף ותרומה</h2>
           <ul>
             {SHARE_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href}>
+                  <MaterialIcon name={link.icon} />
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <nav className="site-footer-col" aria-labelledby="footer-legal">
+          <h2 id="footer-legal">משפטי ונגישות</h2>
+          <ul>
+            {LEGAL_LINKS.map((link) => (
               <li key={link.href}>
                 <Link href={link.href}>
                   <MaterialIcon name={link.icon} />

@@ -8,7 +8,18 @@ import {
 } from "@/lib/security/csp";
 import { supabaseFetch } from "@/lib/supabase/fetch";
 
-const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/auth/callback"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/auth/callback",
+  // Readable before registering.
+  "/terms",
+  "/privacy",
+  "/accessibility",
+  "/contact",
+];
 
 export async function proxy(request: NextRequest) {
   // Next.js reads the nonce from the request's CSP header and applies it to its own scripts.

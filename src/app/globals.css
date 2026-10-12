@@ -1108,11 +1108,31 @@ main:has(> .home-page) + .site-footer {
   grid-template-columns: 1fr;
 }
 
+/* Brand on its own row, the three link columns side by side; all four across on wide screens. */
+@media (min-width: 640px) {
+  .site-footer-inner {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .site-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (min-width: 768px) {
   .site-footer-inner {
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 3rem;
+    gap: 2.5rem 3rem;
     padding-inline: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-footer-inner {
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+  }
+
+  .site-footer-brand {
+    grid-column: auto;
   }
 }
 
@@ -1175,6 +1195,21 @@ main:has(> .home-page) + .site-footer {
 .site-footer-col a:hover .material-symbol {
   color: var(--primary-600);
   text-decoration: none;
+}
+
+/* Comfortable touch targets on phones. */
+@media (max-width: 639px) {
+  .site-footer-col a {
+    padding-block: 0.625rem;
+  }
+}
+
+.site-footer-col a:focus-visible,
+.site-footer-logo:focus-visible {
+  outline: none;
+  border-radius: var(--r-sm);
+  box-shadow: var(--focus);
+  color: var(--primary-600);
 }
 
 .site-footer-bottom {
