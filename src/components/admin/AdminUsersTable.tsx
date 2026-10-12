@@ -114,55 +114,51 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
   }
 
   return (
-    <div className="admin-users-page stack">
-      <section className="admin-users-stats">
-        <article className="admin-users-stat-card">
-          <div className="admin-users-stat-top">
-            <span className="admin-users-stat-label">סה״כ משתמשים</span>
-            <span className="admin-users-stat-icon admin-users-stat-icon--primary">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                groups
-              </span>
+    <div className="stack">
+      <section className="stat-grid" aria-label="נתוני משתמשים">
+        <div className="stat-card">
+          <span className="stat-icon tone-primary">
+            <span className="material-symbols-outlined" aria-hidden="true">
+              groups
             </span>
-          </div>
-          <div className="admin-users-stat-value">{stats.total}</div>
-        </article>
-
-        <article className="admin-users-stat-card admin-users-stat-card--pending">
-          <div className="admin-users-stat-top">
-            <span className="admin-users-stat-label">ממתינים לאישור</span>
-            <span className="admin-users-stat-icon admin-users-stat-icon--secondary">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                pending_actions
-              </span>
+          </span>
+          <span className="stat-text">
+            <strong className="stat-value">{stats.total}</strong>
+            <span className="stat-label">סה״כ משתמשים</span>
+          </span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon tone-warning">
+            <span className="material-symbols-outlined" aria-hidden="true">
+              pending_actions
             </span>
-          </div>
-          <div className="admin-users-stat-value admin-users-stat-value--secondary">
-            {stats.pending_verifications}
-          </div>
-        </article>
-
-        <article className="admin-users-stat-card">
-          <div className="admin-users-stat-top">
-            <span className="admin-users-stat-label">הצטרפו ב-24 שעות</span>
-            <span className="admin-users-stat-icon admin-users-stat-icon--primary">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                bolt
-              </span>
+          </span>
+          <span className="stat-text">
+            <strong className="stat-value">{stats.pending_verifications}</strong>
+            <span className="stat-label">ממתינים לאישור</span>
+          </span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon tone-success">
+            <span className="material-symbols-outlined" aria-hidden="true">
+              bolt
             </span>
-          </div>
-          <div className="admin-users-stat-value">{stats.recently_joined}</div>
-        </article>
+          </span>
+          <span className="stat-text">
+            <strong className="stat-value">{stats.recently_joined}</strong>
+            <span className="stat-label">הצטרפו ב־24 השעות האחרונות</span>
+          </span>
+        </div>
       </section>
 
-      <section className="admin-users-table-card">
-        <div className="admin-users-toolbar">
+      <section className="ui-section ui-section-flush">
+        <div className="panel-head">
           <div>
             <h2>מדריך משתמשים</h2>
             <p>צפייה וניהול תפקידים וסטטוס אישור במערכת.</p>
           </div>
-          <div className="admin-users-toolbar-actions">
-            <label className="admin-users-search">
+          <div className="panel-head-actions">
+            <label className="search-field">
               <span className="material-symbols-outlined" aria-hidden="true">
                 search
               </span>
@@ -179,11 +175,11 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
           </div>
         </div>
 
-        <div className="admin-users-filters" role="group" aria-label="סינון לפי תפקיד">
+        <div className="filter-row" role="group" aria-label="סינון לפי תפקיד">
           <button
             type="button"
-            className="admin-users-filter-chip"
-            data-active={roleFilter === "all"}
+            className="filter-chip"
+            aria-pressed={roleFilter === "all"}
             onClick={() => {
               setRoleFilter("all");
               setPage(1);
@@ -195,8 +191,8 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
             <button
               key={role}
               type="button"
-              className="admin-users-filter-chip"
-              data-active={roleFilter === role}
+              className="filter-chip"
+              aria-pressed={roleFilter === role}
               onClick={() => {
                 setRoleFilter(role);
                 setPage(1);
@@ -207,13 +203,13 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
           ))}
         </div>
 
-        <div className="admin-users-filters" role="group" aria-label="סינון לפי אימות">
+        <div className="filter-row" role="group" aria-label="סינון לפי אימות">
           {(["all", "none", "approved", "pending", "rejected"] as const).map((status) => (
             <button
               key={status}
               type="button"
-              className="admin-users-filter-chip"
-              data-active={statusFilter === status}
+              className="filter-chip"
+              aria-pressed={statusFilter === status}
               onClick={() => {
                 setStatusFilter(status);
                 setPage(1);
@@ -224,13 +220,13 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
           ))}
         </div>
 
-        {error && <p className="error" style={{ padding: "0 1.5rem" }}>{error}</p>}
+        {error && <p className="error panel-error">{error}</p>}
 
         {filtered.length === 0 ? (
-          <p className="admin-users-empty">לא נמצאו משתמשים.</p>
+          <p className="panel-empty">לא נמצאו משתמשים.</p>
         ) : (
-          <div className="admin-users-table-wrap">
-            <table className="admin-users-table">
+          <div className="ui-table-scroll">
+            <table className="ui-table">
               <thead>
                 <tr>
                   <th scope="col">שם משתמש</th>
@@ -238,7 +234,7 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                   <th scope="col">אימות</th>
                   <th scope="col">תפקיד במערכת</th>
                   <th scope="col">הצטרפות</th>
-                  <th scope="col" style={{ textAlign: "end" }}>
+                  <th scope="col" className="ui-th-actions">
                     פעולות
                   </th>
                 </tr>
@@ -247,17 +243,17 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                 {pageItems.map((user, index) => (
                   <tr key={user.id}>
                     <td>
-                      <div className="admin-users-user-cell">
+                      <div className="cell-user">
                         <div
-                          className={`admin-users-avatar admin-users-avatar--${index % 3}`}
+                          className="avatar avatar-sm"
                           aria-hidden="true"
                         >
                           {getInitials(user.full_name)}
                         </div>
-                        <span className="admin-users-name">{user.full_name}</span>
+                        <span className="cell-strong">{user.full_name}</span>
                       </div>
                     </td>
-                    <td className="admin-users-muted">
+                    <td className="cell-muted">
                       {user.title ?? "ללא תפקיד מקצועי"}
                     </td>
                     <td>
@@ -284,16 +280,16 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                         {ROLE_LABELS[user.role]}
                       </span>
                     </td>
-                    <td className="admin-users-muted">{formatJoinedRelative(user.created_at)}</td>
+                    <td className="cell-muted">{formatJoinedRelative(user.created_at)}</td>
                     <td>
-                      <div className="admin-users-actions">
+                      <div className="ui-table-actions">
                         {user.registration_status === "pending" && (
-                          <Link href="/admin/experts" className="admin-users-action-link admin-users-action-verify">
+                          <Link href="/admin/experts" className="btn btn-secondary btn-sm">
                             אימות
                           </Link>
                         )}
                         <select
-                          className="admin-users-role-select"
+                          className="input input-sm"
                           value={user.role}
                           disabled={loadingId === user.id}
                           onChange={(event) =>
@@ -316,16 +312,16 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
           </div>
         )}
 
-        <div className="admin-users-table-footer">
-          <span className="admin-users-table-footer-meta">
+        <div className="table-footer">
+          <span className="table-footer-meta">
             {filtered.length === 0
               ? "0 רשומות"
               : `מציג ${rangeStart}–${rangeEnd} מתוך ${filtered.length}`}
           </span>
-          <div className="admin-users-pagination">
+          <div className="table-pagination">
             <button
               type="button"
-              className="admin-users-page-btn"
+              className="btn btn-secondary btn-sm btn-icon"
               disabled={currentPage <= 1}
               onClick={() => setPage((value) => Math.max(1, value - 1))}
               aria-label="עמוד קודם"
@@ -334,12 +330,12 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                 chevron_right
               </span>
             </button>
-            <span className="admin-users-page-btn" data-active="true" aria-current="page">
+            <span className="table-page-current" aria-current="page">
               {currentPage}
             </span>
             <button
               type="button"
-              className="admin-users-page-btn"
+              className="btn btn-secondary btn-sm btn-icon"
               disabled={currentPage >= totalPages}
               onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
               aria-label="עמוד הבא"

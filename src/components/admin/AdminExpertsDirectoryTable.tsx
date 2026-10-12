@@ -83,14 +83,14 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
   }
 
   return (
-    <section className="admin-experts-table-card">
-      <div style={{ padding: "1.5rem 1.5rem 0" }}>
-        <div className="admin-experts-toolbar">
+    <section className="ui-section ui-section-flush">
+      <div>
+        <div className="panel-head">
           <div>
             <h2>רשימת מומחים</h2>
             <p>כל המומחים הרשומים במערכת, קודי ההפניה וקישורי ההרשמה שלהם.</p>
           </div>
-          <label className="admin-experts-search">
+          <label className="search-field">
             <span className="material-symbols-outlined" aria-hidden="true">
               search
             </span>
@@ -108,10 +108,10 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
       </div>
 
       {filtered.length === 0 ? (
-        <p className="admin-experts-empty">לא נמצאו מומחים.</p>
+        <p className="panel-empty">לא נמצאו מומחים.</p>
       ) : (
-        <div className="admin-experts-table-wrap">
-          <table className="admin-experts-table">
+        <div className="ui-table-scroll">
+          <table className="ui-table">
             <thead>
               <tr>
                 <th scope="col">מומחה</th>
@@ -120,7 +120,7 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
                 <th scope="col">תאריך הצטרפות</th>
                 <th scope="col">ממתינות</th>
                 <th scope="col">סה״כ הפניות</th>
-                <th scope="col" style={{ textAlign: "end" }}>
+                <th scope="col" className="ui-th-actions">
                   הפניה
                 </th>
               </tr>
@@ -129,24 +129,24 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
               {pageItems.map((expert) => (
                 <tr key={expert.id}>
                   <td>
-                    <div className="admin-experts-user-cell">
-                      <div className="admin-experts-avatar" aria-hidden="true">
+                    <div className="cell-user">
+                      <div className="avatar avatar-sm" aria-hidden="true">
                         {getInitials(expert.full_name)}
                       </div>
                       <div>
-                        <div className="admin-experts-user-name">{expert.full_name}</div>
+                        <div className="cell-strong">{expert.full_name}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <div className="admin-experts-request-title">
+                    <div className="cell-strong">
                       {expert.title ?? "ללא תפקיד מקצועי"}
                     </div>
                   </td>
                   <td>
-                    <code className="admin-experts-code">{expert.expert_code ?? "—"}</code>
+                    <code className="code-chip">{expert.expert_code ?? "—"}</code>
                   </td>
-                  <td className="admin-experts-date">{formatApprovalDate(expert.created_at)}</td>
+                  <td className="cell-muted">{formatApprovalDate(expert.created_at)}</td>
                   <td>
                     {expert.pending_referrals > 0 ? (
                       <span className="status status-pending">
@@ -156,22 +156,22 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
                         {expert.pending_referrals}
                       </span>
                     ) : (
-                      <span className="admin-experts-actions-muted">0</span>
+                      <span className="cell-muted">0</span>
                     )}
                   </td>
-                  <td className="admin-experts-date">{expert.total_referrals}</td>
+                  <td className="cell-muted">{expert.total_referrals}</td>
                   <td>
-                    <div className="admin-experts-actions">
+                    <div className="ui-table-actions">
                       <button
                         type="button"
-                        className="btn btn-secondary"
+                        className="btn btn-secondary btn-sm"
                         onClick={() => void handleCopyExpertCode(expert)}
                       >
                         {copiedId === `code:${expert.id}` ? "הועתק" : "העתק קוד"}
                       </button>
                       <button
                         type="button"
-                        className="btn btn-secondary"
+                        className="btn btn-secondary btn-sm"
                         onClick={() => void handleCopyReferralLink(expert)}
                       >
                         {copiedId === expert.id ? "הועתק" : "העתק קישור"}
@@ -185,16 +185,16 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
         </div>
       )}
 
-      <div className="admin-experts-table-footer">
-        <span className="admin-experts-table-footer-meta">
+      <div className="table-footer">
+        <span className="table-footer-meta">
           {filtered.length === 0
             ? "0 רשומות"
             : `מציג ${rangeStart}–${rangeEnd} מתוך ${filtered.length}`}
         </span>
-        <div className="admin-experts-pagination">
+        <div className="table-pagination">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-sm"
             disabled={currentPage <= 1}
             onClick={() => setPage((value) => Math.max(1, value - 1))}
           >
@@ -202,7 +202,7 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
           </button>
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-sm"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
           >

@@ -663,3 +663,171 @@ a.ui-stat:hover {
   color: var(--success);
   font-size: var(--fs-sm);
 }
+
+/* ---------- Admin panels: header, search, filters, table, footer ----------
+   One structure for every admin tab (users, experts, reports, materials...). */
+
+.ui-section-flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 1rem;
+}
+
+.ui-section .panel-head h2 {
+  margin: 0;
+}
+
+.panel-head p {
+  margin: 0.25rem 0 0;
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+}
+
+.panel-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-field {
+  position: relative;
+  display: block;
+  width: min(100%, 18rem);
+}
+
+.search-field .material-symbols-outlined,
+.search-field .material-symbol {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-3);
+  font-size: 1.125rem;
+  pointer-events: none;
+}
+
+.search-field input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding-block: 0;
+  padding-inline: 2.5rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+}
+
+.search-field input:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1.5rem 1rem;
+}
+
+.ui-table-scroll {
+  overflow-x: auto;
+  border-top: 1px solid var(--line);
+}
+
+.panel-empty {
+  margin: 0;
+  padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  text-align: center;
+}
+
+.panel-error {
+  padding: 0 1.5rem;
+}
+
+.cell-user {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.cell-strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.cell-muted {
+  color: var(--ink-3);
+}
+
+.code-chip {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--primary-600);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  direction: ltr;
+}
+
+.input-sm {
+  min-height: 2rem !important;
+  width: auto !important;
+  padding: 0 0.5rem !important;
+  font-size: var(--fs-sm) !important;
+}
+
+.table-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.table-footer-meta {
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.table-page-current {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: var(--r-sm);
+  background: var(--primary-600);
+  color: var(--on-primary);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.cell-user,
+.cell-muted,
+.ui-table .status {
+  white-space: nowrap;
+}
