@@ -169,3 +169,15 @@ describe("blocked storage host", () => {
     expect((await response.json()).error).toContain("חסום");
   });
 });
+
+describe("refusals shown in a browser tab", () => {
+  it("a document navigation gets a readable page, a script gets JSON", async () => {
+    mocks.authorize.mockRejectedValue(new FileNotFoundError());
+    const page = await serveFile(request({ "Sec-Fetch-Dest": "document" }), KEY, false);
+    expect(page.status).toBe(404);
+    expect(page.headers.get("Content-Type")).toContain("text/html");
+    expect(await page.text()).toContain("הקובץ לא נמצא.");
+    const json = await serveFile(request({ "Sec-Fetch-Dest": "empty" }), KEY, false);
+    expect(json.headers.get("Content-Type")).toContain("application/json");
+  });
+});
