@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { useFocusTrap } from "@/components/ui/useFocusTrap";
+import { FileFetchError, fetchImageSource } from "@/lib/files/encoded";
 import { fileDownloadPath, fileNameFromKey } from "@/lib/files/path";
 import { previewErrorMessage, previewKindForKey, type PreviewKind } from "@/lib/files/preview";
 
@@ -30,9 +31,9 @@ const isNarrow = () => window.matchMedia(NARROW_QUERY).matches;
  * Opens a stored file in a dialog on the page instead of navigating away or forcing a download.
  *
  * The preview is the app's own `/api/files/...?inline=1` route (same origin, access-checked), and
- * the header always carries a small download link to the same route without `inline`. Before
- * anything is embedded the route is asked for its headers, so a refusal (signed out, missing,
- * rate limited) becomes a readable message instead of raw JSON inside a frame.
+ * the header always carries a small download link to the same route without `inline`. Images first
+ * request the encoded JSON form so a client-side image filter cannot match the payload; other
+ * types HEAD the route so a refusal becomes a readable message instead of raw JSON in a frame.
  */
 export function FilePreviewButton({ fileKey, label = "צפייה בקובץ" }: FilePreviewButtonProps) {
   const [open, setOpen] = useState(false);
@@ -64,7 +65,9 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
   const dialogRef = useRef<HTMLDivElement>(null);
   const fileName = fileNameFromKey(fileKey);
   const kind = previewKindForKey(fileKey);
+  const isImage = kind === "image";
   const inlineUrl = fileDownloadPath(fileKey, { inline: true });
+  const encodedUrl = fileDownloadPath(fileKey, { inline: true, encoded: true });
   const downloadUrl = fileDownloadPath(fileKey);
   const narrow = useSyncExternalStore(subscribeNarrow, isNarrow, () => false);
 
@@ -74,6 +77,8 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
   const [status, setStatus] = useState<Status>(canEmbed ? "checking" : "ready");
   const [errorMessage, setErrorMessage] = useState("");
   const [frameLoaded, setFrameLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const releaseImageRef = useRef<(() => void) | null>(null);
 
   useFocusTrap(dialogRef, true);
 
@@ -96,6 +101,31 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
     if (!canEmbed) return;
     const controller = new AbortController();
 
+    if (isImage) {
+      fetchImageSource(encodedUrl, controller.signal)
+        .then((source) => {
+          if (controller.signal.aborted) {
+            source.release();
+            return;
+          }
+          releaseImageRef.current = source.release;
+          setImageSrc(source.src);
+          setStatus("ready");
+        })
+        .catch((error: unknown) => {
+          if ((error as { name?: string }).name === "AbortError") return;
+          const statusCode = error instanceof FileFetchError ? error.status : 0;
+          setErrorMessage(previewErrorMessage(statusCode));
+          setStatus("error");
+        });
+
+      return () => {
+        controller.abort();
+        releaseImageRef.current?.();
+        releaseImageRef.current = null;
+      };
+    }
+
     fetch(inlineUrl, { method: "HEAD", signal: controller.signal })
       .then((response) => {
         if (response.ok) {
@@ -112,7 +142,7 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
       });
 
     return () => controller.abort();
-  }, [canEmbed, inlineUrl]);
+  }, [canEmbed, encodedUrl, inlineUrl, isImage]);
 
   function showError() {
     setErrorMessage(previewErrorMessage(0));
@@ -143,6 +173,28 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
             href={downloadUrl}
             target="_blank"
             rel="noopener noreferrer"
+            download={imageSrc ? fileName : undefined}
+            onClick={(event) => {
+              if (!imageSrc) return;
+              event.preventDefault();
+              void (async () => {
+                let href = imageSrc;
+                let release = () => {};
+                if (imageSrc.startsWith("data:")) {
+                  const blob = await fetch(imageSrc).then((response) => response.blob());
+                  href = URL.createObjectURL(blob);
+                  release = () => URL.revokeObjectURL(href);
+                }
+                const link = document.createElement("a");
+                link.href = href;
+                link.download = fileName;
+                link.rel = "noopener";
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.setTimeout(release, 1000);
+              })();
+            }}
           >
             <MaterialIcon name="download" />
             הורדה
@@ -185,7 +237,7 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
             />
           )}
 
-          {status === "ready" && canEmbed && (
+          {status === "ready" && canEmbed && (!isImage || imageSrc) && (
             <>
               {!frameLoaded && kind !== "image" && (
                 <div className="file-preview-state file-preview-state-overlay" role="status">
@@ -195,7 +247,7 @@ function PreviewDialog({ fileKey, onClose }: { fileKey: string; onClose: () => v
               )}
               <PreviewContent
                 kind={kind}
-                src={inlineUrl}
+                src={isImage ? imageSrc! : inlineUrl}
                 name={fileName}
                 onLoaded={() => setFrameLoaded(true)}
                 onFailed={showError}

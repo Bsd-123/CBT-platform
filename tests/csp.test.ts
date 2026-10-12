@@ -31,6 +31,10 @@ describe("file response policy", () => {
     expect(csp).not.toMatch(/script-src/);
   });
 
+  it("allows Data URLs and blob URLs so encoded image previews can render locally", () => {
+    expect(buildContentSecurityPolicy("abc", false)).toContain("img-src 'self' data: blob:");
+  });
+
   it("keeps every other page unframeable", () => {
     expect(buildContentSecurityPolicy("abc", false)).toContain("frame-ancestors 'none'");
   });

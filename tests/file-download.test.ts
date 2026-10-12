@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   authorize: vi.fn(),
@@ -14,10 +14,14 @@ vi.mock("@/lib/r2/download", () => ({ getObjectFromR2: mocks.getObject }));
 import { AuthError } from "@/lib/auth/errors";
 import { RateLimitError } from "@/lib/errors";
 import { FileNotFoundError } from "@/lib/files/access";
+import { clearEncodedCache } from "@/lib/files/encoded-cache";
+import { MAX_ENCODED_BYTES, toDataUrl } from "@/lib/files/encoded";
 import { fileDownloadPath, fileNameFromKey } from "@/lib/files/path";
 import { serveFile } from "@/lib/files/serve";
 
 const KEY = "materials/0b9f2b1e-7c1d-4c55-9c0a-5a1b2c3d4e5f/1700000000000-lesson plan.pdf".replace(" ", "_");
+const PNG_KEY = "materials/0b9f2b1e-7c1d-4c55-9c0a-5a1b2c3d4e5f/1700000000000-photo.png";
+const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const url = (query = "") => `https://app.test/api/files/x${query}`;
 const request = (headers: Record<string, string> = {}, query = "") =>
   new Request(url(query), { headers });
@@ -30,12 +34,27 @@ const stream = (text: string) =>
     },
   });
 
+const bytesStream = (bytes: Uint8Array) =>
+  new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(bytes);
+      controller.close();
+    },
+  });
+
 beforeEach(() => {
   vi.clearAllMocks();
+  clearEncodedCache();
+  delete process.env.FILE_ENCODING_USER_IDS;
   mocks.authorize.mockResolvedValue({ userId: "u1" });
   mocks.getObject.mockResolvedValue({
     status: 200, body: stream("PDFDATA"), contentLength: 7, etag: '"abc"', lastModified: new Date("2026-10-01T00:00:00Z"),
   });
+});
+
+afterEach(() => {
+  delete process.env.FILE_ENCODING_USER_IDS;
+  clearEncodedCache();
 });
 
 describe("file URLs", () => {
@@ -44,6 +63,8 @@ describe("file URLs", () => {
     expect(fileDownloadPath(KEY)).toBe(fileDownloadPath(KEY));
     expect(fileDownloadPath(KEY)).not.toMatch(/X-Amz|Signature|Expires/i);
     expect(fileDownloadPath(KEY, { inline: true })).toMatch(/\?inline=1$/);
+    expect(fileDownloadPath(KEY, { inline: true, encoded: true })).toMatch(/inline=1/);
+    expect(fileDownloadPath(KEY, { inline: true, encoded: true })).toMatch(/encoded=1/);
   });
 
   it("encodes each path segment but keeps the slashes", () => {
@@ -157,6 +178,58 @@ describe("refusals", () => {
     const response = await serveFile(request(), KEY, false);
     expect(response.status).toBe(500);
     expect(JSON.stringify(await response.json())).not.toContain("R2 secret");
+  });
+});
+
+describe("encoded image delivery", () => {
+  function mockPng(contentLength = PNG.byteLength) {
+    mocks.getObject.mockImplementation(async (_key: string, opts?: { head?: boolean }) => {
+      if (opts?.head) {
+        return { status: 200, body: null, contentLength, etag: '"img"' };
+      }
+      return { status: 200, body: bytesStream(PNG), contentLength, etag: '"img"' };
+    });
+  }
+
+  it("returns a JSON Data URL for an allow-listed member, not an image Content-Type", async () => {
+    process.env.FILE_ENCODING_USER_IDS = "u1";
+    mockPng();
+    const response = await serveFile(request({}, "?encoded=1&inline=1"), PNG_KEY, false);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Type")).toContain("application/json");
+    expect(await response.json()).toEqual({ dataUrl: toDataUrl(PNG, "image/png") });
+    expect(mocks.getObject).toHaveBeenCalledWith(PNG_KEY, expect.objectContaining({ head: true }));
+  });
+
+  it("reuses the in-memory cache on a second request with the same ETag", async () => {
+    process.env.FILE_ENCODING_USER_IDS = "u1";
+    mockPng();
+    await serveFile(request({}, "?encoded=1"), PNG_KEY, false);
+    await serveFile(request({}, "?encoded=1"), PNG_KEY, false);
+    const bodies = mocks.getObject.mock.calls.filter(([, opts]) => !opts?.head);
+    expect(bodies).toHaveLength(1);
+  });
+
+  it("falls back to a normal image stream when the file is too large to encode", async () => {
+    process.env.FILE_ENCODING_USER_IDS = "u1";
+    mockPng(MAX_ENCODED_BYTES + 1);
+    const response = await serveFile(request({}, "?encoded=1"), PNG_KEY, false);
+    expect(response.headers.get("Content-Type")).toBe("image/png");
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(PNG);
+  });
+
+  it("does not encode for members outside the allow-list, or for non-images", async () => {
+    process.env.FILE_ENCODING_USER_IDS = "someone-else";
+    mockPng();
+    const image = await serveFile(request({}, "?encoded=1"), PNG_KEY, false);
+    expect(image.headers.get("Content-Type")).toBe("image/png");
+
+    process.env.FILE_ENCODING_USER_IDS = "u1";
+    mocks.getObject.mockResolvedValue({
+      status: 200, body: stream("PDFDATA"), contentLength: 7, etag: '"abc"',
+    });
+    const pdf = await serveFile(request({}, "?encoded=1"), KEY, false);
+    expect(pdf.headers.get("Content-Type")).toBe("application/pdf");
   });
 });
 
