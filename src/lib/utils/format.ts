@@ -14,3 +14,11 @@ export function formatDate(value: Date | string): string {
 export function countLabel(count: number, singular: string, plural: string): string {
   return `${count} ${count === 1 ? singular : plural}`;
 }
+
+const NEW_CONTENT_WINDOW_MS = 48 * 60 * 60 * 1000;
+
+/** True for content created within the last 48 hours; drives the "חדש" badge on list cards. */
+export function isRecent(value: Date | string, now: Date = new Date()): boolean {
+  const age = now.getTime() - new Date(value).getTime();
+  return age >= 0 && age < NEW_CONTENT_WINDOW_MS;
+}
