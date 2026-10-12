@@ -1,35 +1,10 @@
 /* Clinical Clarity — Materials Library */
 
 :root {
-  --cc-surface: #f7f6f2;
-  --cc-surface-low: #f3f2ec;
-  --cc-surface-container: #eeede7;
-  --cc-surface-container-high: #e8e7e1;
-  --cc-surface-container-highest: #e2e1db;
-  --cc-surface-lowest: #fdfcf8;
-  --cc-on-surface: #0d1c2f;
-  --cc-on-surface-variant: #57423d;
-  --cc-outline: #8a716c;
-  --cc-outline-variant: #dec0ba;
-  --cc-primary: #a43c28;
-  --cc-primary-container: #ff8066;
-  --cc-on-primary: #ffffff;
-  --cc-on-primary-container: #731908;
-  --cc-secondary-container: #fed65b;
-  --cc-on-secondary-container: #745c00;
-  --cc-tertiary-container: #a8a77f;
-  --cc-on-tertiary-container: #3c3c1d;
-  --cc-cream-bar: rgba(255, 253, 208, 0.8);
-  --cc-shadow: 0 10px 24px rgba(51, 65, 85, 0.08);
-  --cc-radius-lg: 1rem;
-  --cc-radius-md: 0.75rem;
-  --cc-radius-sm: 0.5rem;
-  --cc-max-width: 1280px;
-  --cc-gutter: 1.5rem;
 }
 
 .materials-space main {
-  max-width: var(--cc-max-width);
+  max-width: var(--container);
   padding: 2rem 3rem;
 }
 
@@ -60,20 +35,20 @@
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .materials-hero p {
   margin: 0.25rem 0 0;
   font-size: 1rem;
   line-height: 1.6;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .materials-layout {
   display: flex;
   flex-direction: column;
-  gap: var(--cc-gutter);
+  gap: var(--gutter);
 }
 
 @media (min-width: 1024px) {
@@ -95,9 +70,9 @@
 }
 
 .materials-sidebar-panel {
-  background: var(--cc-surface-low);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
   padding: 1rem;
 }
 
@@ -107,7 +82,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .materials-type-list {
@@ -125,9 +100,9 @@
   width: 100%;
   padding: 0.5rem;
   border: none;
-  border-radius: var(--cc-radius-sm);
+  border-radius: var(--r-sm);
   background: transparent;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
   font: inherit;
   font-size: 0.95rem;
   cursor: pointer;
@@ -136,12 +111,12 @@
 }
 
 .materials-type-btn:hover {
-  background: var(--cc-surface-container);
+  background: var(--surface-2);
 }
 
 .materials-type-btn.is-active {
-  background: var(--cc-primary-container);
-  color: var(--cc-on-primary-container);
+  background: var(--primary-600);
+  color: var(--on-primary);
   font-weight: 600;
 }
 
@@ -155,17 +130,17 @@
   font-size: 0.75rem;
   padding: 0.125rem 0.5rem;
   border-radius: 999px;
-  background: var(--cc-surface-container-highest);
+  background: var(--surface-3);
 }
 
 .materials-type-btn.is-active .materials-type-count {
-  background: rgba(115, 25, 8, 0.15);
+  background: color-mix(in srgb, var(--primary-700) 15%, transparent);
 }
 
 .materials-sidebar-divider {
   margin: 1.5rem 0;
   border: none;
-  border-top: 1px solid var(--cc-outline-variant);
+  border-top: 1px solid var(--line);
 }
 
 .materials-tag-filters-header {
@@ -221,8 +196,8 @@
 }
 
 .materials-tag-filter.is-active {
-  border-color: var(--cc-primary);
-  box-shadow: 0 0 0 2px rgba(164, 60, 40, 0.2);
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
   transform: scale(1.03);
 }
 
@@ -233,9 +208,9 @@
   gap: 0.65rem;
   margin-bottom: 1rem;
   padding: 0.85rem 1rem;
-  background: var(--cc-surface-low);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
 }
 
 .materials-active-filters-label {
@@ -244,7 +219,7 @@
   gap: 0.35rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .materials-active-filters-chips {
@@ -263,7 +238,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-decoration: none;
-  border: 2px solid rgba(164, 60, 40, 0.35);
+  border: 2px solid var(--primary-600);
 }
 
 .materials-active-filter-chip:hover {
@@ -278,7 +253,7 @@
 .materials-active-filters-clear {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--cc-primary);
+  color: var(--primary-600);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -295,7 +270,7 @@
 .materials-detail-tags-label {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .materials-space .tag-list {
@@ -331,9 +306,9 @@
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   padding: 0.25rem;
-  background: var(--cc-surface-low);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
 }
 
 .materials-library-tab {
@@ -343,9 +318,9 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-radius: var(--cc-radius-sm);
+  border-radius: var(--r-sm);
   background: transparent;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
   font: inherit;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -354,15 +329,15 @@
 }
 
 .materials-library-tab:hover {
-  background: var(--cc-surface-container);
-  color: var(--cc-on-surface);
+  background: var(--surface-2);
+  color: var(--ink);
   text-decoration: none;
 }
 
 .materials-library-tab.is-active {
-  background: var(--cc-surface-lowest);
-  color: var(--cc-primary);
-  box-shadow: var(--cc-shadow);
+  background: var(--surface);
+  color: var(--primary-600);
+  box-shadow: var(--sh-2);
 }
 
 .materials-empty .materials-btn-primary {
@@ -393,32 +368,32 @@
   inset-inline-end: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
   pointer-events: none;
 }
 
 .materials-search-input {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-surface-lowest);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
   font: inherit;
   font-size: 1rem;
-  color: var(--cc-on-surface);
+  color: var(--ink);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .materials-search-input:focus {
   outline: none;
-  border-color: var(--cc-primary);
-  box-shadow: 0 0 0 3px rgba(255, 128, 102, 0.15);
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
 }
 
 .materials-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--cc-gutter);
+  gap: var(--gutter);
 }
 
 @media (min-width: 768px) {
@@ -434,26 +409,26 @@
 }
 
 .material-card {
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   overflow: hidden;
   transition: box-shadow 0.3s, transform 0.3s;
 }
 
 .material-card:hover {
-  box-shadow: var(--cc-shadow);
+  box-shadow: var(--sh-2);
   transform: translateY(-4px);
 }
 
 .material-card-accent {
   height: 0.5rem;
-  background: var(--cc-cream-bar);
+  background: var(--primary-100);
   transition: background 0.3s;
 }
 
 .material-card:hover .material-card-accent {
-  background: var(--cc-primary-container);
+  background: var(--primary-600);
 }
 
 .material-card-body {
@@ -479,25 +454,25 @@
 }
 
 .material-type-badge.secondary {
-  background: var(--cc-secondary-container);
-  color: var(--cc-on-secondary-container);
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
 .material-type-badge.tertiary {
-  background: var(--cc-tertiary-container);
-  color: var(--cc-on-tertiary-container);
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .material-type-badge.neutral {
-  background: var(--cc-surface-container-highest);
-  color: var(--cc-on-surface);
+  background: var(--surface-3);
+  color: var(--ink);
 }
 
 .material-card-rating {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  color: var(--cc-primary);
+  color: var(--primary-600);
   font-weight: 700;
   font-size: 0.875rem;
 }
@@ -512,7 +487,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .material-card-title a {
@@ -521,14 +496,14 @@
 }
 
 .material-card-title a:hover {
-  color: var(--cc-primary);
+  color: var(--primary-600);
 }
 
 .material-card-desc {
   margin: 0 0 1rem;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -547,9 +522,9 @@
   font-weight: 600;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  border: 1px solid var(--cc-outline-variant);
-  background: var(--cc-surface);
-  color: var(--cc-outline);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--line-strong);
 }
 
 .material-card-footer {
@@ -557,7 +532,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid var(--cc-outline-variant);
+  border-top: 1px solid var(--line);
 }
 
 .material-card-date {
@@ -565,7 +540,7 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .material-card-link {
@@ -574,7 +549,7 @@
   gap: 0.25rem;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--cc-primary);
+  color: var(--primary-600);
   text-decoration: none;
 }
 
@@ -588,22 +563,22 @@
   gap: 0.5rem;
   padding: 0.75rem 2rem;
   border: none;
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-primary);
-  color: var(--cc-on-primary);
+  border-radius: var(--r-sm);
+  background: var(--primary-600);
+  color: var(--on-primary);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(164, 60, 40, 0.2);
+  box-shadow: var(--sh-2);
   transition: background 0.2s, transform 0.15s;
 }
 
 .materials-btn-primary:hover {
-  background: #842513;
+  background: var(--primary-700);
   text-decoration: none;
-  color: var(--cc-on-primary);
+  color: var(--on-primary);
 }
 
 .materials-btn-primary:active {
@@ -615,10 +590,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  border: 1.5px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-sm);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
   background: transparent;
-  color: var(--cc-on-surface);
+  color: var(--ink);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -628,7 +603,7 @@
 }
 
 .materials-btn-secondary:hover {
-  background: var(--cc-surface-container);
+  background: var(--surface-2);
   text-decoration: none;
 }
 
@@ -639,17 +614,17 @@
   align-items: center;
   text-align: center;
   padding: 3rem 1rem;
-  color: var(--cc-on-surface-variant);
-  background: var(--cc-surface-low);
-  border: 1px dashed var(--cc-outline-variant);
-  border-radius: var(--cc-radius-lg);
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-lg);
 }
 
 .materials-section-title {
   margin: 2.5rem 0 1rem;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .materials-requests-list {
@@ -660,15 +635,15 @@
 
 .materials-request-item {
   padding: 1rem;
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
   transition: box-shadow 0.2s;
   overflow: visible;
 }
 
 .materials-request-item:hover {
-  box-shadow: var(--cc-shadow);
+  box-shadow: var(--sh-2);
 }
 
 .materials-request-item-row {
@@ -685,18 +660,18 @@
 
 .materials-request-title {
   font-weight: 600;
-  color: var(--cc-on-surface);
+  color: var(--ink);
   text-decoration: none;
 }
 
 .materials-request-title:hover {
-  color: var(--cc-primary);
+  color: var(--primary-600);
 }
 
 .materials-request-item p {
   margin: 0.35rem 0 0;
   font-size: 0.875rem;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .materials-request-responses-link {
@@ -704,7 +679,7 @@
   margin-top: 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--cc-primary);
+  color: var(--primary-600);
   text-decoration: none;
 }
 
@@ -722,17 +697,17 @@
   height: 2.75rem;
   padding: 0;
   border: none;
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-primary-container);
-  color: var(--cc-on-primary-container);
+  border-radius: var(--r-sm);
+  background: var(--primary-600);
+  color: var(--on-primary);
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(255, 128, 102, 0.25);
+  box-shadow: var(--sh-2);
   transition: background 0.2s, color 0.2s, transform 0.15s;
 }
 
 .materials-request-upload-btn:hover {
-  background: #f06b50;
-  color: var(--cc-on-primary-container);
+  background: var(--primary-700);
+  color: var(--on-primary);
   text-decoration: none;
 }
 
@@ -752,8 +727,8 @@
   left: auto;
   transform: none;
   padding: 0.35rem 0.65rem;
-  background: var(--cc-on-surface);
-  color: var(--cc-surface-lowest);
+  background: var(--ink);
+  color: var(--surface);
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
@@ -786,15 +761,15 @@
 }
 
 .materials-clinical-card {
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 
 .materials-clinical-card-accent {
   height: 1.5rem;
-  background: var(--cc-cream-bar);
+  background: var(--primary-100);
 }
 
 .materials-clinical-card-body {
@@ -804,14 +779,14 @@
 .materials-clinical-card .form-field label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .materials-clinical-card .form-field input,
 .materials-clinical-card .form-field textarea,
 .materials-clinical-card .form-field select {
-  border-color: var(--cc-outline-variant);
-  border-radius: var(--cc-radius-sm);
+  border-color: var(--line);
+  border-radius: var(--r-sm);
   padding: 0.75rem;
 }
 
@@ -819,8 +794,8 @@
 .materials-clinical-card .form-field textarea:focus,
 .materials-clinical-card .form-field select:focus {
   outline: none;
-  border-color: var(--cc-primary);
-  box-shadow: 0 0 0 3px rgba(255, 128, 102, 0.12);
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
 }
 
 .materials-back-link {
@@ -830,7 +805,7 @@
   margin-bottom: 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--cc-primary);
+  color: var(--primary-600);
   text-decoration: none;
 }
 
@@ -854,12 +829,12 @@
 }
 
 .materials-space .star-rating-star.is-filled {
-  color: var(--cc-primary);
+  color: var(--primary-600);
 }
 
 .materials-space .star-rating:not(.star-rating-readonly) .star-rating-star:hover,
 .materials-space .star-rating:not(.star-rating-readonly) .star-rating-star:focus-visible {
-  color: var(--cc-primary-container);
+  color: var(--primary-600);
 }
 
 .material-symbol {

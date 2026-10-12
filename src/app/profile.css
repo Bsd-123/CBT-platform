@@ -1,30 +1,13 @@
 /* Profile page — matches stitch_expert_management_portal (5) / code.html */
 
 .profile-page-shell {
-  background: #f9f9f8;
+  background: var(--bg);
   min-height: calc(100vh - 4rem);
-  color: #1c1c1b;
+  color: var(--ink);
 }
 
 .profile-page {
-  --pp-primary: #ff8066;
-  --pp-on-primary: #ffffff;
-  --pp-primary-container: #ff8066;
-  --pp-on-primary-container: #ffffff;
-  --pp-surface: #f9f9f8;
-  --pp-surface-container-lowest: #ffffff;
-  --pp-surface-container-low: #f4f4f3;
-  --pp-surface-container: #e9e9e8;
-  --pp-surface-container-high: #efefee;
-  --pp-secondary-container: #fbf4e1;
-  --pp-on-secondary-container: #484338;
-  --pp-on-surface: #1c1c1b;
-  --pp-on-surface-variant: #5c5c5b;
-  --pp-outline-variant: #d1d1d0;
-  --pp-container-max: 1280px;
-  --pp-shadow-hover: 0 4px 12px -2px rgba(28, 28, 27, 0.04);
-
-  max-width: var(--pp-container-max);
+  max-width: var(--container);
   margin-inline: auto;
   padding: 2rem 1rem;
   display: flex;
@@ -60,14 +43,14 @@
 }
 
 .profile-clinical-card {
-  background: var(--pp-surface-container-lowest);
-  border: 1px solid var(--pp-surface-container);
+  background: var(--surface);
+  border: 1px solid var(--surface-3);
   border-radius: 0.75rem;
   transition: box-shadow 0.2s ease-in-out, transform 0.15s ease;
 }
 
 .profile-clinical-card:hover {
-  box-shadow: var(--pp-shadow-hover);
+  box-shadow: var(--sh-2);
 }
 
 .profile-clinical-card:active {
@@ -75,8 +58,8 @@
 }
 
 .profile-clinical-card--accent {
-  background: var(--pp-secondary-container);
-  border-color: var(--pp-outline-variant);
+  background: var(--tag-sand-bg);
+  border-color: var(--line);
 }
 
 .profile-identity-card {
@@ -91,8 +74,8 @@
   width: 6rem;
   height: 6rem;
   border-radius: 9999px;
-  background: var(--pp-secondary-container);
-  color: var(--pp-on-secondary-container);
+  background: var(--tag-sand-bg);
+  color: var(--tag-sand-fg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,7 +91,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.3;
-  color: var(--pp-on-surface);
+  color: var(--ink);
 }
 
 .profile-identity-title {
@@ -117,13 +100,13 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--pp-primary);
+  color: var(--primary-600);
 }
 
 .profile-identity-meta {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--pp-outline-variant);
+  border-top: 1px solid var(--line);
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -135,7 +118,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -155,8 +138,8 @@
   padding: 0.75rem 1rem;
   border: none;
   border-radius: 0.5rem;
-  background: var(--pp-primary);
-  color: var(--pp-on-primary);
+  background: var(--primary-600);
+  color: var(--on-primary);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -181,7 +164,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--pp-on-surface);
+  color: var(--ink);
 }
 
 .profile-focus-chips {
@@ -193,29 +176,29 @@
 .profile-focus-chip {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background: var(--pp-surface-container-high);
+  background: var(--surface-3);
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.2;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .profile-side-card--accent h3 {
   margin-bottom: 0.5rem;
-  color: var(--pp-on-secondary-container);
+  color: var(--tag-sand-fg);
 }
 
 .profile-side-card--accent p {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
 .profile-tabs {
   display: flex;
   gap: 2rem;
-  border-bottom: 1px solid var(--pp-outline-variant);
+  border-bottom: 1px solid var(--line);
   margin-bottom: 1rem;
   overflow-x: auto;
   scrollbar-width: none;
@@ -233,7 +216,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   cursor: pointer;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
@@ -242,12 +225,12 @@
 }
 
 .profile-tab:hover {
-  color: var(--pp-primary);
+  color: var(--primary-600);
 }
 
 .profile-tab[data-active="true"] {
-  color: var(--pp-primary);
-  border-bottom-color: var(--pp-primary);
+  color: var(--primary-600);
+  border-bottom-color: var(--primary-600);
 }
 
 .profile-materials-grid {
@@ -275,8 +258,8 @@
   width: 3rem;
   height: 3rem;
   border-radius: 0.5rem;
-  background: var(--pp-surface-container-high);
-  color: var(--pp-primary);
+  background: var(--surface-3);
+  color: var(--primary-600);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -292,18 +275,18 @@
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--pp-on-surface);
+  color: var(--ink);
   transition: color 0.15s;
 }
 
 .profile-material-card:hover .profile-material-title {
-  color: var(--pp-primary);
+  color: var(--primary-600);
 }
 
 .profile-material-desc {
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -318,7 +301,7 @@
   gap: 1rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   opacity: 0.6;
 }
 
@@ -328,17 +311,17 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 2px dashed var(--pp-outline-variant);
+  border: 2px dashed var(--line);
   background: transparent;
   text-decoration: none;
-  color: var(--pp-primary);
+  color: var(--primary-600);
   font-size: 0.875rem;
   font-weight: 600;
   min-height: 6rem;
 }
 
 .profile-upload-card:hover {
-  background: var(--pp-surface-container-low);
+  background: var(--surface-2);
 }
 
 .profile-upload-card .material-symbols-outlined {
@@ -347,7 +330,7 @@
 
 .profile-recommendation-card {
   padding: 1.5rem;
-  border-inline-start: 4px solid var(--pp-primary);
+  border-inline-start: 4px solid var(--primary-600);
 }
 
 .profile-recommendation-label {
@@ -359,7 +342,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--pp-primary);
+  color: var(--primary-600);
 }
 
 .profile-recommendation-label .material-symbols-outlined {
@@ -372,13 +355,13 @@
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--pp-on-surface);
+  color: var(--ink);
 }
 
 .profile-recommendation-content {
   margin: 0.5rem 0 0;
   font-size: 1rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   font-style: italic;
   line-height: 1.6;
 }
@@ -395,7 +378,7 @@
 .profile-recommendation-date {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .profile-link-btn {
@@ -404,7 +387,7 @@
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--pp-primary);
+  color: var(--primary-600);
   cursor: pointer;
   text-decoration: none;
 }
@@ -418,12 +401,12 @@
 }
 
 .profile-forum-card-header {
-  background: var(--pp-surface-container-low);
+  background: var(--surface-2);
   padding: 0.5rem 1.5rem;
-  border-bottom: 1px solid var(--pp-outline-variant);
+  border-bottom: 1px solid var(--line);
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .profile-forum-card-body {
@@ -439,13 +422,13 @@
   margin: 0 0 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--pp-on-surface);
+  color: var(--ink);
 }
 
 .profile-forum-card-body p {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -466,7 +449,7 @@
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .profile-forum-meta-item .material-symbols-outlined {
@@ -488,8 +471,8 @@
 
 .profile-event-date-panel {
   width: 100%;
-  background: var(--pp-primary-container);
-  color: var(--pp-on-primary-container);
+  background: var(--primary-600);
+  color: var(--on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -533,8 +516,8 @@
   display: inline-block;
   padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
-  background: var(--pp-secondary-container);
-  color: var(--pp-on-secondary-container);
+  background: var(--tag-sand-bg);
+  color: var(--tag-sand-fg);
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -546,13 +529,13 @@
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--pp-on-surface);
+  color: var(--ink);
 }
 
 .profile-event-desc {
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   line-height: 1.5;
 }
 
@@ -571,7 +554,7 @@
   gap: 0.5rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .profile-event-participants .material-symbols-outlined {
@@ -584,8 +567,8 @@
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;
-  background: var(--pp-primary);
-  color: #ffffff;
+  background: var(--primary-600);
+  color: var(--on-primary);
   font: inherit;
   font-size: 0.75rem;
   font-weight: 700;
@@ -601,7 +584,7 @@
 .profile-event-edit-wrap {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--pp-outline-variant);
+  border-top: 1px solid var(--line);
 }
 
 .profile-event-edit-toggle {
@@ -611,7 +594,7 @@
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--pp-primary);
+  color: var(--primary-600);
   cursor: pointer;
   padding: 0;
 }
@@ -623,7 +606,7 @@
 .profile-empty {
   padding: 2rem 1rem;
   text-align: center;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
   font-size: 0.875rem;
 }
 
@@ -641,9 +624,9 @@
   height: 3.5rem;
   border-radius: 9999px;
   border: none;
-  background: var(--pp-primary);
-  color: #ffffff;
-  box-shadow: 0 10px 15px -3px rgba(28, 28, 27, 0.12);
+  background: var(--primary-600);
+  color: var(--on-primary);
+  box-shadow: var(--sh-3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -664,7 +647,7 @@
 .profile-edit-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(28, 28, 27, 0.4);
+  background: rgba(31, 36, 48, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -677,9 +660,9 @@
   max-width: 28rem;
   padding: 1.5rem;
   border-radius: 0.75rem;
-  background: var(--pp-surface-container-lowest);
-  border: 1px solid var(--pp-outline-variant);
-  box-shadow: 0 16px 48px rgba(28, 28, 27, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-3);
 }
 
 .profile-edit-dialog h2 {
@@ -702,15 +685,15 @@
 .profile-edit-dialog input {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--pp-outline-variant);
+  border: 1px solid var(--line);
   border-radius: 0.5rem;
   font: inherit;
 }
 
 .profile-edit-dialog input:focus {
   outline: none;
-  border-color: var(--pp-primary);
-  box-shadow: 0 0 0 2px rgba(255, 128, 102, 0.15);
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
 }
 
 .profile-edit-actions {
@@ -725,14 +708,14 @@
   margin-inline-start: 0.5rem;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
-  background: var(--pp-surface-container-high);
+  background: var(--surface-3);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .profile-focus-empty {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--pp-on-surface-variant);
+  color: var(--ink-2);
 }

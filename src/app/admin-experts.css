@@ -1,31 +1,12 @@
 /* Admin — Expert approvals (Warm Professionalism) */
 
 .admin-experts-page {
-  --ae-surface: #f4fafd;
-  --ae-surface-container-lowest: #ffffff;
-  --ae-surface-container-low: #eef5f7;
-  --ae-surface-container: #e8eff1;
-  --ae-surface-container-high: #e2e9ec;
-  --ae-surface-container-highest: #dde4e6;
-  --ae-on-surface: #161d1f;
-  --ae-on-surface-variant: #57423d;
-  --ae-outline: #8a716c;
-  --ae-outline-variant: #dec0ba;
-  --ae-primary: #a43c28;
-  --ae-primary-container: #ff8066;
-  --ae-on-primary-container: #731908;
-  --ae-error: #ba1a1a;
-  --ae-error-container: #ffdad6;
-  --ae-on-error-container: #93000a;
-  --ae-radius-xl: 0.75rem;
-  --ae-radius-2xl: 1rem;
-  --ae-shadow: 0 4px 24px rgba(22, 29, 31, 0.04);
 }
 
 .admin-experts-page .admin-experts-header {
-  background: var(--ae-surface-container-lowest);
-  border: 1px solid var(--ae-outline-variant);
-  border-radius: var(--ae-radius-2xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
 }
 
 .admin-experts-toolbar {
@@ -48,7 +29,7 @@
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--ae-on-surface);
+  color: var(--ink);
 }
 
 @media (max-width: 767px) {
@@ -59,7 +40,7 @@
 
 .admin-experts-toolbar p {
   margin: 0.25rem 0 0;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
   font-size: 1rem;
 }
 
@@ -79,7 +60,7 @@
   inset-inline-start: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--ae-outline);
+  color: var(--line-strong);
   font-size: 1.25rem;
   pointer-events: none;
 }
@@ -89,26 +70,26 @@
   padding-block: 0.5rem;
   padding-inline-start: 2.5rem;
   padding-inline-end: 0.75rem;
-  background: var(--ae-surface-container-lowest);
-  border: 1px solid var(--ae-outline-variant);
-  border-radius: var(--ae-radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   font: inherit;
   font-size: 1rem;
-  color: var(--ae-on-surface);
+  color: var(--ink);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .admin-experts-search input:focus {
   outline: none;
-  border-color: var(--ae-primary);
-  box-shadow: 0 0 0 3px rgba(164, 60, 40, 0.1);
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
 }
 
 .admin-experts-table-card {
-  background: var(--ae-surface-container-lowest);
-  border: 1px solid var(--ae-outline-variant);
-  border-radius: var(--ae-radius-2xl);
-  box-shadow: var(--ae-shadow);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
   overflow: hidden;
 }
 
@@ -123,8 +104,8 @@
 }
 
 .admin-experts-table thead tr {
-  background: var(--ae-surface-container-low);
-  border-bottom: 1px solid var(--ae-outline-variant);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
 }
 
 .admin-experts-table th {
@@ -133,17 +114,17 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
   white-space: nowrap;
 }
 
 .admin-experts-table tbody tr {
-  border-bottom: 1px solid var(--ae-outline-variant);
+  border-bottom: 1px solid var(--line);
   transition: background 0.15s;
 }
 
 .admin-experts-table tbody tr:hover {
-  background: var(--ae-surface-container-low);
+  background: var(--surface-2);
 }
 
 .admin-experts-table tbody tr:last-child {
@@ -165,8 +146,8 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 9999px;
-  background: var(--ae-surface-container-highest);
-  color: var(--ae-outline);
+  background: var(--surface-3);
+  color: var(--line-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,23 +159,23 @@
 .admin-experts-user-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--ae-on-surface);
+  color: var(--ink);
 }
 
 .admin-experts-user-meta {
   font-size: 0.75rem;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
   margin-top: 0.125rem;
 }
 
 .admin-experts-request-title {
   font-size: 1rem;
-  color: var(--ae-on-surface);
+  color: var(--ink);
 }
 
 .admin-experts-request-sub {
   font-size: 0.75rem;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
   margin-top: 0.125rem;
   max-width: 16rem;
   overflow: hidden;
@@ -204,7 +185,7 @@
 
 .admin-experts-date {
   font-size: 1rem;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
   white-space: nowrap;
 }
 
@@ -224,21 +205,21 @@
 }
 
 .admin-experts-badge--pending {
-  background: color-mix(in srgb, var(--ae-primary-container) 25%, white);
-  color: var(--ae-on-primary-container);
-  border: 1px solid color-mix(in srgb, var(--ae-primary-container) 35%, transparent);
+  background: color-mix(in srgb, var(--primary-600) 25%, white);
+  color: var(--primary-700);
+  border: 1px solid color-mix(in srgb, var(--primary-600) 35%, transparent);
 }
 
 .admin-experts-badge--approved {
-  background: var(--ae-surface-container-high);
-  color: var(--ae-on-surface);
-  border: 1px solid var(--ae-outline-variant);
+  background: var(--surface-3);
+  color: var(--ink);
+  border: 1px solid var(--line);
 }
 
 .admin-experts-badge--rejected {
-  background: var(--ae-error-container);
-  color: var(--ae-on-error-container);
-  border: 1px solid color-mix(in srgb, var(--ae-error) 20%, transparent);
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
 }
 
 .admin-experts-actions {
@@ -255,7 +236,7 @@
 
 .admin-experts-actions-muted {
   font-size: 0.875rem;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-experts-table-footer {
@@ -263,8 +244,8 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid var(--ae-outline-variant);
-  background: var(--ae-surface-container-lowest);
+  border-top: 1px solid var(--line);
+  background: var(--surface);
 }
 
 @media (min-width: 640px) {
@@ -277,7 +258,7 @@
 
 .admin-experts-table-footer-meta {
   font-size: 0.75rem;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-experts-pagination {
@@ -294,7 +275,7 @@
 .admin-experts-empty {
   padding: 3rem 1.5rem;
   text-align: center;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-experts-filters {
@@ -307,9 +288,9 @@
 .admin-experts-filter-chip {
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  border: 1px solid var(--ae-outline-variant);
-  background: var(--ae-surface-container-lowest);
-  color: var(--ae-on-surface-variant);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -317,24 +298,24 @@
 }
 
 .admin-experts-filter-chip:hover {
-  background: var(--ae-surface-container-low);
-  color: var(--ae-on-surface);
+  background: var(--surface-2);
+  color: var(--ink);
 }
 
 .admin-experts-filter-chip[data-active="true"] {
-  background: color-mix(in srgb, var(--ae-primary-container) 20%, white);
-  border-color: var(--ae-primary);
-  color: var(--ae-primary);
+  background: color-mix(in srgb, var(--primary-600) 20%, white);
+  border-color: var(--primary-600);
+  color: var(--primary-600);
   font-weight: 600;
 }
 
 .pending-approval-icon {
   font-size: 2.5rem;
-  color: var(--ae-primary);
+  color: var(--primary-600);
 }
 
 .pending-approval-icon--rejected {
-  color: var(--ae-error);
+  color: var(--danger);
 }
 
 .pending-approval-notice {
@@ -342,19 +323,19 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-radius: var(--ae-radius-xl);
-  background: color-mix(in srgb, var(--ae-primary-container) 15%, white);
-  border: 1px solid var(--ae-outline-variant);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--primary-600) 15%, white);
+  border: 1px solid var(--line);
 }
 
 .pending-approval-notice .material-symbols-outlined {
-  color: var(--ae-primary);
+  color: var(--primary-600);
   flex-shrink: 0;
 }
 
 .pending-approval-notice p {
   margin: 0;
-  color: var(--ae-on-surface-variant);
+  color: var(--ink-2);
   font-size: 0.95rem;
 }
 
@@ -362,8 +343,8 @@
   display: inline-block;
   padding: 0.2rem 0.5rem;
   border-radius: 0.375rem;
-  background: var(--ae-surface-container-low);
-  color: var(--ae-primary);
+  background: var(--surface-2);
+  color: var(--primary-600);
   font-family: ui-monospace, monospace;
   font-size: 0.875rem;
   font-weight: 600;

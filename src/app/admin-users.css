@@ -1,31 +1,12 @@
 /* Admin — User management (Clinical Clarity) */
 
 .admin-users-page {
-  --au-surface: #f9f9f8;
-  --au-surface-container-lowest: #ffffff;
-  --au-surface-container-low: #f4f4f3;
-  --au-surface-container-high: #ebebe9;
-  --au-on-surface: #242423;
-  --au-on-surface-variant: #57423d;
-  --au-outline-variant: #dadad9;
-  --au-primary: #a43c28;
-  --au-primary-container: #ff8066;
-  --au-on-primary-container: #731908;
-  --au-secondary: #735c00;
-  --au-secondary-container: #fed65b;
-  --au-on-secondary-container: #745c00;
-  --au-tertiary-container: #e6e5b9;
-  --au-on-tertiary-container: #3c3c1d;
-  --au-success-bg: #dcfce7;
-  --au-success-text: #166534;
-  --au-radius-xl: 0.75rem;
-  --au-shadow: 0 4px 12px -2px rgba(36, 36, 35, 0.06);
 }
 
 .admin-users-page .admin-users-header {
-  background: var(--au-surface-container-lowest);
-  border: 1px solid var(--au-outline-variant);
-  border-radius: var(--au-radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
 }
 
 .admin-users-stats {
@@ -41,9 +22,9 @@
 }
 
 .admin-users-stat-card {
-  background: var(--au-surface-container-lowest);
-  border: 1px solid var(--au-outline-variant);
-  border-radius: var(--au-radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   padding: 1rem;
   min-height: 8rem;
   display: flex;
@@ -53,11 +34,11 @@
 }
 
 .admin-users-stat-card:hover {
-  box-shadow: var(--au-shadow);
+  box-shadow: var(--sh-1);
 }
 
 .admin-users-stat-card--pending {
-  background: color-mix(in srgb, var(--au-secondary-container) 12%, white);
+  background: color-mix(in srgb, var(--warning-bg) 12%, white);
 }
 
 .admin-users-stat-top {
@@ -69,7 +50,7 @@
 .admin-users-stat-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--au-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-users-stat-icon {
@@ -81,36 +62,36 @@
 }
 
 .admin-users-stat-icon--primary {
-  background: color-mix(in srgb, var(--au-primary-container) 12%, white);
-  color: var(--au-primary-container);
+  background: color-mix(in srgb, var(--primary-600) 12%, white);
+  color: var(--primary-600);
 }
 
 .admin-users-stat-icon--secondary {
-  background: color-mix(in srgb, var(--au-secondary-container) 35%, white);
-  color: var(--au-secondary);
+  background: color-mix(in srgb, var(--warning-bg) 35%, white);
+  color: var(--warning);
 }
 
 .admin-users-stat-value {
   font-size: 2rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--au-on-surface);
+  color: var(--ink);
 }
 
 .admin-users-stat-value--secondary {
-  color: var(--au-secondary);
+  color: var(--warning);
 }
 
 .admin-users-table-card {
-  background: var(--au-surface-container-lowest);
-  border: 1px solid var(--au-outline-variant);
-  border-radius: var(--au-radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 
 .admin-users-toolbar {
   padding: 1.5rem;
-  border-bottom: 1px solid var(--au-outline-variant);
+  border-bottom: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -128,13 +109,13 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--au-on-surface);
+  color: var(--ink);
 }
 
 .admin-users-toolbar p {
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
-  color: var(--au-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-users-toolbar-actions {
@@ -169,7 +150,7 @@
   inset-inline-start: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--au-on-surface-variant);
+  color: var(--ink-2);
   font-size: 1.15rem;
   pointer-events: none;
 }
@@ -179,34 +160,34 @@
   padding: 0.5rem 0.75rem 0.5rem 2.5rem;
   padding-inline-start: 2.5rem;
   padding-inline-end: 0.75rem;
-  border: 1px solid var(--au-outline-variant);
+  border: 1px solid var(--line);
   border-radius: 9999px;
-  background: var(--au-surface-container-low);
+  background: var(--surface-2);
   font: inherit;
   font-size: 0.875rem;
 }
 
 .admin-users-search input:focus {
   outline: none;
-  border-color: var(--au-primary-container);
-  box-shadow: 0 0 0 2px rgba(255, 128, 102, 0.12);
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
 }
 
 .admin-users-filter-chip {
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  border: 1px solid var(--au-outline-variant);
-  background: var(--au-surface-container-lowest);
-  color: var(--au-on-surface-variant);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
 }
 
 .admin-users-filter-chip[data-active="true"] {
-  background: color-mix(in srgb, var(--au-primary-container) 15%, white);
-  border-color: var(--au-primary-container);
-  color: var(--au-primary);
+  background: color-mix(in srgb, var(--primary-600) 15%, white);
+  border-color: var(--primary-600);
+  color: var(--primary-600);
   font-weight: 600;
 }
 
@@ -228,25 +209,25 @@
 }
 
 .admin-users-table thead tr {
-  background: var(--au-surface-container-low);
+  background: var(--surface-2);
 }
 
 .admin-users-table th {
   padding: 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--au-on-surface-variant);
-  border-bottom: 1px solid var(--au-outline-variant);
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
 
 .admin-users-table tbody tr {
-  border-bottom: 1px solid var(--au-outline-variant);
+  border-bottom: 1px solid var(--line);
   transition: background 0.15s;
 }
 
 .admin-users-table tbody tr:hover {
-  background: var(--au-surface-container-low);
+  background: var(--surface-2);
 }
 
 .admin-users-table td {
@@ -273,29 +254,29 @@
 }
 
 .admin-users-avatar--0 {
-  background: var(--au-tertiary-container);
-  color: var(--au-on-tertiary-container);
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .admin-users-avatar--1 {
-  background: var(--au-primary-container);
-  color: #fff;
+  background: var(--primary-600);
+  color: var(--on-primary);
 }
 
 .admin-users-avatar--2 {
-  background: var(--au-secondary-container);
-  color: var(--au-on-secondary-container);
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
 .admin-users-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--au-on-surface);
+  color: var(--ink);
 }
 
 .admin-users-muted {
   font-size: 0.875rem;
-  color: var(--au-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-users-badge {
@@ -314,23 +295,23 @@
 }
 
 .admin-users-badge--verified {
-  background: var(--au-success-bg);
-  color: var(--au-success-text);
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .admin-users-badge--pending {
-  background: color-mix(in srgb, var(--au-secondary-container) 45%, white);
-  color: var(--au-secondary);
+  background: color-mix(in srgb, var(--warning-bg) 45%, white);
+  color: var(--warning);
 }
 
 .admin-users-badge--rejected {
-  background: #ffdad6;
-  color: #93000a;
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 .admin-users-badge--role {
-  background: var(--au-surface-container-high);
-  color: var(--au-on-surface-variant);
+  background: var(--surface-3);
+  color: var(--ink-2);
 }
 
 .admin-users-actions {
@@ -358,7 +339,7 @@
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--au-primary-container);
+  color: var(--primary-600);
   cursor: pointer;
   text-decoration: none;
   padding: 0.25rem 0.5rem;
@@ -366,22 +347,22 @@
 }
 
 .admin-users-action-link:hover {
-  background: color-mix(in srgb, var(--au-primary-container) 8%, transparent);
+  background: color-mix(in srgb, var(--primary-600) 8%, transparent);
 }
 
 .admin-users-action-verify {
   padding: 0.25rem 0.75rem;
   border-radius: 0.35rem;
-  background: color-mix(in srgb, var(--au-primary-container) 8%, transparent);
+  background: color-mix(in srgb, var(--primary-600) 8%, transparent);
 }
 
 .admin-users-role-select {
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--au-outline-variant);
+  border: 1px solid var(--line);
   border-radius: 0.35rem;
   font: inherit;
   font-size: 0.8rem;
-  background: var(--au-surface-container-lowest);
+  background: var(--surface);
 }
 
 .admin-users-table-footer {
@@ -389,8 +370,8 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid var(--au-outline-variant);
-  background: color-mix(in srgb, var(--au-surface-container-low) 50%, white);
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-2) 50%, white);
 }
 
 @media (min-width: 640px) {
@@ -403,7 +384,7 @@
 
 .admin-users-table-footer-meta {
   font-size: 0.875rem;
-  color: var(--au-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .admin-users-pagination {
@@ -415,9 +396,9 @@
   min-width: 2rem;
   height: 2rem;
   padding: 0 0.5rem;
-  border: 1px solid var(--au-outline-variant);
+  border: 1px solid var(--line);
   border-radius: 0.35rem;
-  background: var(--au-surface-container-lowest);
+  background: var(--surface);
   font: inherit;
   font-size: 0.75rem;
   font-weight: 500;
@@ -425,9 +406,9 @@
 }
 
 .admin-users-page-btn[data-active="true"] {
-  background: var(--au-primary-container);
-  color: #fff;
-  border-color: var(--au-primary-container);
+  background: var(--primary-600);
+  color: var(--on-primary);
+  border-color: var(--primary-600);
 }
 
 .admin-users-page-btn:disabled {
@@ -438,7 +419,7 @@
 .admin-users-empty {
   padding: 3rem 1.5rem;
   text-align: center;
-  color: var(--au-on-surface-variant);
+  color: var(--ink-2);
 }
 
 span.admin-users-page-btn {

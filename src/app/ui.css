@@ -1,5 +1,5 @@
 /* Shared UI primitives. Visual language follows the Materials Library ("Clinical Clarity").
-   Tokens (--cc-*) are defined once in materials.css under :root. */
+   Tokens are defined once in globals.css under :root. */
 
 /* ---------- Page hero ---------- */
 
@@ -24,14 +24,14 @@
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .ui-hero p {
   margin: 0.25rem 0 0;
   font-size: 1rem;
   line-height: 1.6;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .ui-hero-actions {
@@ -54,15 +54,15 @@
   display: flex;
   gap: 1rem;
   padding: 1.25rem;
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
-  box-shadow: var(--cc-shadow);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-2);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .ui-card:hover {
-  border-color: var(--cc-primary);
+  border-color: var(--primary-600);
 }
 
 .ui-card-body {
@@ -87,17 +87,17 @@
 }
 
 .ui-card-title a {
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .ui-card-title a:hover {
-  color: var(--cc-primary);
+  color: var(--primary-600);
   text-decoration: none;
 }
 
 .ui-card-excerpt {
   margin: 0;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 0.5rem 1rem;
   font-size: 0.8125rem;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .ui-card-meta > span {
@@ -128,15 +128,15 @@
   align-items: center;
   padding: 0.125rem 0.625rem;
   border-radius: 999px;
-  background: var(--cc-secondary-container);
-  color: var(--cc-on-secondary-container);
+  background: var(--warning-bg);
+  color: var(--warning);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .ui-badge[data-kind="danger"] {
-  background: #ffdad6;
-  color: #93000a;
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 .ui-date-badge {
@@ -147,9 +147,9 @@
   justify-content: center;
   width: 4rem;
   min-height: 4rem;
-  border-radius: var(--cc-radius-md);
-  background: var(--cc-surface-container);
-  color: var(--cc-primary);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--primary-600);
   text-align: center;
   line-height: 1.1;
 }
@@ -162,7 +162,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 /* ---------- Empty state ---------- */
@@ -174,21 +174,21 @@
   text-align: center;
   gap: 0.25rem;
   padding: 3rem 1rem;
-  color: var(--cc-on-surface-variant);
-  background: var(--cc-surface-low);
-  border: 1px dashed var(--cc-outline-variant);
-  border-radius: var(--cc-radius-lg);
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-lg);
 }
 
 .ui-empty .material-symbol {
   font-size: 2.5rem;
-  color: var(--cc-outline);
+  color: var(--line-strong);
 }
 
 .ui-empty h3 {
   margin: 0.5rem 0 0;
   font-size: 1.125rem;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .ui-empty p {
@@ -202,9 +202,9 @@
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   padding: 0.25rem;
-  background: var(--cc-surface-low);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
 }
 
 .ui-tab {
@@ -214,8 +214,8 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-radius: var(--cc-radius-sm);
-  color: var(--cc-on-surface-variant);
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
   font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: none;
@@ -223,15 +223,15 @@
 }
 
 .ui-tab:hover {
-  background: var(--cc-surface-container);
-  color: var(--cc-on-surface);
+  background: var(--surface-2);
+  color: var(--ink);
   text-decoration: none;
 }
 
 .ui-tab.is-active {
-  background: var(--cc-surface-lowest);
-  color: var(--cc-primary);
-  box-shadow: var(--cc-shadow);
+  background: var(--surface);
+  color: var(--primary-600);
+  box-shadow: var(--sh-2);
 }
 
 /* ---------- Search toolbar ---------- */
@@ -255,9 +255,9 @@
 .ui-toolbar input[type="text"] {
   flex: 1;
   padding: 0.65rem 0.9rem;
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-surface-lowest);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
   font: inherit;
 }
 
@@ -271,22 +271,22 @@
   height: 2.25rem;
   padding: 0;
   border: none;
-  border-radius: var(--cc-radius-sm);
+  border-radius: var(--r-sm);
   background: transparent;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
   cursor: pointer;
 }
 
 .ui-icon-btn:hover {
-  background: var(--cc-surface-container);
-  color: var(--cc-on-surface);
+  background: var(--surface-2);
+  color: var(--ink);
 }
 
 .ui-link-btn {
   padding: 0;
   border: none;
   background: none;
-  color: var(--cc-primary);
+  color: var(--primary-600);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -312,16 +312,16 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(13, 28, 47, 0.45);
+  background: rgba(31, 36, 48, 0.45);
 }
 
 .ui-dialog {
   width: min(40rem, 100%);
   max-height: 90vh;
   overflow: auto;
-  background: var(--cc-surface-lowest);
-  border-radius: var(--cc-radius-lg);
-  box-shadow: 0 24px 48px rgba(13, 28, 47, 0.25);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-3);
   outline: none;
 }
 
@@ -335,7 +335,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--cc-outline-variant);
+  border-bottom: 1px solid var(--line);
 }
 
 .ui-dialog-header h2 {
@@ -371,15 +371,15 @@
 
 .ui-toast {
   padding: 0.75rem 1rem;
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-on-surface);
-  color: #fff;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--on-primary);
   font-size: 0.9rem;
-  box-shadow: var(--cc-shadow);
+  box-shadow: var(--sh-2);
 }
 
 .ui-toast[data-kind="error"] {
-  background: #93000a;
+  background: var(--danger-hover);
 }
 
 /* ---------- Threads (forum answers, professional-request comments) ---------- */
@@ -396,9 +396,9 @@
   display: grid;
   gap: 0.5rem;
   padding: 1rem;
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
 }
 
 .thread-card p {
@@ -410,11 +410,11 @@
   flex-wrap: wrap;
   gap: 0.25rem 0.75rem;
   font-size: 0.8125rem;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .thread-meta strong {
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .thread-actions {
@@ -428,7 +428,7 @@
   margin-top: 0.75rem;
   margin-inline-start: 0.75rem;
   padding-inline-start: 1rem;
-  border-inline-start: 2px solid var(--cc-outline-variant);
+  border-inline-start: 2px solid var(--line);
 }
 
 .thread-form {
@@ -449,9 +449,9 @@
 
 .ui-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
-  background: var(--cc-surface-lowest);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
 }
 
 .ui-table {
@@ -464,14 +464,14 @@
 .ui-table td {
   padding: 0.75rem 1rem;
   text-align: start;
-  border-bottom: 1px solid var(--cc-outline-variant);
+  border-bottom: 1px solid var(--line);
 }
 
 .ui-table th {
-  background: var(--cc-surface-low);
+  background: var(--surface-2);
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .ui-table tbody tr:last-child td {
@@ -503,28 +503,28 @@
   display: grid;
   gap: 0.25rem;
   padding: 1rem 1.25rem;
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
-  box-shadow: var(--cc-shadow);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-2);
 }
 
 .ui-stat span {
   font-size: 0.8125rem;
-  color: var(--cc-on-surface-variant);
+  color: var(--ink-2);
 }
 
 .ui-stat strong {
   font-size: 1.75rem;
-  color: var(--cc-on-surface);
+  color: var(--ink);
 }
 
 .ui-section {
   margin-bottom: 1.5rem;
   padding: 1.25rem;
-  background: var(--cc-surface-lowest);
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
 }
 
 .ui-section h2 {
@@ -580,9 +580,9 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.25rem 0.25rem 0.5rem;
-  border: 1px solid var(--cc-outline-variant);
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--cc-surface-lowest);
+  background: var(--surface);
 }
 
 .ui-table input,
@@ -590,9 +590,9 @@
   width: 100%;
   min-width: 7rem;
   padding: 0.4rem 0.6rem;
-  border: 1px solid var(--cc-outline-variant);
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-surface-lowest);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
   font: inherit;
 }
 
@@ -602,5 +602,5 @@ a.ui-stat {
 }
 
 a.ui-stat:hover {
-  border-color: var(--cc-primary);
+  border-color: var(--primary-600);
 }
