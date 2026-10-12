@@ -38,6 +38,7 @@ export async function listEvents(filter: ListEventsFilter = {}): Promise<PublicE
   if (!filter.include_hidden) query = query.eq("is_hidden", false);
   if (filter.user_id) query = query.eq("user_id", filter.user_id);
   if (filter.calendar_only) query = query.not("event_date", "is", null).eq("is_cancelled", false);
+  if (filter.from_date) query = query.gte("event_date", filter.from_date);
   query = query.order("event_date", { ascending: true }).order("event_time", { ascending: true });
   if (filter.take !== undefined) {
     const skip = filter.skip ?? 0;

@@ -19,6 +19,7 @@
 
   /* Warm neutrals */
   --bg: #f7f6f2;
+  --bg-wash: #f1ece3;
   --surface: #fdfcf8;
   --surface-2: #f1efe8;
   --surface-3: #e8e5dc;
@@ -129,8 +130,13 @@ a:hover {
   text-decoration: underline;
 }
 
+body {
+  /* A warm wash at the top of every page so the background never feels flat. */
+  background: linear-gradient(180deg, var(--bg-wash) 0, var(--bg) 10rem) no-repeat, var(--bg);
+}
+
 main {
-  max-width: 1280px;
+  max-width: var(--container);
   margin: 0 auto;
   padding: 2rem 3rem;
 }
