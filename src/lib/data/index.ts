@@ -101,6 +101,7 @@ import {
   listProfessionalRequests,
   countProfessionalRequests,
   listRecommendationComments,
+  countRecommendations,
   listRecommendations,
   listRecommendationsFeed,
   listReports,
@@ -279,6 +280,10 @@ export async function toggleForumLike(
 }
 
 // Recommendations
+export async function fetchRecommendationCount() {
+  return countRecommendations();
+}
+
 export async function fetchRecommendations() {
   return listRecommendations();
 }

@@ -66,6 +66,7 @@ export {
 
 export {
   getRecommendationById,
+  countRecommendations,
   listRecommendations,
   listRecommendationsFeed,
   createRecommendation,
