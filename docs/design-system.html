@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>שפת העיצוב – קהילת מטפלי CBT</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23a43c28'/%3E%3Cpath d='M11 20.5a8.5 8.5 0 0 1 8.5-8.5h1a8.5 8.5 0 0 1 0 17H16l-4.2 3.2V27A8.4 8.4 0 0 1 11 20.5z' fill='%23fff'/%3E%3Cpath d='M20 25.5v-5.5m0 0c0-3 2-4.6 5-4.6 0 3-2 4.6-5 4.6zm0 1.6c0-2.3-1.6-3.6-3.9-3.6 0 2.3 1.6 3.6 3.9 3.6z' fill='none' stroke='%23a43c28' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>שפת העיצוב – CBTeam</title>
+<link rel="icon" href="../src/app/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
@@ -306,8 +306,8 @@ pre.code { direction: ltr; text-align: left; background: #1f2430; color: #e9e4dc
 <header class="doc-header">
   <div class="doc-header-inner">
     <a class="logo" href="#top" aria-label="קהילת מטפלי CBT">
-      <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#a43c28"/><path d="M11 20.5a8.5 8.5 0 0 1 8.5-8.5h1a8.5 8.5 0 0 1 0 17H16l-4.2 3.2V27A8.4 8.4 0 0 1 11 20.5z" fill="#fff"/><path d="M20 25.5v-5.5m0 0c0-3 2-4.6 5-4.6 0 3-2 4.6-5 4.6zm0 1.6c0-2.3-1.6-3.6-3.9-3.6 0 2.3 1.6 3.6 3.9 3.6z" fill="none" stroke="#a43c28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span><b>שפת העיצוב</b><small>קהילת מטפלי CBT</small></span>
+      <img src="../public/brand/logo-mark.png" alt="" width="37" height="34" style="display:block">
+      <span><b>שפת העיצוב</b><small>CBTeam · קהילת מטפלי CBT</small></span>
     </a>
     <nav class="doc-toc" aria-label="תוכן">
       <a href="#findings">ממצאים</a><a href="#colors">צבעים</a><a href="#type">טיפוגרפיה</a><a href="#shape">ריווח וצורה</a>
@@ -340,7 +340,7 @@ pre.code { direction: ltr; text-align: left; background: #1f2430; color: #e9e4dc
     <tbody>
       <tr><td>שש מערכות צבעים במקביל</td><td>החומרים בטרקוטה כהה, הפרופיל וההמלצות בקורל, ניהול המומחים על רקע תכלת והיומן בכחול.</td><td>קובץ אחד של משתני צבע (סעיף 14). כל הקידומות <code>--cc / --pp / --rc / --au / --ae / --home</code> יוסרו.</td><td><span class="badge b-info src">סקירה</span></td></tr>
       <tr><td>כפתורים בקורל לא קריאים</td><td>טקסט לבן על <code>#ff8066</code> נותן ניגודיות של 2.46:1. כך נראים הכפתורים "כניסה לקהילה", "המלצה חדשה" ו"עריכת פרופיל", וגם הכפתור הצף.</td><td>כל כפתור ראשי בטרקוטה <code>#a43c28</code> (6.45:1). הקורל נשאר רק לקישוט.</td><td><span class="badge b-info src">סקירה</span></td></tr>
-      <tr><td>אין סמל בכרטיסיית הדפדפן</td><td>בכרטיסייה מופיע סמל ברירת המחדל. קובץ הלוגו <code>public/brand/logo.svg</code> קיים, אבל אף דף לא משתמש בו והטקסט העברי שבו פגום.</td><td>סמל חדש: בועת שיחה עם נבט. הוא משמש לכרטיסייה וללוגו (סעיף 5).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>אין סמל בכרטיסיית הדפדפן</td><td>בכרטיסייה מופיע סמל ברירת המחדל. קובץ הלוגו <code>public/brand/logo.svg</code> קיים, אבל אף דף לא משתמש בו והטקסט העברי שבו פגום.</td><td>לוגו CBTeam (שלושה עיגולים ובית). משמש לכרטיסייה, לכותרת ולמסכי ההתחברות (סעיף 5).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
       <tr><td>הלוגו קופץ</td><td>בדפים שאין בהם גלילה פס הגלילה נעלם, וכל הכותרת זזה כמה פיקסלים. בנוסף, הקישור הפעיל מודגש יותר מהשאר ולכן מזיז את הקישורים שלידו.</td><td><code>scrollbar-gutter: stable</code> על כל הדף, ומשקל גופן קבוע לכל הקישורים. הקישור הפעיל מסומן בקו תחתון וברקע עדין (סעיף 11).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
       <tr><td>האזור העליון בדף הבית ריק ומבולגן</td><td>ריבוע בקורל עם שלושה אייקונים, נקודות ברקע, אפקט זוהר וזכוכית. שני הכפתורים מובילים לאותו דף.</td><td>אזור עליון נקי: כותרת, כפתור אחד ומשני, ובצד פעילות אמיתית מהקהילה (סעיף 13).</td><td><span class="badge b-pending src">שניהם</span></td></tr>
       <tr><td>הרקע ריק לגמרי</td><td>רקע שמנת אחיד בכל דף.</td><td>שני כתמי צבע רכים (קורל ומרווה) באזורים העליונים, ומעבר עדין בראש כל דף (סעיף 5).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
@@ -464,22 +464,22 @@ pre.code { direction: ltr; text-align: left; background: #1f2430; color: #e9e4dc
 <!-- ============ 5. BRAND ============ -->
 <section class="block" id="brand">
   <h2><span class="num">5</span>לוגו, סמל לכרטיסייה ורקע</h2>
-  <p class="lead">הסמל הוא בועת שיחה (התייעצות וקהילה) ובתוכה נבט (צמיחה, שינוי וטיפול). אותו סמל משמש לכרטיסייה בדפדפן, לכותרת האתר ולמסכי ההתחברות. הלוגו בכותרת נמצא תמיד באותו מקום ובאותו גודל.</p>
+  <p class="lead">הלוגו של CBTeam: שלושה עיגולים בזהב, אפרסק וקורל סביב בית. אותו סמל משמש לכרטיסייה בדפדפן, לכותרת האתר ולמסכי ההתחברות. המילה CBTeam כתובה בשלושת הצבעים, בגוונים מעט כהים יותר כדי שיהיה קל לקרוא אותה על רקע בהיר. הלוגו בכותרת נמצא תמיד באותו מקום ובאותו גודל.</p>
   <div class="grid g3">
     <div class="panel" style="display:grid;place-items:center;gap:12px">
-      <svg width="96" height="96" viewBox="0 0 40 40" role="img" aria-label="סמל"><rect width="40" height="40" rx="11" fill="#a43c28"/><path d="M11 20.5a8.5 8.5 0 0 1 8.5-8.5h1a8.5 8.5 0 0 1 0 17H16l-4.2 3.2V27A8.4 8.4 0 0 1 11 20.5z" fill="#fff"/><path d="M20 25.5v-5.5m0 0c0-3 2-4.6 5-4.6 0 3-2 4.6-5 4.6zm0 1.6c0-2.3-1.6-3.6-3.9-3.6 0 2.3 1.6 3.6 3.9 3.6z" fill="none" stroke="#a43c28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <small class="muted">סמל · <code>icon.svg</code> / favicon</small>
+      <img src="../public/brand/logo-mark.png" alt="" width="104" height="96" style="display:block">
+      <small class="muted">סמל · <code>src/app/icon.png</code> (favicon)</small>
     </div>
     <div class="panel" style="display:grid;place-items:center;gap:12px">
       <span class="logo">
-        <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#a43c28"/><path d="M11 20.5a8.5 8.5 0 0 1 8.5-8.5h1a8.5 8.5 0 0 1 0 17H16l-4.2 3.2V27A8.4 8.4 0 0 1 11 20.5z" fill="#fff"/><path d="M20 25.5v-5.5m0 0c0-3 2-4.6 5-4.6 0 3-2 4.6-5 4.6zm0 1.6c0-2.3-1.6-3.6-3.9-3.6 0 2.3 1.6 3.6 3.9 3.6z" fill="none" stroke="#a43c28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span><b style="font-size:1.05rem">קהילת מטפלי CBT</b><small>מרחב מקצועי לשיתוף ידע</small></span>
+        <img src="../public/brand/logo-mark.png" alt="" width="43" height="40" style="display:block">
+        <span><b style="font-size:1.25rem" dir="ltr"><span style="color:#a88a1c">C</span><span style="color:#c9693f">B</span><span style="color:#d4513a">Team</span></b><small>קהילת מטפלי CBT</small></span>
       </span>
       <small class="muted">לוגו מלא בכותרת האתר (רוחב קבוע)</small>
     </div>
-    <div class="panel" style="display:grid;place-items:center;gap:12px;background:#a43c28;border-color:#a43c28">
-      <svg width="64" height="64" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#fff"/><path d="M11 20.5a8.5 8.5 0 0 1 8.5-8.5h1a8.5 8.5 0 0 1 0 17H16l-4.2 3.2V27A8.4 8.4 0 0 1 11 20.5z" fill="#a43c28"/><path d="M20 25.5v-5.5m0 0c0-3 2-4.6 5-4.6 0 3-2 4.6-5 4.6zm0 1.6c0-2.3-1.6-3.6-3.9-3.6 0 2.3 1.6 3.6 3.9 3.6z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <small style="color:#fff">גרסה הפוכה, לרקע כהה</small>
+    <div class="panel" style="display:grid;place-items:center;gap:12px;background:#1f2430;border-color:#1f2430">
+      <img src="../public/brand/logo-mark.png" alt="" width="69" height="64" style="display:block">
+      <small style="color:#fff">על רקע כהה</small>
     </div>
   </div>
 
@@ -728,7 +728,7 @@ pre.code { direction: ltr; text-align: left; background: #1f2430; color: #e9e4dc
   <div class="panel" style="padding:0;overflow:hidden">
     <div class="mock-header">
       <a class="logo" href="#nav">
-        <svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#a43c28"/><path d="M11 20.5a8.5 8.5 0 0 1 8.5-8.5h1a8.5 8.5 0 0 1 0 17H16l-4.2 3.2V27A8.4 8.4 0 0 1 11 20.5z" fill="#fff"/><path d="M20 25.5v-5.5m0 0c0-3 2-4.6 5-4.6 0 3-2 4.6-5 4.6zm0 1.6c0-2.3-1.6-3.6-3.9-3.6 0 2.3 1.6 3.6 3.9 3.6z" fill="none" stroke="#a43c28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <img src="../public/brand/logo-mark.png" alt="" width="39" height="36" style="display:block">
         <span><b>קהילת מטפלי CBT</b></span>
       </a>
       <nav class="mock-nav" aria-label="דוגמה">
