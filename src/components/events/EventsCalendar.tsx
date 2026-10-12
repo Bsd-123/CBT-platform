@@ -60,15 +60,15 @@ export function EventsCalendar({ events, initialYear, initialMonth }: EventsCale
     <div className="stack">
       <div className="calendar-toolbar">
         <div className="calendar-toolbar-nav">
-          <button type="button" className="button secondary" onClick={handlePrevMonth} aria-label="חודש קודם">
+          <button type="button" className="btn btn-secondary" onClick={handlePrevMonth} aria-label="חודש קודם">
             →
           </button>
           <h2 className="calendar-month-label">{formatMonthLabel(year, month)}</h2>
-          <button type="button" className="button secondary" onClick={handleNextMonth} aria-label="חודש הבא">
+          <button type="button" className="btn btn-secondary" onClick={handleNextMonth} aria-label="חודש הבא">
             ←
           </button>
         </div>
-        <button type="button" className="button secondary" onClick={handleToday}>
+        <button type="button" className="btn btn-secondary" onClick={handleToday}>
           היום
         </button>
       </div>

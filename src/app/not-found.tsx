@@ -6,7 +6,7 @@ export default function NotFound() {
       <section className="card">
         <h1>העמוד לא נמצא</h1>
         <p className="muted">ייתכן שהקישור שגוי או שהתוכן הוסר.</p>
-        <Link href="/" className="button">
+        <Link href="/" className="btn btn-primary">
           חזרה לדף הבית
         </Link>
       </section>

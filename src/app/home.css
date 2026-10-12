@@ -87,49 +87,6 @@ main:has(> .home-page) {
   gap: 1rem;
 }
 
-.home-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  border-radius: 0.75rem;
-  background: var(--primary-600);
-  color: var(--on-primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: var(--sh-3);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.home-btn-primary:hover {
-  transform: scale(1.02);
-  box-shadow: var(--sh-3);
-  text-decoration: none;
-  color: var(--on-primary);
-}
-
-.home-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--line);
-  background: var(--surface-3);
-  color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.home-btn-secondary:hover {
-  background: var(--surface-2);
-  text-decoration: none;
-  color: var(--ink);
-}
-
 .home-hero-visual {
   position: relative;
 }

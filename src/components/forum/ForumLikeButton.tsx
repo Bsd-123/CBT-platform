@@ -45,7 +45,7 @@ export function ForumLikeButton({
     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
       <button
         type="button"
-        className={`button secondary${liked ? " active" : ""}`}
+        className={"btn btn-secondary"}
         disabled={loading}
         aria-pressed={liked}
         onClick={() => void handleToggle()}

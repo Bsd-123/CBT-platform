@@ -59,7 +59,7 @@ export function MaterialResponseForm({ requestId }: MaterialResponseFormProps) {
         <input id="response-file" type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "שולח..." : "שליחת תגובה"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "שולח..." : "שליחת תגובה"}</button>
     </form>
   );
 }

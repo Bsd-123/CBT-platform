@@ -98,7 +98,7 @@ export function UploadMaterialForm({
         <input id="material-file" type="file" required onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="materials-btn-primary" disabled={loading}>
+      <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? "מעלה..." : "העלאת חומר"}
       </button>
     </form>

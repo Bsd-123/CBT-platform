@@ -77,11 +77,11 @@ export default function HomePage() {
               קלינית ואמפתיה.
             </p>
             <div className="home-hero-actions">
-              <Link href="/materials" className="home-btn-primary">
+              <Link href="/materials" className="btn btn-primary btn-lg">
                 כניסה לקהילה
                 <MaterialIcon name="arrow_back" />
               </Link>
-              <Link href="/materials" className="home-btn-secondary">
+              <Link href="/materials" className="btn btn-secondary btn-lg">
                 גלו את ספריית החומרים
               </Link>
             </div>

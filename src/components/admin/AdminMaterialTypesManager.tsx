@@ -151,7 +151,7 @@ export function AdminMaterialTypesManager({
                 onChange={(event) => setNewIcon(event.target.value)}
               />
             </div>
-            <button type="submit" className="materials-btn-primary" disabled={creating}>
+            <button type="submit" className="btn btn-primary" disabled={creating}>
               {creating ? "שומר..." : "הוספה"}
             </button>
           </form>
@@ -197,7 +197,7 @@ export function AdminMaterialTypesManager({
                         <div className="ui-table-actions">
                           <button
                             type="button"
-                            className="materials-btn-secondary"
+                            className="btn btn-secondary"
                             disabled={loadingId === type.id}
                             onClick={() => void handleUpdate(type)}
                           >
@@ -205,8 +205,7 @@ export function AdminMaterialTypesManager({
                           </button>
                           <button
                             type="button"
-                            className="materials-btn-primary"
-                            data-danger="true"
+                            className="btn btn-danger-quiet btn-sm"
                             disabled={loadingId === type.id}
                             onClick={() => void handleDelete(type)}
                           >

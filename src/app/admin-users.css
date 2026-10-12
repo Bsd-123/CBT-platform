@@ -279,41 +279,6 @@
   color: var(--ink-2);
 }
 
-.admin-users-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.15rem 0.65rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.admin-users-badge .material-symbols-outlined {
-  font-size: 0.875rem;
-}
-
-.admin-users-badge--verified {
-  background: var(--success-bg);
-  color: var(--success);
-}
-
-.admin-users-badge--pending {
-  background: color-mix(in srgb, var(--warning-bg) 45%, white);
-  color: var(--warning);
-}
-
-.admin-users-badge--rejected {
-  background: var(--danger-bg);
-  color: var(--danger);
-}
-
-.admin-users-badge--role {
-  background: var(--surface-3);
-  color: var(--ink-2);
-}
-
 .admin-users-actions {
   display: flex;
   justify-content: flex-end;

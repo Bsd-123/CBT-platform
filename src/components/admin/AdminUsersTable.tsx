@@ -64,9 +64,9 @@ function matchesSearch(user: AdminUserDirectoryEntry, query: string): boolean {
 }
 
 function getVerificationBadgeClass(status: AdminUserRegistrationStatus): string {
-  if (status === "pending") return "admin-users-badge--pending";
-  if (status === "rejected") return "admin-users-badge--rejected";
-  return "admin-users-badge--verified";
+  if (status === "pending") return "status-pending";
+  if (status === "rejected") return "status-rejected";
+  return "status-approved";
 }
 
 function getVerificationIcon(status: AdminUserRegistrationStatus): string {
@@ -262,7 +262,7 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                     </td>
                     <td>
                       <span
-                        className={`admin-users-badge ${getVerificationBadgeClass(user.registration_status)}`}
+                        className={`status ${getVerificationBadgeClass(user.registration_status)}`}
                       >
                         <span
                           className="material-symbols-outlined"
@@ -280,7 +280,7 @@ export function AdminUsersTable({ users, stats }: AdminUsersTableProps) {
                       </span>
                     </td>
                     <td>
-                      <span className="admin-users-badge admin-users-badge--role">
+                      <span className="status status-neutral">
                         {ROLE_LABELS[user.role]}
                       </span>
                     </td>

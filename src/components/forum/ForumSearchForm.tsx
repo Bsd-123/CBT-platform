@@ -29,7 +29,7 @@ export function ForumSearchForm() {
         onChange={(event) => setQuery(event.target.value)}
         placeholder="חיפוש לפי כותרת או תוכן..."
       />
-      <button type="submit" className="materials-btn-secondary">
+      <button type="submit" className="btn btn-secondary">
         <MaterialIcon name="search" />
         חיפוש
       </button>

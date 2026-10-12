@@ -77,7 +77,7 @@ export function PostRecommendationForm({ tags, stayOnPage = false }: PostRecomme
       </div>
       <TagSelect tags={tags} value={selectedTagIds} onChange={setSelectedTagIds} required />
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "מפרסם..." : "פרסום המלצה"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "מפרסם..." : "פרסום המלצה"}</button>
     </form>
   );
 }

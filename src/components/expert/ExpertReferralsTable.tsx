@@ -166,7 +166,7 @@ export function ExpertReferralsTable({ expertId, approvals }: ExpertReferralsTab
                     <td className="admin-experts-date">{formatApprovalDate(approval.created_at)}</td>
                     <td>
                       <span
-                        className={`admin-experts-badge admin-experts-badge--${approval.status}`}
+                        className={`status status-${approval.status}`}
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">
                           {approval.status === "pending"
@@ -184,7 +184,7 @@ export function ExpertReferralsTable({ expertId, approvals }: ExpertReferralsTab
                           <>
                             <button
                               type="button"
-                              className="button"
+                              className="btn btn-primary"
                               disabled={isLoading}
                               onClick={() => void handleDecision(approval, "approved")}
                             >
@@ -192,7 +192,7 @@ export function ExpertReferralsTable({ expertId, approvals }: ExpertReferralsTab
                             </button>
                             <button
                               type="button"
-                              className="button danger"
+                              className="btn btn-danger"
                               disabled={isLoading}
                               onClick={() => void handleDecision(approval, "rejected")}
                             >
@@ -221,7 +221,7 @@ export function ExpertReferralsTable({ expertId, approvals }: ExpertReferralsTab
         <div className="admin-experts-pagination">
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary"
             disabled={currentPage <= 1}
             onClick={() => setPage((value) => Math.max(1, value - 1))}
           >
@@ -229,7 +229,7 @@ export function ExpertReferralsTable({ expertId, approvals }: ExpertReferralsTab
           </button>
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
           >

@@ -130,29 +130,6 @@
 
 .profile-edit-btn {
   margin-top: 2rem;
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  background: var(--primary-600);
-  color: var(--on-primary);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.profile-edit-btn:hover {
-  opacity: 0.9;
-}
-
-.profile-edit-btn .material-symbols-outlined {
-  font-size: 1.125rem;
 }
 
 .profile-side-card {

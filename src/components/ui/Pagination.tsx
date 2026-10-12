@@ -19,7 +19,7 @@ export function Pagination({ basePath, params = {}, page, totalPages }: Paginati
   return (
     <nav className="ui-pagination" aria-label="עימוד">
       {page > 1 ? (
-        <Link className="materials-btn-secondary" href={buildPageHref(basePath, params, page - 1)}>
+        <Link className="btn btn-secondary" href={buildPageHref(basePath, params, page - 1)}>
           הקודם
         </Link>
       ) : (
@@ -29,7 +29,7 @@ export function Pagination({ basePath, params = {}, page, totalPages }: Paginati
         עמוד {page} מתוך {totalPages}
       </span>
       {page < totalPages ? (
-        <Link className="materials-btn-secondary" href={buildPageHref(basePath, params, page + 1)}>
+        <Link className="btn btn-secondary" href={buildPageHref(basePath, params, page + 1)}>
           הבא
         </Link>
       ) : (

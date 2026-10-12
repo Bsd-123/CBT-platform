@@ -15,7 +15,7 @@ export function Disclosure({ label, children }: DisclosureProps) {
     <div className="ui-disclosure">
       <button
         type="button"
-        className="ui-link-btn"
+        className="btn btn-link"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
       >

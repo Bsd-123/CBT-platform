@@ -208,7 +208,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                     <td className="admin-experts-date">{formatDate(approval.created_at)}</td>
                     <td>
                       <span
-                        className={`admin-experts-badge admin-experts-badge--${approval.status}`}
+                        className={`status status-${approval.status}`}
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">
                           {approval.status === "pending"
@@ -226,7 +226,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                           <>
                             <button
                               type="button"
-                              className="button"
+                              className="btn btn-primary"
                               disabled={isLoading}
                               onClick={() => void handleDecision(approval, "approved")}
                             >
@@ -234,7 +234,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                             </button>
                             <button
                               type="button"
-                              className="button danger"
+                              className="btn btn-danger"
                               disabled={isLoading}
                               onClick={() => void handleDecision(approval, "rejected")}
                             >
@@ -263,7 +263,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
         <div className="admin-experts-pagination">
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary"
             disabled={currentPage <= 1}
             onClick={() => setPage((value) => Math.max(1, value - 1))}
           >
@@ -271,7 +271,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
           </button>
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
           >

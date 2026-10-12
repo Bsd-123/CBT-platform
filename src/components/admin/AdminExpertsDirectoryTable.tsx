@@ -149,7 +149,7 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
                   <td className="admin-experts-date">{formatApprovalDate(expert.created_at)}</td>
                   <td>
                     {expert.pending_referrals > 0 ? (
-                      <span className="admin-experts-badge admin-experts-badge--pending">
+                      <span className="status status-pending">
                         <span className="material-symbols-outlined" aria-hidden="true">
                           schedule
                         </span>
@@ -164,14 +164,14 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
                     <div className="admin-experts-actions">
                       <button
                         type="button"
-                        className="button secondary"
+                        className="btn btn-secondary"
                         onClick={() => void handleCopyExpertCode(expert)}
                       >
                         {copiedId === `code:${expert.id}` ? "הועתק" : "העתק קוד"}
                       </button>
                       <button
                         type="button"
-                        className="button secondary"
+                        className="btn btn-secondary"
                         onClick={() => void handleCopyReferralLink(expert)}
                       >
                         {copiedId === expert.id ? "הועתק" : "העתק קישור"}
@@ -194,7 +194,7 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
         <div className="admin-experts-pagination">
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary"
             disabled={currentPage <= 1}
             onClick={() => setPage((value) => Math.max(1, value - 1))}
           >
@@ -202,7 +202,7 @@ export function AdminExpertsDirectoryTable({ experts }: AdminExpertsDirectoryTab
           </button>
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
           >

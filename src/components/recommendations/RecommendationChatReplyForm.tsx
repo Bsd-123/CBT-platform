@@ -65,7 +65,7 @@ export function RecommendationChatReplyForm({
             }
           }}
         />
-        <button type="submit" className="rec-chat-send-btn" disabled={loading} aria-label="שליחה">
+        <button type="submit" className="btn btn-primary btn-icon" disabled={loading} aria-label="שליחה">
           <span className="material-symbols-outlined" aria-hidden="true">
             send
           </span>
@@ -73,7 +73,7 @@ export function RecommendationChatReplyForm({
       </form>
       <div className="rec-chat-reply-form-footer">
         {onCancel ? (
-          <button type="button" className="rec-chat-cancel-btn" onClick={onCancel}>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
             ביטול
           </button>
         ) : (

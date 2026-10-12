@@ -45,7 +45,7 @@ export function PostForumQuestionForm() {
       </div>
       <TagInput value={tags} onChange={setTags} required />
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "מפרסם..." : "פרסום שאלה"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "מפרסם..." : "פרסום שאלה"}</button>
     </form>
   );
 }

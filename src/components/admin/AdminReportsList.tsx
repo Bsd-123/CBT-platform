@@ -129,7 +129,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                   <div className="ui-table-actions">
                     <button
                       type="button"
-                      className="materials-btn-secondary"
+                      className="btn btn-secondary"
                       disabled={busy}
                       onClick={() =>
                         void run(
@@ -143,7 +143,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                     </button>
                     <button
                       type="button"
-                      className="materials-btn-secondary"
+                      className="btn btn-secondary"
                       disabled={busy}
                       onClick={() =>
                         void run(
@@ -157,8 +157,7 @@ export function AdminReportsList({ reports }: AdminReportsListProps) {
                     </button>
                     <button
                       type="button"
-                      className="materials-btn-primary"
-                      data-danger="true"
+                      className="btn btn-danger-quiet btn-sm"
                       disabled={busy}
                       onClick={() => void handleDelete(report)}
                     >

@@ -35,7 +35,7 @@ export function MaterialReviewActions({ materialId, materialTitle }: MaterialRev
     <div className="ui-table-actions">
       <button
         type="button"
-        className="materials-btn-primary"
+        className="btn btn-primary"
         disabled={busy}
         onClick={() => void handleApprove()}
       >
@@ -44,7 +44,7 @@ export function MaterialReviewActions({ materialId, materialTitle }: MaterialRev
       <ModalButton
         label="דחייה"
         title={`דחיית החומר: ${materialTitle}`}
-        triggerClassName="materials-btn-secondary"
+        triggerClassName="btn btn-secondary"
       >
         <RejectMaterialForm materialId={materialId} />
       </ModalButton>
@@ -93,7 +93,7 @@ function RejectMaterialForm({ materialId }: { materialId: string }) {
         />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="materials-btn-primary" data-danger="true" disabled={loading}>
+      <button type="submit" className="btn btn-danger" disabled={loading}>
         {loading ? "שולח..." : "דחיית החומר"}
       </button>
     </form>

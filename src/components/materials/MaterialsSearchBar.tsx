@@ -40,7 +40,7 @@ export function MaterialsSearchBar({ defaultValue = "" }: MaterialsSearchBarProp
           aria-label="חיפוש חומרים"
         />
       </div>
-      <button type="submit" className="materials-btn-secondary">
+      <button type="submit" className="btn btn-secondary">
         <MaterialIcon name="filter_list" />
         חיפוש
       </button>

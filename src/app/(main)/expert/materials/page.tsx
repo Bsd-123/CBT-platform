@@ -65,7 +65,7 @@ export default async function MaterialReviewPage({ searchParams }: ReviewPagePro
                       <Link href={`/materials/${material.id}`}>{material.title}</Link>
                     </h2>
                     {material.material_type && (
-                      <span className="ui-badge">{material.material_type.label}</span>
+                      <span className="status status-neutral">{material.material_type.label}</span>
                     )}
                   </div>
 
