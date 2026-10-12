@@ -340,6 +340,81 @@
   font-size: 1.25rem;
 }
 
+/* ---------- Legal and support pages ---------- */
+
+.legal-doc {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+.legal-doc-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.legal-doc-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: var(--fs-2xl);
+}
+
+.legal-doc-subtitle {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--fs-lg);
+}
+
+.legal-doc-meta {
+  margin: 0.5rem 0 0;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+.legal-doc-body {
+  color: var(--ink);
+  line-height: 1.8;
+}
+
+.legal-doc-body h2 {
+  margin: 2rem 0 0.5rem;
+  font-size: var(--fs-xl);
+}
+
+.legal-doc-body p,
+.legal-doc-body ul {
+  margin: 0 0 1rem;
+}
+
+.legal-doc-body ul {
+  padding-inline-start: 1.25rem;
+}
+
+.legal-doc-body li + li {
+  margin-top: 0.35rem;
+}
+
+.legal-doc-body a {
+  color: var(--primary-600);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.legal-doc-body a:focus-visible {
+  outline: none;
+  border-radius: var(--r-sm);
+  box-shadow: var(--focus);
+}
+
+.legal-draft-note {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: var(--fs-sm);
+}
+
 /* ---------- File preview dialog ---------- */
 
 .ui-dialog-preview {
