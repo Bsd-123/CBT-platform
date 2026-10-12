@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import Script from "next/script";
+import { ENABLE_SCRIPT_SRC } from "@/lib/site";
 import "./globals.css";
 
 // Every page must render per request so Next.js can apply the CSP nonce from src/proxy.ts.
@@ -12,11 +15,15 @@ export const metadata: Metadata = {
   description: "פלטפורמת קהילה מקצועית למטפלי CBT",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The proxy puts the per-request nonce in the request's CSP header; third-party scripts need it.
+  const csp = (await headers()).get("content-security-policy") ?? "";
+  const nonce = /'nonce-([^']+)'/.exec(csp)?.[1];
+
   return (
     <html lang="he" dir="rtl">
       <head>
@@ -31,7 +38,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Script src={ENABLE_SCRIPT_SRC} nonce={nonce} strategy="afterInteractive" />
+      </body>
     </html>
   );
 }
