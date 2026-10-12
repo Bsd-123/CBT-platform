@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchMaterialRequestById } from "@/lib/data";
 import { MaterialResponseForm } from "@/components/materials/MaterialResponseForm";
-import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";
+import { FilePreviewButton } from "@/components/materials/FilePreviewButton";
 import { isUuid } from "@/lib/utils/ids";
 
 type MaterialRequestDetailPageProps = {
@@ -33,7 +33,7 @@ export default async function MaterialRequestDetailPage({ params }: MaterialRequ
                 <p>{response.text ?? "—"}</p>
                 <p className="muted">{response.user?.full_name}</p>
                 {response.file_url && (
-                  <DownloadMaterialButton fileKey={response.file_url} label="הורדת קובץ מצורף" />
+                  <FilePreviewButton fileKey={response.file_url} label="צפייה בקובץ מצורף" />
                 )}
               </li>
             ))}

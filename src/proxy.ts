@@ -1,13 +1,20 @@
 import { createServerClient, type SetAllCookies } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { buildContentSecurityPolicy, createNonce } from "@/lib/security/csp";
+import {
+  buildContentSecurityPolicy,
+  buildFileResponsePolicy,
+  createNonce,
+  isFileRoute,
+} from "@/lib/security/csp";
 import { supabaseFetch } from "@/lib/supabase/fetch";
 
 const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/auth/callback"];
 
 export async function proxy(request: NextRequest) {
   // Next.js reads the nonce from the request's CSP header and applies it to its own scripts.
-  const csp = buildContentSecurityPolicy(createNonce(), process.env.NODE_ENV !== "production");
+  const csp = isFileRoute(request.nextUrl.pathname)
+    ? buildFileResponsePolicy()
+    : buildContentSecurityPolicy(createNonce(), process.env.NODE_ENV !== "production");
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("Content-Security-Policy", csp);
   const withCsp = <T extends NextResponse>(res: T): T => {

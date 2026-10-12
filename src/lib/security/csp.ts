@@ -15,6 +15,26 @@ export function buildContentSecurityPolicy(nonce: string, isDev: boolean): strin
   ].join("; ");
 }
 
+/**
+ * Policy for `/api/files/*` responses (PDFs, images, text, audio, video). They have no scripts to
+ * run, and they may be framed by the app's own pages (the preview dialog) but by nobody else.
+ * `object-src 'self'` lets the browser's built-in PDF viewer start inside the frame.
+ */
+export function buildFileResponsePolicy(): string {
+  return [
+    "default-src 'none'",
+    "style-src 'unsafe-inline'",
+    "img-src 'self' data:",
+    "media-src 'self'",
+    "object-src 'self'",
+    "frame-ancestors 'self'",
+    "base-uri 'none'",
+    "form-action 'none'",
+  ].join("; ");
+}
+
+export const isFileRoute = (pathname: string) => pathname.startsWith("/api/files/");
+
 export function createNonce(): string {
   return btoa(crypto.randomUUID());
 }

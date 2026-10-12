@@ -8,7 +8,7 @@ import {
 } from "@/lib/data";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { MaterialRatingForm } from "@/components/materials/MaterialRatingForm";
-import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";
+import { FilePreviewButton } from "@/components/materials/FilePreviewButton";
 import { ReportForm } from "@/components/shared/ReportForm";
 import { TagList } from "@/components/shared/TagList";
 import { StarRating } from "@/components/shared/StarRating";
@@ -125,7 +125,7 @@ export default async function MaterialDetailPage({ params }: MaterialDetailPageP
           </div>
 
           <div className="materials-detail-actions">
-            <DownloadMaterialButton fileKey={material.file_url} />
+            <FilePreviewButton fileKey={material.file_url} />
             {isApproved && <ReportForm targetType="material" targetId={material.id} />}
           </div>
         </div>

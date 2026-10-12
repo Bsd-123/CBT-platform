@@ -1,6 +1,6 @@
 import type { MaterialApprovalStatus } from "@/lib/db/types";
 import Link from "next/link";
-import { DownloadMaterialButton } from "@/components/materials/DownloadMaterialButton";
+import { FilePreviewButton } from "@/components/materials/FilePreviewButton";
 import { MaterialReviewActions } from "@/components/materials/MaterialReviewActions";
 import { TagList } from "@/components/shared/TagList";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -90,7 +90,7 @@ export default async function MaterialReviewPage({ searchParams }: ReviewPagePro
                   )}
 
                   <div className="ui-table-actions">
-                    <DownloadMaterialButton fileKey={material.file_url} label="הורדת הקובץ לבדיקה" />
+                    <FilePreviewButton fileKey={material.file_url} label="צפייה בקובץ לבדיקה" />
                     {material.approval_status === "pending" && (
                       <MaterialReviewActions
                         materialId={material.id}
