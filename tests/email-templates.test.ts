@@ -74,15 +74,15 @@ describe("email templates", () => {
   it("forum answer: previews the answer and links to it", () => {
     const mail = forumAnswerEmail({
       siteUrl: SITE,
-      recipientName: "נועה",
-      answererName: "דני",
+      recipientName: "שרה",
+      answererName: "רבקה",
       questionTitle: "איך בונים היררכיה?",
       questionId: "q1",
       answerId: "a1",
       content: "מומלץ להתחיל בחשיפה קצרה.",
     });
     expect(mail.subject).toContain("איך בונים היררכיה?");
-    expect(mail.html).toContain("שלום נועה,");
+    expect(mail.html).toContain("שלום שרה,");
     expect(mail.html).toContain("מומלץ להתחיל בחשיפה קצרה.");
     expect(mail.html).toContain(`href="${SITE}/forum/q1#answer-a1"`);
   });
@@ -90,7 +90,7 @@ describe("email templates", () => {
   it("professional request: links to the request", () => {
     const mail = professionalCommentEmail({
       siteUrl: SITE,
-      commenterName: "דני",
+      commenterName: "רבקה",
       requestTitle: "בקשה",
       requestId: "r1",
       content: "תגובה",
@@ -101,10 +101,10 @@ describe("email templates", () => {
 
   it("material request: says when a file was uploaded", () => {
     const withFile = materialResponseEmail({
-      siteUrl: SITE, responderName: "דני", requestTitle: "דף עבודה", requestId: "m1", hasFile: true,
+      siteUrl: SITE, responderName: "רבקה", requestTitle: "דף עבודה", requestId: "m1", hasFile: true,
     });
     const textOnly = materialResponseEmail({
-      siteUrl: SITE, responderName: "דני", requestTitle: "דף עבודה", requestId: "m1", hasFile: false, text: "ראו קישור",
+      siteUrl: SITE, responderName: "רבקה", requestTitle: "דף עבודה", requestId: "m1", hasFile: false, text: "ראו קישור",
     });
     expect(withFile.subject).toContain("חומר חדש");
     expect(withFile.html).toContain(`href="${SITE}/materials/requests/m1"`);
@@ -188,15 +188,15 @@ describe("email previews", () => {
     };
     const samples = {
       answer: forumAnswerEmail({
-        siteUrl: SITE, recipientName: "נועה", answererName: "ד״ר מאיה לוי", questionTitle: "איך בונים היררכיית חשיפה לנערה עם הפרעת פאניקה?",
+        siteUrl: SITE, recipientName: "שרה", answererName: "ד״ר מרים לוי", questionTitle: "איך בונים היררכיית חשיפה לנערה עם הפרעת פאניקה?",
         questionId: "q1", answerId: "a1", content: "הסירוב הוא מידע. התחילו מהאמונה, ורק אחר כך עברו לניסוי התנהגותי קצר.\n\nשלב 1: ניבוי.",
       }),
       event: eventUpdatedEmail({
-        siteUrl: SITE, recipientName: "נועה", eventId: "e1", ...base, event_time: new Date("1970-01-01T19:30:00Z"),
+        siteUrl: SITE, recipientName: "שרה", eventId: "e1", ...base, event_time: new Date("1970-01-01T19:30:00Z"),
         changes: diffEvent(base, { ...base, event_time: new Date("1970-01-01T19:30:00Z"), event_date: new Date("2026-10-27T00:00:00Z"), title: "סדנת חשיפה מתקדמת" }),
       }),
       moderation: contentModeratedEmail({
-        siteUrl: SITE, recipientName: "נועה", kind: "forum_question", action: "hidden", title: "שאלה על מטופל", reason: "השאלה כוללת פרטים מזהים של מטופל.",
+        siteUrl: SITE, recipientName: "שרה", kind: "forum_question", action: "hidden", title: "שאלה על מטופל", reason: "השאלה כוללת פרטים מזהים של מטופל.",
       }),
     };
     for (const [name, mail] of Object.entries(samples)) writeFileSync(join(process.env.EMAIL_PREVIEW_DIR, `${name}.html`), mail.html);

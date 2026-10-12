@@ -36,18 +36,18 @@ function answer(
 }
 
 const asker = "u-asker";
-const reply2 = answer("r1b", "u-3", "תומר אביב", "אצלנו ציפיות השתנו, לא SUDS.", 7, 1);
-const reply1 = answer("r1a", asker, "נועה פרץ", "תודה, זה עוזר מאוד.", 6, 2, "user", [reply2]);
+const reply2 = answer("r1b", "u-3", "חנה אביב", "אצלנו ציפיות השתנו, לא SUDS.", 7, 1);
+const reply1 = answer("r1a", asker, "רחל פרץ", "תודה, זה עוזר מאוד.", 6, 2, "user", [reply2]);
 const answers = [
-  answer("a-old", "u-1", "רינה בן דוד", "מומלץ להתחיל בניסוי קצר.", 5, 3, "admin", [reply1]),
-  answer("a-top", "u-2", "ד״ר מאיה לוי", "הסירוב הוא מידע. התחילו מהאמונה.\n\nשלב 1: ניבוי.", 6, 9, "expert"),
-  answer("a-new", "u-4", "אלי מזרחי", "אולי שעון דופק?", 9, 0),
+  answer("a-old", "u-1", "לאה בן דוד", "מומלץ להתחיל בניסוי קצר.", 5, 3, "admin", [reply1]),
+  answer("a-top", "u-2", "ד״ר מרים לוי", "הסירוב הוא מידע. התחילו מהאמונה.\n\nשלב 1: ניבוי.", 6, 9, "expert"),
+  answer("a-new", "u-4", "אסתר מזרחי", "אולי שעון דופק?", 9, 0),
 ];
 
 const question = {
   id: "q1", user_id: asker, title: "איך בונים היררכיית חשיפה לנערה עם הפרעת פאניקה?",
   content: "היא מסרבת לתרגילים אינטרוצפטיביים.\nמה ניסיתם?", created_at: day(1),
-  user: user(asker, "נועה פרץ"), answers, answer_count: 3, like_count: 4, user_liked: true,
+  user: user(asker, "רחל פרץ"), answers, answer_count: 3, like_count: 4, user_liked: true,
 };
 
 function thread(sort: "top" | "newest" | "oldest") {

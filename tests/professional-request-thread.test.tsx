@@ -9,7 +9,7 @@ vi.mock("@/lib/actions/submit", () => ({
 
 import { ProfessionalRequestThread } from "@/components/professional-requests/ProfessionalRequestThread";
 
-const user = { id: "u1", full_name: "נועה פרץ", title: null, role: "user" as const, created_at: new Date(), expert_code: null };
+const user = { id: "u1", full_name: "רחל פרץ", title: null, role: "user" as const, created_at: new Date(), expert_code: null };
 const request = {
   id: "r1", title: "איך מתחילים טיפול בחשיפה?", description: "מחפשת הכוונה.", created_at: new Date("2026-10-01T09:00:00Z"), user,
 };

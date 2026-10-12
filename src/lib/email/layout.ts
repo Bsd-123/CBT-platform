@@ -43,7 +43,7 @@ export type EmailContent = {
   /** Shown by mail clients next to the subject; hidden in the body. */
   preheader: string;
   heading: string;
-  /** Greeting line, e.g. "שלום נועה,". */
+  /** Greeting line, e.g. "שלום שרה,". */
   greeting?: string;
   blocks: EmailBlock[];
   cta?: { label: string; url: string };

@@ -15,7 +15,7 @@ import { AdminReportsList } from "@/components/admin/AdminReportsList";
 const report = (id: string, target_type: string, target_id: string, content: unknown) =>
   ({
     id, user_id: "u1", target_type, target_id, reason: "spam", status: "open",
-    created_at: new Date("2026-10-01T00:00:00Z"), user: { full_name: "Reporter" }, content,
+    created_at: new Date("2026-10-01T00:00:00Z"), user: { full_name: "דבורה כהן" }, content,
   }) as never;
 
 describe("admin reports list", () => {

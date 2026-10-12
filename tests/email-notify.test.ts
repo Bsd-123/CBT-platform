@@ -31,7 +31,7 @@ const person = (id: string) => ({ id, email: `${id}@x.test`, name: id.toUpperCas
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.getRecipient.mockImplementation(async (_c: unknown, id: string) => person(id));
-  mocks.getDisplayName.mockResolvedValue("דני");
+  mocks.getDisplayName.mockResolvedValue("רבקה");
 });
 
 const sent = () => (mocks.sendEmail.mock.calls[0] as unknown as [unknown, { to: string; subject: string; html: string }])[1];

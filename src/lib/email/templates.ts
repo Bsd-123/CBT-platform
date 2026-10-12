@@ -23,11 +23,11 @@ export function forumAnswerEmail(input: {
   return {
     subject: `תשובה חדשה לשאלה: ${previewText(input.questionTitle, 80)}`,
     ...renderEmail({
-      preheader: `${input.answererName} ענו על השאלה שלך בפורום`,
+      preheader: `התקבלה תשובה חדשה מאת ${input.answererName} על השאלה שלך בפורום`,
       heading,
       greeting: greeting(input.recipientName),
       blocks: [
-        { kind: "paragraph", text: `${input.answererName} פרסמו תשובה לשאלה "${previewText(input.questionTitle, 120)}":` },
+        { kind: "paragraph", text: `התקבלה תשובה חדשה מאת ${input.answererName} לשאלה "${previewText(input.questionTitle, 120)}":` },
         { kind: "quote", text: previewText(input.content), byline: input.answererName },
       ],
       cta: { label: "לצפייה בתשובה", url: url(input.siteUrl, `/forum/${input.questionId}#answer-${input.answerId}`) },
@@ -46,11 +46,11 @@ export function professionalCommentEmail(input: {
   return {
     subject: `תגובה חדשה לפנייה: ${previewText(input.requestTitle, 80)}`,
     ...renderEmail({
-      preheader: `${input.commenterName} הגיבו לפנייה המקצועית שלך`,
+      preheader: `התקבלה תגובה חדשה מאת ${input.commenterName} לפנייה המקצועית שלך`,
       heading: "התקבלה תגובה לפנייה שלך",
       greeting: greeting(input.recipientName),
       blocks: [
-        { kind: "paragraph", text: `${input.commenterName} הגיבו לפנייה "${previewText(input.requestTitle, 120)}":` },
+        { kind: "paragraph", text: `התקבלה תגובה חדשה מאת ${input.commenterName} לפנייה "${previewText(input.requestTitle, 120)}":` },
         { kind: "quote", text: previewText(input.content), byline: input.commenterName },
       ],
       cta: { label: "לצפייה בפנייה", url: url(input.siteUrl, `/professional-requests/${input.requestId}`) },
@@ -73,8 +73,8 @@ export function materialResponseEmail(input: {
     {
       kind: "paragraph",
       text: input.hasFile
-        ? `${input.responderName} העלו חומר בתגובה לבקשה שלך "${previewText(input.requestTitle, 120)}".`
-        : `${input.responderName} השיבו לבקשת החומר שלך "${previewText(input.requestTitle, 120)}".`,
+        ? `חומר חדש הועלה על ידי ${input.responderName} בתגובה לבקשה שלך "${previewText(input.requestTitle, 120)}".`
+        : `התקבלה תגובה מאת ${input.responderName} לבקשת החומר שלך "${previewText(input.requestTitle, 120)}".`,
     },
   ];
   if (input.text?.trim()) {
@@ -183,7 +183,7 @@ export function contentModeratedEmail(input: {
     { kind: "quote", text: input.reason?.trim() || DEFAULT_MODERATION_REASON, byline: "הסיבה" },
     {
       kind: "paragraph",
-      text: "אנחנו שומרים על קהילה מקצועית, מכבדת ובטוחה לכל המטפלים. נשמח אם בפעם הבאה תקפידו על הנחיות הקהילה: שיח מכבד, שמירה על פרטיות מטופלים, ותוכן מקצועי ורלוונטי.",
+      text: "אנחנו שומרים על קהילה מקצועית, מכבדת ובטוחה לכל חברות וחברי הקהילה. נשמח אם בפעם הבאה תקפידו על הנחיות הקהילה: שיח מכבד ומכבד־ערכים, שמירה על פרטיות מטופלים, ותוכן מקצועי ורלוונטי.",
     },
     { kind: "paragraph", text: "אם לדעתכם מדובר בטעות, אפשר לפנות אלינו ונשמח לבדוק שוב." },
   ];
