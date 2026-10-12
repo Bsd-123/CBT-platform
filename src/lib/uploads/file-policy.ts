@@ -110,3 +110,15 @@ export function checkUpload(
 
   return { ok: true, contentType: rule.contentType };
 }
+
+/** Content types a browser can show in place (no HTML, SVG or scripts are ever allowed to upload). */
+const INLINE_VIEWABLE = new Set(["pdf", "png", "jpg", "jpeg", "gif", "webp", "mp4", "mp3", "txt"]);
+
+/** The Content-Type to serve a stored file with, from its extension (never from stored metadata). */
+export function contentTypeForFileName(fileName: string): string {
+  return ALLOWED[getExtension(fileName)]?.contentType ?? "application/octet-stream";
+}
+
+export function canViewInline(fileName: string): boolean {
+  return INLINE_VIEWABLE.has(getExtension(fileName));
+}

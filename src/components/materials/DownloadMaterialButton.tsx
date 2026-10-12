@@ -1,14 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { requestFileDownloadUrl } from "@/lib/actions/auth";
-import { unwrap } from "@/lib/actions/result";
+import { fileDownloadPath } from "@/lib/files/path";
 
 type DownloadMaterialButtonProps = {
   fileKey: string;
   label?: string;
 };
 
+const FAILURE_MESSAGES: Record<number, string> = {
+  401: "יש להתחבר מחדש כדי להמשיך.",
+  404: "הקובץ לא נמצא.",
+  429: "יותר מדי בקשות. נסו שוב בעוד רגע.",
+  502: "שירות האחסון אינו נגיש כרגע מהרשת של השרת (ייתכן שהוא חסום במסנן).",
+};
+
+/**
+ * Downloads from the app's own domain (`/api/files/...`). A quick HEAD request first lets us
+ * show a readable message when access is refused, instead of landing on a bare error page.
+ */
 export function DownloadMaterialButton({
   fileKey,
   label = "הורדת קובץ",
@@ -21,8 +31,16 @@ export function DownloadMaterialButton({
     setLoading(true);
 
     try {
-      const url = unwrap(await requestFileDownloadUrl(fileKey));
-      window.open(url, "_blank", "noopener,noreferrer");
+      const url = fileDownloadPath(fileKey);
+      const check = await fetch(url, { method: "HEAD", credentials: "same-origin" });
+      if (!check.ok) throw new Error(FAILURE_MESSAGES[check.status] ?? "ההורדה נכשלה. נסו שוב.");
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "";
+      document.body.append(link);
+      link.click();
+      link.remove();
     } catch (downloadError) {
       setError(downloadError instanceof Error ? downloadError.message : "ההורדה נכשלה");
     } finally {

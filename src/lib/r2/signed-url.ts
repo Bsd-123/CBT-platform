@@ -1,10 +1,9 @@
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getR2Client } from "@/lib/r2/client";
 import { r2Config } from "@/lib/r2/config";
 
 const DEFAULT_UPLOAD_EXPIRY_SECONDS = 300;
-const DEFAULT_DOWNLOAD_EXPIRY_SECONDS = 300;
 
 const FILE_KEY_PATTERN =
   /^(materials|material-responses)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/\d+-[a-zA-Z0-9._-]+$/i;
@@ -25,11 +24,6 @@ export function isFileKeyOwnedBy(
 export type SignedUploadUrlInput = {
   key: string;
   contentType: string;
-  expiresIn?: number;
-};
-
-export type SignedDownloadUrlInput = {
-  key: string;
   expiresIn?: number;
 };
 
@@ -64,18 +58,4 @@ export async function createSignedUploadUrl(
   });
 
   return { uploadUrl, key: input.key };
-}
-
-export async function createSignedDownloadUrl(
-  input: SignedDownloadUrlInput,
-): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: r2Config.bucketName,
-    Key: input.key,
-    ResponseContentDisposition: "attachment",
-  });
-
-  return getSignedUrl(getR2Client(), command, {
-    expiresIn: input.expiresIn ?? DEFAULT_DOWNLOAD_EXPIRY_SECONDS,
-  });
 }
