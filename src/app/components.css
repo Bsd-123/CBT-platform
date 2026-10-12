@@ -604,8 +604,10 @@ a.stat-card:hover {
   color: var(--ink-2);
 }
 
+/* Text fills the row so the arrow always lands on the far edge, whatever the label length. */
 .stat-text {
   display: grid;
+  flex: 1;
   min-width: 0;
 }
 
@@ -620,9 +622,14 @@ a.stat-card:hover {
   color: var(--ink-2);
 }
 
-.stat-go {
-  margin-inline-start: auto;
+.stat-card .stat-go {
   color: var(--ink-3);
+  transition: transform 0.15s;
+}
+
+a.stat-card:hover .stat-go {
+  color: var(--primary-600);
+  transform: translateX(-3px);
 }
 
 @media (prefers-reduced-motion: reduce) {

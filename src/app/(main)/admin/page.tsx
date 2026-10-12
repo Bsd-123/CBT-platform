@@ -135,7 +135,7 @@ export default async function AdminDashboardPage() {
               אין הרשמות שממתינות לאישור
             </p>
           ) : (
-            <ul className="attention-list">
+            <ul className="attention-list attention-list-people">
               {approvals.map((approval) => (
                 <li key={approval.id}>
                   <span className="attention-main">
