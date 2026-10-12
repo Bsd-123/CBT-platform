@@ -1,59 +1,34 @@
-"use client";
-
-import { useState } from "react";
-import { fileDownloadPath } from "@/lib/files/path";
+import { fileDownloadPath, fileNameFromKey } from "@/lib/files/path";
+import { canViewInline } from "@/lib/uploads/file-policy";
 
 type DownloadMaterialButtonProps = {
   fileKey: string;
   label?: string;
 };
 
-const FAILURE_MESSAGES: Record<number, string> = {
-  401: "יש להתחבר מחדש כדי להמשיך.",
-  404: "הקובץ לא נמצא.",
-  429: "יותר מדי בקשות. נסו שוב בעוד רגע.",
-  502: "שירות האחסון אינו נגיש כרגע מהרשת של השרת (ייתכן שהוא חסום במסנן).",
-};
-
 /**
- * Downloads from the app's own domain (`/api/files/...`). A quick HEAD request first lets us
- * show a readable message when access is refused, instead of landing on a bare error page.
+ * A plain link that opens the file in a new tab, on the app's own domain.
+ *
+ * It must be a real navigation, not a script-triggered download: network filters answer an
+ * unknown file with their own HTML page ("this file will be filtered, continue?"). A navigation
+ * shows that page so the member can click through; a forced download tries to save the page as
+ * a file and fails. Viewable types (PDF, images, audio, video, text) open in the tab; the rest
+ * are downloaded once the filter's page is dismissed.
  */
 export function DownloadMaterialButton({
   fileKey,
   label = "הורדת קובץ",
 }: DownloadMaterialButtonProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleDownload() {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const url = fileDownloadPath(fileKey);
-      const check = await fetch(url, { method: "HEAD", credentials: "same-origin" });
-      if (!check.ok) throw new Error(FAILURE_MESSAGES[check.status] ?? "ההורדה נכשלה. נסו שוב.");
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "";
-      document.body.append(link);
-      link.click();
-      link.remove();
-    } catch (downloadError) {
-      setError(downloadError instanceof Error ? downloadError.message : "ההורדה נכשלה");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const inline = canViewInline(fileNameFromKey(fileKey));
 
   return (
-    <div className="stack">
-      <button type="button" className="materials-btn-secondary" disabled={loading} onClick={() => void handleDownload()}>
-        {loading ? "מכין..." : label}
-      </button>
-      {error && <p className="error">{error}</p>}
-    </div>
+    <a
+      className="materials-btn-secondary"
+      href={fileDownloadPath(fileKey, { inline })}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {label}
+    </a>
   );
 }

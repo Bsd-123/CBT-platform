@@ -7,8 +7,21 @@ import { logger } from "@/lib/logger";
 import { getObjectFromR2 } from "@/lib/r2/download";
 import { canViewInline, contentTypeForFileName } from "@/lib/uploads/file-policy";
 
-const fail = (status: number, error: string) =>
-  Response.json({ error }, { status, headers: { "Cache-Control": "no-store" } });
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/**
+ * Refusals are JSON for scripts. When a member opens the link in a tab (a document navigation)
+ * they get a small readable page instead of raw JSON.
+ */
+const failFor = (request: Request) => (status: number, error: string) => {
+  const headers = { "Cache-Control": "no-store" };
+  if (request.headers.get("sec-fetch-dest") === "document") {
+    const page = `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>הקובץ אינו זמין</title></head><body style="font-family:Heebo,Arial,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem;color:#1c1c1b"><h1 style="font-size:1.25rem">הקובץ אינו זמין</h1><p>${escapeHtml(error)}</p></body></html>`;
+    return new Response(page, { status, headers: { ...headers, "Content-Type": "text/html; charset=utf-8" } });
+  }
+  return Response.json({ error }, { status, headers });
+};
 
 /** One `bytes=a-b` / `bytes=a-` / `bytes=-n` range; anything fancier is ignored (full file). */
 function parseRange(header: string | null): string | undefined {
@@ -27,6 +40,7 @@ function contentDisposition(disposition: "attachment" | "inline", fileName: stri
  * and can inspect and approve it once, instead of an endless series of one-off presigned links.
  */
 export async function serveFile(request: Request, key: string, head: boolean): Promise<Response> {
+  const fail = failFor(request);
   try {
     await authorizeFileDownload(key);
 
