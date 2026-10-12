@@ -2,14 +2,14 @@
    (coral date panel, cream badge, white card) with the same palette. */
 
 .event-page {
-  --ev-primary: #ff8066;
-  --ev-on-primary: #ffffff;
-  --ev-badge-bg: #fbf4e1;
-  --ev-badge-fg: #484338;
-  --ev-surface: #ffffff;
-  --ev-border: #e9e9e8;
-  --ev-text: #1c1c1b;
-  --ev-text-muted: #5c5c5b;
+  --ev-primary: var(--primary-600);
+  --ev-on-primary: var(--on-primary);
+  --ev-badge-bg: var(--tag-sand-bg);
+  --ev-badge-fg: var(--tag-sand-fg);
+  --ev-surface: var(--surface);
+  --ev-border: var(--line);
+  --ev-text: var(--ink);
+  --ev-text-muted: var(--ink-2);
 
   display: grid;
   gap: 1.5rem;

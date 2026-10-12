@@ -5,7 +5,10 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "קהילת מטפלי CBT",
+  title: {
+    default: "CBTeam · קהילת מטפלי CBT",
+    template: "%s · CBTeam",
+  },
   description: "פלטפורמת קהילה מקצועית למטפלי CBT",
 };
 
@@ -24,7 +27,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400,0..1,0&display=block"
           rel="stylesheet"
         />
       </head>

@@ -21,7 +21,7 @@ export function ModalButton({
   label,
   icon,
   title,
-  triggerClassName = "materials-btn-primary",
+  triggerClassName = "btn btn-primary",
   children,
 }: ModalButtonProps) {
   const [open, setOpen] = useState(false);
@@ -80,7 +80,7 @@ export function ModalButton({
               <h2 id={titleId}>{title}</h2>
               <button
                 type="button"
-                className="ui-icon-btn"
+                className="btn btn-ghost btn-icon btn-sm"
                 onClick={() => setOpen(false)}
                 aria-label="סגירה"
               >

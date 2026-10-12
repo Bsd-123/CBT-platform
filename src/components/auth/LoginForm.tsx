@@ -43,7 +43,7 @@ export function LoginForm() {
     <form className="card auth-card stack" onSubmit={handleSubmit}>
       <div>
         <h1>התחברות</h1>
-        <p className="muted">התחברו לקהילת מטפלי CBT</p>
+        <p className="muted">ברוכים השבים ל־CBTeam</p>
       </div>
 
       <div className="form-field">
@@ -79,7 +79,7 @@ export function LoginForm() {
 
       {error && <p className="error">{error}</p>}
 
-      <button type="submit" className="button" disabled={loading}>
+      <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? "מתחבר..." : "התחברות"}
       </button>
 

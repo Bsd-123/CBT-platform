@@ -22,6 +22,8 @@ export type UpdateEventInput = {
 export type ListEventsFilter = {
   user_id?: string;
   calendar_only?: boolean;
+  /** Only events dated on or after this day (YYYY-MM-DD). */
+  from_date?: string;
   include_hidden?: boolean;
   skip?: number;
   take?: number;

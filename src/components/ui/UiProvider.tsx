@@ -116,14 +116,13 @@ export function UiProvider({ children }: { children: ReactNode }) {
               <h2>{pending.title}</h2>
               {pending.message && <p className="muted">{pending.message}</p>}
               <div className="ui-dialog-actions">
-                <button type="button" className="materials-btn-secondary" onClick={() => settle(false)}>
+                <button type="button" className="btn btn-secondary" onClick={() => settle(false)}>
                   ביטול
                 </button>
                 <button
                   ref={confirmButtonRef}
                   type="button"
-                  className="materials-btn-primary"
-                  data-danger={pending.danger ? "true" : undefined}
+                  className={pending.danger ? "btn btn-danger" : "btn btn-primary"}
                   onClick={() => settle(true)}
                 >
                   {pending.confirmLabel ?? "אישור"}

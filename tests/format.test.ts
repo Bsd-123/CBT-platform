@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countLabel, formatDate } from "@/lib/utils/format";
+import { countLabel, formatDate, isRecent } from "@/lib/utils/format";
 
 describe("format helpers", () => {
   it("uses singular for 1 and plural otherwise", () => {
@@ -18,5 +18,18 @@ describe("format helpers", () => {
     } finally {
       process.env.TZ = original;
     }
+  });
+});
+
+describe("isRecent", () => {
+  const now = new Date("2026-10-12T12:00:00Z");
+
+  it("marks content from the last 48 hours as recent", () => {
+    expect(isRecent("2026-10-11T12:00:00Z", now)).toBe(true);
+  });
+
+  it("does not mark older or future-dated content", () => {
+    expect(isRecent("2026-10-10T11:59:00Z", now)).toBe(false);
+    expect(isRecent("2026-10-13T12:00:00Z", now)).toBe(false);
   });
 });

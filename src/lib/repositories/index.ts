@@ -22,6 +22,7 @@ export {
   getMaterialById,
   reviewMaterial,
   countPendingMaterials,
+  countMaterialsByApprovalStatus,
   listMaterialsForReview,
   listMaterials,
   countMaterials,
@@ -65,6 +66,7 @@ export {
 
 export {
   getRecommendationById,
+  countRecommendations,
   listRecommendations,
   listRecommendationsFeed,
   createRecommendation,

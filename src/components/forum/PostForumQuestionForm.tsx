@@ -51,7 +51,7 @@ export function PostForumQuestionForm({ tags }: PostForumQuestionFormProps) {
       </div>
       <TagSelect tags={tags} value={selectedTagIds} onChange={setSelectedTagIds} optional />
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "מפרסם..." : "פרסום שאלה"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "מפרסם..." : "פרסום שאלה"}</button>
     </form>
   );
 }

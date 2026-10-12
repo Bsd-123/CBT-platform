@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שפת העיצוב – CBTeam</title>
+<link rel="icon" href="../src/app/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400,0..1,0&display=swap" rel="stylesheet">
+<style>
+/* ===== Design tokens (the single source of truth proposed for the app) ===== */
+:root {
+  /* Brand */
+  --primary-50:  #fbefeb;
+  --primary-100: #f8e1da;
+  --primary-500: #c4553e;
+  --primary-600: #a43c28;  /* main brand color: buttons, links, active states */
+  --primary-700: #842513;  /* hover */
+  --primary-800: #6e1e0f;  /* pressed */
+  --accent:      #ff8066;  /* decorative only: illustrations, glows. Never text or white-on-coral */
+
+  /* Neutrals (warm) */
+  --bg:          #f7f6f2;
+  --surface:     #fdfcf8;
+  --surface-2:   #f1efe8;
+  --surface-3:   #e8e5dc;
+  --line:        #e6dad4;  /* decorative dividers, card borders */
+  --line-strong: #988680;  /* form controls (3.4:1, meets WCAG non-text) */
+  --ink:         #1f2430;  /* primary text */
+  --ink-2:       #5b4a45;  /* secondary text */
+  --ink-3:       #7a6862;  /* hints, meta */
+  --disabled-bg: #ecebe6;
+  --disabled-fg: #9b8f8a;
+
+  /* Semantic */
+  --success:     #3f6b55;  --success-bg: #dcebe2;
+  --warning:     #8a6400;  --warning-bg: #fbf1d6;
+  --danger:      #b42318;  --danger-bg:  #fbe4e1;
+  --info:        #2b5a87;  --info-bg:    #e6eef6;
+
+  /* Typography */
+  --font: 'Heebo', system-ui, sans-serif;
+  --fs-xs: 0.75rem;   /* 12 – labels on badges */
+  --fs-sm: 0.875rem;  /* 14 – meta, table cells */
+  --fs-md: 1rem;      /* 16 – body */
+  --fs-lg: 1.125rem;  /* 18 – card titles */
+  --fs-xl: 1.375rem;  /* 22 – section titles */
+  --fs-2xl: 1.75rem;  /* 28 – page titles */
+  --fs-3xl: 2.5rem;   /* 40 – home hero only */
+
+  /* Spacing (4px grid) */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  /* Shape */
+  --r-sm: 6px;    /* badges, small chips, inputs inside tables */
+  --r-md: 10px;   /* buttons, inputs */
+  --r-lg: 16px;   /* cards, panels, modals */
+  --r-full: 999px;/* pills, avatars */
+
+  /* Elevation */
+  --sh-1: 0 1px 2px rgba(31, 36, 48, .06);
+  --sh-2: 0 4px 14px rgba(31, 36, 48, .08);
+  --sh-3: 0 12px 32px rgba(31, 36, 48, .14);
+  --focus: 0 0 0 3px rgba(164, 60, 40, .28);
+}
+
+* { box-sizing: border-box; }
+html { scrollbar-gutter: stable; }
+body {
+  margin: 0; font-family: var(--font); color: var(--ink); background: var(--bg);
+  line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+.ms { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1;
+  display: inline-block; direction: ltr; -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; vertical-align: middle; }
+.ms.fill { font-variation-settings: 'FILL' 1; }
+a { color: var(--primary-600); }
+code, .mono { font-family: ui-monospace, Consolas, monospace; font-size: .85em; direction: ltr; unicode-bidi: embed; }
+
+/* ===== Doc layout ===== */
+.doc-header {
+  position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+}
+.doc-header-inner { max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 24px; }
+.doc-toc { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
+.doc-toc a { white-space: nowrap; padding: 6px 10px; border-radius: var(--r-sm); font-size: var(--fs-sm); color: var(--ink-2); text-decoration: none; }
+.doc-toc a:hover { background: var(--surface-2); color: var(--ink); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px 96px; }
+.intro { padding: 56px 0 32px; position: relative; }
+.intro h1 { font-size: var(--fs-3xl); line-height: 1.15; margin: 0 0 12px; letter-spacing: -.01em; }
+.intro p { max-width: 720px; color: var(--ink-2); font-size: var(--fs-lg); margin: 0; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+section.block { padding-top: 56px; scroll-margin-top: 70px; }
+section.block > h2 { font-size: var(--fs-2xl); margin: 0 0 6px; display: flex; align-items: center; gap: 10px; }
+section.block > h2 .num { font-size: var(--fs-sm); font-weight: 700; color: var(--primary-600); background: var(--primary-50);
+  border-radius: var(--r-full); width: 30px; height: 30px; display: inline-grid; place-items: center; }
+section.block > .lead { color: var(--ink-2); margin: 0 0 24px; max-width: 760px; }
+h3 { font-size: var(--fs-lg); margin: 28px 0 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--sh-1); }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); }
+.note { font-size: var(--fs-sm); color: var(--ink-3); margin: 8px 0 0; }
+.rule { display: flex; gap: 10px; align-items: flex-start; font-size: var(--fs-sm); padding: 10px 12px; border-radius: var(--r-md); }
+.rule .ms { font-size: 18px; margin-top: 2px; }
+.rule.do { background: var(--success-bg); color: #24402f; }
+.rule.dont { background: var(--danger-bg); color: #7a1a12; }
+.rules { display: grid; gap: 8px; }
+
+/* ===== Findings ===== */
+.finding-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.finding-table th { text-align: start; font-weight: 500; color: var(--ink-3); padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.finding-table td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.finding-table tr:last-child td { border-bottom: 0; }
+.finding-table td:first-child { font-weight: 500; width: 26%; }
+.src { font-size: var(--fs-xs); white-space: nowrap; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
+
+/* ===== Swatches ===== */
+.swatch { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.swatch .chip { height: 84px; display: flex; align-items: flex-end; padding: 10px 12px; font-size: var(--fs-sm); font-weight: 500; }
+.swatch .info { padding: 10px 12px; font-size: var(--fs-sm); }
+.swatch .info b { display: block; }
+.swatch .info span { color: var(--ink-3); }
+.ramp { display: flex; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); }
+.ramp div { flex: 1; height: 56px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; font-size: 11px; }
+
+/* ===== Type scale ===== */
+.type-row { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.type-row:last-child { border-bottom: 0; }
+.type-row .lbl { font-size: var(--fs-xs); color: var(--ink-3); }
+
+/* ===== Product components (the spec) ===== */
+.btn {
+  --h: 40px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: var(--h); padding: 0 16px; border-radius: var(--r-md); border: 1px solid transparent;
+  font: 500 var(--fs-sm)/1 var(--font); cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s, transform .05s;
+}
+.btn .ms { font-size: 18px; }
+.btn:focus-visible, .btn.is-focus { outline: none; box-shadow: var(--focus); }
+.btn:active, .btn.is-active { transform: translateY(1px); }
+.btn.sm { --h: 32px; padding: 0 12px; font-size: var(--fs-xs); border-radius: var(--r-sm); }
+.btn.lg { --h: 48px; padding: 0 22px; font-size: var(--fs-md); }
+.btn-primary { background: var(--primary-600); color: #fff; }
+.btn-primary:hover, .btn-primary.is-hover { background: var(--primary-700); }
+.btn-primary:active, .btn-primary.is-active { background: var(--primary-800); }
+.btn-secondary { background: var(--surface); color: var(--primary-600); border-color: var(--line-strong); }
+.btn-secondary:hover, .btn-secondary.is-hover { background: var(--primary-50); border-color: var(--primary-600); }
+.btn-secondary:active, .btn-secondary.is-active { background: var(--primary-100); }
+.btn-ghost { background: transparent; color: var(--ink-2); }
+.btn-ghost:hover, .btn-ghost.is-hover { background: var(--surface-2); color: var(--ink); }
+.btn-ghost:active, .btn-ghost.is-active { background: var(--surface-3); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover, .btn-danger.is-hover { background: #8f1c13; }
+.btn-danger-quiet { background: transparent; color: var(--danger); border-color: transparent; }
+.btn-danger-quiet:hover, .btn-danger-quiet.is-hover { background: var(--danger-bg); }
+.btn:disabled, .btn.is-disabled { background: var(--disabled-bg); color: var(--disabled-fg); border-color: transparent; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-icon { width: var(--h); padding: 0; }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+
+.state-grid { display: grid; grid-template-columns: 140px repeat(6, minmax(110px, 1fr)); gap: 12px; align-items: center; min-width: 860px; }
+.state-grid .h { font-size: var(--fs-xs); color: var(--ink-3); font-weight: 500; }
+.state-grid .r { font-size: var(--fs-sm); font-weight: 500; }
+
+/* Inputs */
+.field { display: grid; gap: 6px; }
+.field label { font-size: var(--fs-sm); font-weight: 500; }
+.field .hint { font-size: var(--fs-xs); color: var(--ink-3); }
+.field .err { font-size: var(--fs-xs); color: var(--danger); display: flex; gap: 4px; align-items: center; }
+.input {
+  height: 44px; width: 100%; padding: 0 12px; border-radius: var(--r-md); border: 1px solid var(--line-strong);
+  background: var(--surface); font: 400 var(--fs-md) var(--font); color: var(--ink); transition: border-color .15s, box-shadow .15s;
+}
+.input::placeholder { color: var(--ink-3); }
+.input:hover, .input.is-hover { border-color: var(--ink-2); }
+.input:focus, .input.is-focus { outline: none; border-color: var(--primary-600); box-shadow: var(--focus); }
+.input.is-error { border-color: var(--danger); }
+.input:disabled { background: var(--disabled-bg); border-color: var(--line); color: var(--disabled-fg); }
+textarea.input { height: 96px; padding: 10px 12px; resize: vertical; }
+.search { position: relative; }
+.search .ms { position: absolute; inset-inline-start: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-3); }
+.search .input { padding-inline-start: 40px; }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: var(--fs-sm); cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--primary-600); }
+
+/* Tags & badges */
+.tag { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: var(--r-full); font-size: var(--fs-xs); font-weight: 500; }
+.badge { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: var(--r-sm); font-size: var(--fs-xs); font-weight: 500; }
+.badge .ms { font-size: 14px; }
+.b-neutral { background: var(--surface-3); color: var(--ink-2); }
+.b-pending { background: var(--warning-bg); color: var(--warning); }
+.b-approved { background: var(--success-bg); color: var(--success); }
+.b-rejected { background: var(--danger-bg); color: var(--danger); }
+.b-info { background: var(--info-bg); color: var(--info); }
+.b-new { background: var(--primary-600); color: #fff; }
+.filter-chip { height: 32px; padding: 0 14px; border-radius: var(--r-full); border: 1px solid var(--line-strong); background: var(--surface);
+  font: 500 var(--fs-sm) var(--font); color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.filter-chip:hover { background: var(--surface-2); }
+.filter-chip[aria-pressed="true"] { background: var(--primary-600); border-color: var(--primary-600); color: #fff; }
+.count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--r-full); background: var(--surface-3); color: var(--ink-2);
+  font-size: 11px; font-weight: 700; display: inline-grid; place-items: center; }
+
+/* Tag color picker */
+.tag-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-swatch { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 14px; border-radius: var(--r-full);
+  border: 2px solid transparent; cursor: pointer; font: 500 var(--fs-sm) var(--font); }
+.tag-swatch[aria-checked="true"] { border-color: currentColor; box-shadow: var(--sh-2); }
+.tag-swatch .dot { width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px; box-shadow: var(--sh-1);
+  transition: box-shadow .2s, border-color .2s, transform .2s; position: relative; }
+.card.clickable { cursor: pointer; }
+.card.clickable:hover { box-shadow: var(--sh-2); border-color: #d8c3bb; transform: translateY(-2px); }
+.card-title { font-size: var(--fs-lg); font-weight: 700; margin: 0; }
+.card-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--ink-3); font-size: var(--fs-sm); align-items: center; }
+.card-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.card-meta .ms { font-size: 16px; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: inline-grid; place-items: center; font-weight: 700; font-size: var(--fs-sm); flex: none; }
+.stat-card { display: flex; gap: 14px; align-items: center; }
+.stat-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; }
+.stat-icon .ms { font-size: 22px; }
+.stat-num { font-size: var(--fs-2xl); font-weight: 700; line-height: 1.1; }
+.stat-lbl { font-size: var(--fs-sm); color: var(--ink-2); }
+.stat-card .go { margin-inline-start: auto; color: var(--ink-3); }
+.empty { text-align: center; padding: 40px 20px; }
+.empty .ico { width: 64px; height: 64px; border-radius: 50%; background: var(--primary-50); color: var(--primary-600); display: inline-grid; place-items: center; margin-bottom: 12px; }
+.empty .ico .ms { font-size: 30px; }
+
+/* Nav & tabs */
+.mock-header { display: flex; align-items: center; gap: 24px; padding: 0 20px; height: 64px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.logo b { font-size: var(--fs-md); line-height: 1.1; display: block; }
+.logo small { font-size: 11px; color: var(--ink-3); display: block; }
+.mock-nav { display: flex; gap: 4px; flex: 1; }
+.mock-nav a { position: relative; padding: 8px 12px; border-radius: var(--r-md); font-size: var(--fs-sm); font-weight: 500; color: var(--ink-2); text-decoration: none; }
+.mock-nav a:hover { background: var(--surface-2); color: var(--ink); }
+.mock-nav a[aria-current="page"] { color: var(--primary-600); background: var(--primary-50); }
+.mock-nav a[aria-current="page"]::after { content: ""; position: absolute; inset-inline: 12px; bottom: -13px; height: 3px; border-radius: 3px 3px 0 0; background: var(--primary-600); }
+.user-pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 4px 4px 10px; border-radius: var(--r-full); border: 1px solid var(--line); background: var(--surface); font-size: var(--fs-sm); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs button { position: relative; background: none; border: 0; padding: 10px 14px; font: 500 var(--fs-sm) var(--font); color: var(--ink-2); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { color: var(--primary-600); }
+.tabs button[aria-selected="true"]::after { content: ""; position: absolute; inset-inline: 8px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--primary-600); }
+.tabs button[aria-selected="true"] .count { background: var(--primary-600); color: #fff; }
+.segmented { display: inline-flex; padding: 4px; gap: 4px; background: var(--surface-2); border-radius: var(--r-md); }
+.segmented button { border: 0; background: none; padding: 6px 14px; border-radius: 7px; font: 500 var(--fs-sm) var(--font); color: var(--ink-2); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.segmented button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--sh-1); }
+
+/* Table */
+.dtable { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.dtable th { text-align: start; font-weight: 500; color: var(--ink-3); font-size: var(--fs-xs); padding: 10px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.dtable td { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.dtable tbody tr:hover { background: #faf8f3; }
+.row-actions { display: flex; gap: 2px; justify-content: flex-end; }
+
+/* Hero mock */
+.hero-mock { position: relative; overflow: hidden; border-radius: var(--r-lg); padding: 48px 40px; background: var(--bg); border: 1px solid var(--line);
+  display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center; }
+.hero-mock::before { content: ""; position: absolute; width: 520px; height: 520px; border-radius: 50%; inset-inline-end: -160px; top: -220px;
+  background: radial-gradient(circle, rgba(255,128,102,.22), rgba(255,128,102,0) 65%); }
+.hero-mock::after { content: ""; position: absolute; width: 420px; height: 420px; border-radius: 50%; inset-inline-start: -140px; bottom: -240px;
+  background: radial-gradient(circle, rgba(63,107,85,.16), rgba(63,107,85,0) 65%); }
+.hero-mock > * { position: relative; z-index: 1; }
+.hero-mock h4 { font-size: 2.25rem; line-height: 1.2; margin: 0 0 12px; }
+.hero-mock h4 em { font-style: normal; color: var(--primary-600); }
+.feed { display: grid; gap: 10px; }
+.feed .item { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--sh-1); font-size: var(--fs-sm); }
+.feed .item .ms { color: var(--primary-600); }
+.feed .item small { display: block; color: var(--ink-3); font-size: var(--fs-xs); }
+
+/* Icons grid */
+.icon-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); text-align: center; }
+.icon-cell .ms { font-size: 26px; color: var(--ink); }
+.icon-cell b { font-size: var(--fs-xs); font-weight: 500; }
+.icon-cell code { font-size: 10.5px; color: var(--ink-3); }
+.icon-section-tile { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
+
+pre.code { direction: ltr; text-align: left; background: #1f2430; color: #e9e4dc; padding: 20px; border-radius: var(--r-lg); overflow-x: auto; font-size: 12.5px; line-height: 1.55; margin: 0; }
+.roadmap { counter-reset: step; display: grid; gap: 12px; }
+.roadmap li { list-style: none; counter-increment: step; display: grid; grid-template-columns: 40px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; }
+.roadmap li::before { content: counter(step); width: 32px; height: 32px; border-radius: 50%; background: var(--primary-600); color: #fff; font-weight: 700; display: grid; place-items: center; }
+.roadmap b { display: block; margin-bottom: 2px; }
+.roadmap p { margin: 0; color: var(--ink-2); font-size: var(--fs-sm); }
+.roadmap { padding: 0; margin: 0; }
+
+@media (max-width: 760px) {
+  .wrap, .doc-header-inner { padding-inline: 16px; }
+  .intro h1 { font-size: 2rem; }
+  .hero-mock { grid-template-columns: 1fr; padding: 28px 20px; }
+  .mock-nav { display: none; }
+  .type-row { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<header class="doc-header">
+  <div class="doc-header-inner">
+    <a class="logo" href="#top" aria-label="קהילת מטפלי CBT">
+      <img src="../public/brand/logo-mark.png" alt="" width="37" height="34" style="display:block">
+      <span><b>שפת העיצוב</b><small>CBTeam · קהילת מטפלי CBT</small></span>
+    </a>
+    <nav class="doc-toc" aria-label="תוכן">
+      <a href="#findings">ממצאים</a><a href="#colors">צבעים</a><a href="#type">טיפוגרפיה</a><a href="#shape">ריווח וצורה</a>
+      <a href="#brand">לוגו ורקע</a><a href="#icons">אייקונים</a><a href="#buttons">כפתורים</a><a href="#forms">טפסים</a>
+      <a href="#tags">תגיות וסטטוס</a><a href="#cards">כרטיסים</a><a href="#nav">ניווט</a><a href="#admin">ניהול</a>
+      <a href="#home">דף הבית</a><a href="#tokens">קוד</a><a href="#plan">תוכנית</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap" id="top">
+
+<div class="intro">
+  <h1>שפת עיצוב אחת לכל הפלטפורמה</h1>
+  <p>המסמך מגדיר צבעים, גופנים, אייקונים, כפתורים ורכיבים שכל דף באתר משתמש בהם. כל רכיב חדש צריך להיבנות מהערכים שמופיעים כאן, בלי צבעים או מידות שנבחרים לכל מקרה בנפרד.</p>
+  <div class="meta-row">
+    <span class="badge b-info"><span class="ms">calendar_today</span>12 באוקטובר 2026</span>
+    <span class="badge b-neutral"><span class="ms">call_split</span>ענף: design/unified-ui</span>
+    <span class="badge b-approved"><span class="ms">accessibility_new</span>כל צמדי הצבעים עומדים ב־WCAG AA</span>
+  </div>
+</div>
+
+<!-- ============ 1. FINDINGS ============ -->
+<section class="block" id="findings">
+  <h2><span class="num">1</span>מה מצאנו ומה עושים עם זה</h2>
+  <p class="lead">אלה הממצאים מהסקירה של האתר החי ושל הקוד, יחד עם הרשימה שלך. מול כל בעיה כתוב הפתרון שנבחר, ובסוגריים המקום במסמך שבו הוא מתואר.</p>
+  <div class="table-scroll">
+  <table class="finding-table">
+    <thead><tr><th>הבעיה</th><th>מה רואים היום</th><th>ההחלטה</th><th>מקור</th></tr></thead>
+    <tbody>
+      <tr><td>שש מערכות צבעים במקביל</td><td>החומרים בטרקוטה כהה, הפרופיל וההמלצות בקורל, ניהול המומחים על רקע תכלת והיומן בכחול.</td><td>קובץ אחד של משתני צבע (סעיף 14). כל הקידומות <code>--cc / --pp / --rc / --au / --ae / --home</code> יוסרו.</td><td><span class="badge b-info src">סקירה</span></td></tr>
+      <tr><td>כפתורים בקורל לא קריאים</td><td>טקסט לבן על <code>#ff8066</code> נותן ניגודיות של 2.46:1. כך נראים הכפתורים "כניסה לקהילה", "המלצה חדשה" ו"עריכת פרופיל", וגם הכפתור הצף.</td><td>כל כפתור ראשי בטרקוטה <code>#a43c28</code> (6.45:1). הקורל נשאר רק לקישוט.</td><td><span class="badge b-info src">סקירה</span></td></tr>
+      <tr><td>אין סמל בכרטיסיית הדפדפן</td><td>בכרטיסייה מופיע סמל ברירת המחדל. קובץ הלוגו <code>public/brand/logo.svg</code> קיים, אבל אף דף לא משתמש בו והטקסט העברי שבו פגום.</td><td>לוגו CBTeam (שלושה עיגולים ובית). משמש לכרטיסייה, לכותרת ולמסכי ההתחברות (סעיף 5).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>הלוגו קופץ</td><td>בדפים שאין בהם גלילה פס הגלילה נעלם, וכל הכותרת זזה כמה פיקסלים. בנוסף, הקישור הפעיל מודגש יותר מהשאר ולכן מזיז את הקישורים שלידו.</td><td><code>scrollbar-gutter: stable</code> על כל הדף, ומשקל גופן קבוע לכל הקישורים. הקישור הפעיל מסומן בקו תחתון וברקע עדין (סעיף 11).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>האזור העליון בדף הבית ריק ומבולגן</td><td>ריבוע בקורל עם שלושה אייקונים, נקודות ברקע, אפקט זוהר וזכוכית. שני הכפתורים מובילים לאותו דף.</td><td>אזור עליון נקי: כותרת, כפתור אחד ומשני, ובצד פעילות אמיתית מהקהילה (סעיף 13).</td><td><span class="badge b-pending src">שניהם</span></td></tr>
+      <tr><td>הרקע ריק לגמרי</td><td>רקע שמנת אחיד בכל דף.</td><td>שני כתמי צבע רכים (קורל ומרווה) באזורים העליונים, ומעבר עדין בראש כל דף (סעיף 5).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>הפרופיל הוא הדף המוצלח ביותר</td><td>יש בו אווטאר, חלוקה ברורה וכרטיסים קטנים. זה כיוון טוב.</td><td>האווטאר, המבנה והכרטיסים הקטנים של הפרופיל הופכים לבסיס לשאר הדפים. רק הכפתור עובר לטרקוטה.</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>באישור חומרים לא רואים כמויות</td><td>שלוש לשוניות בלי מספרים, וצריך להיכנס לכל אחת כדי לדעת מה יש בה.</td><td>מספר על כל לשונית: ממתינים, אושרו ונדחו (סעיף 11).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>כל לשונית בניהול נראית אחרת</td><td>בלשונית המשתמשים יש כרטיסי נתונים עם אייקונים, ובסקירה אין. לטבלת המומחים יש כותרת בתכלת, והקטגוריות מוצגות כטבלת שדות. בכל שורה יש כפתור מחיקה אדום ומלא.</td><td>תבנית אחת לכל לשונית: כותרת, סרגל חיפוש וסינון, ואז טבלה. פעולות בשורה הן כפתורי אייקון שקטים (סעיף 12).</td><td><span class="badge b-pending src">שניהם</span></td></tr>
+      <tr><td>חסר לוח בקרה (דשבורד) לניהול</td><td>בסקירה יש חמישה מספרים שלא אפשר ללחוץ עליהם.</td><td>לוח בקרה שבו כל כרטיס מוביל ללשונית שלו, עם רשימת "דורש טיפול" וקיצורי דרך (סעיף 12).</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+      <tr><td>הצבע של תגית נבחר לפי קוד</td><td>בחירת הצבע היא רשימה נפתחת עם ערכים כמו <code>#6366f1</code>. גם הקטגוריות דורשות להקליד שם של אייקון.</td><td>8 צבעים עם שמות בעברית שבוחרים מתוך דוגמאות צבע, ובחירת אייקון מתוך רשת (סעיף 9).</td><td><span class="badge b-pending src">שניהם</span></td></tr>
+      <tr><td>צבעי התגיות צועקים</td><td>סגול, ורוד, תכלת, ירוק וכתום בגוונים חזקים, ולידם טקסט לבן.</td><td>רקע בהיר עם טקסט כהה מאותו גוון. התגיות שקטות, וכל השילובים עומדים בתקן הניגודיות.</td><td><span class="badge b-info src">סקירה</span></td></tr>
+      <tr><td>שדות בטפסים כמעט לא נראים</td><td>הניגודיות של מסגרת השדה היא 1.5:1.</td><td>מסגרת <code>#988680</code> (3.4:1) ורקע בהיר (סעיף 8).</td><td><span class="badge b-info src">סקירה</span></td></tr>
+      <tr><td>תפריט עמוס</td><td>9 קישורים בשורה אחת, כולם באותו משקל.</td><td>5 מרחבים במרכז, ובצד פעמון ותפריט משתמש עם הפרופיל, הניהול וההתנתקות (סעיף 11).</td><td><span class="badge b-info src">סקירה</span></td></tr>
+      <tr><td>נתוני ניסוי באתר החי</td><td>"ניסוי", "מבחן טסט 1–3" ו"מבחן טסט 2" מופיעים בחומרים, בפורום ובפרופיל.</td><td>מחיקה מבסיס הנתונים, אחרי אישור שלך על כל פריט. זה לא שינוי עיצוב, ואין לי גישה לבסיס הנתונים.</td><td><span class="badge b-pending src">הרשימה שלך</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ 2. COLORS ============ -->
+<section class="block" id="colors">
+  <h2><span class="num">2</span>פלטת הצבעים</h2>
+  <p class="lead">בסיס חם ורגוע (שמנת ונייר) עם צבע מותג אחד בטרקוטה. מרווה ירוקה היא צבע משני להצלחה ולקישוט. בדקתי את כל השילובים של טקסט ורקע מול תקן WCAG AA.</p>
+
+  <h3>צבע המותג: טרקוטה</h3>
+  <div class="ramp">
+    <div style="background:#fbefeb;color:#842513">50</div>
+    <div style="background:#f8e1da;color:#842513">100</div>
+    <div style="background:#ff8066;color:#5a1508">accent</div>
+    <div style="background:#c4553e;color:#fff">500</div>
+    <div style="background:#a43c28;color:#fff"><b>600 ראשי</b></div>
+    <div style="background:#842513;color:#fff">700 ריחוף</div>
+    <div style="background:#6e1e0f;color:#fff">800 לחיצה</div>
+  </div>
+  <p class="note">הקורל (<code>accent #ff8066</code>) משמש רק לאיורים ולזוהר ברקע. לא שמים עליו טקסט ולא משתמשים בו לכפתור.</p>
+
+  <h3>צבעי בסיס</h3>
+  <div class="grid g4">
+    <div class="swatch"><div class="chip" style="background:#f7f6f2">רקע הדף</div><div class="info"><b>bg</b><span class="mono">#f7f6f2</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#fdfcf8">משטח / כרטיס</div><div class="info"><b>surface</b><span class="mono">#fdfcf8</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#f1efe8">משטח משני</div><div class="info"><b>surface-2</b><span class="mono">#f1efe8</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#e6dad4">קו מפריד</div><div class="info"><b>line</b><span class="mono">#e6dad4</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#988680;color:#fff">מסגרת שדה</div><div class="info"><b>line-strong</b><span class="mono">#988680 · 3.4:1</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#1f2430;color:#fff">טקסט ראשי</div><div class="info"><b>ink</b><span class="mono">#1f2430 · 14.4:1</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#5b4a45;color:#fff">טקסט משני</div><div class="info"><b>ink-2</b><span class="mono">#5b4a45 · 7.7:1</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#7a6862;color:#fff">טקסט עזר</div><div class="info"><b>ink-3</b><span class="mono">#7a6862 · 5.1:1</span></div></div>
+  </div>
+
+  <h3>צבעים סמנטיים</h3>
+  <div class="grid g4">
+    <div class="swatch"><div class="chip" style="background:#dcebe2;color:#3f6b55"><span class="ms">check_circle</span>&nbsp;הצלחה / אושר</div><div class="info"><b>success</b><span class="mono">#3f6b55 על #dcebe2</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#fbf1d6;color:#8a6400"><span class="ms">hourglass_top</span>&nbsp;ממתין / אזהרה</div><div class="info"><b>warning</b><span class="mono">#8a6400 על #fbf1d6</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#fbe4e1;color:#b42318"><span class="ms">cancel</span>&nbsp;נדחה / שגיאה</div><div class="info"><b>danger</b><span class="mono">#b42318 על #fbe4e1</span></div></div>
+    <div class="swatch"><div class="chip" style="background:#e6eef6;color:#2b5a87"><span class="ms">info</span>&nbsp;מידע</div><div class="info"><b>info</b><span class="mono">#2b5a87 על #e6eef6</span></div></div>
+  </div>
+
+  <h3>כללים</h3>
+  <div class="grid g2">
+    <div class="rules">
+      <div class="rule do"><span class="ms">check</span>בכל מסך יש רק כפתור ראשי אחד בטרקוטה.</div>
+      <div class="rule do"><span class="ms">check</span>סטטוסים מוצגים תמיד בצבעים הסמנטיים, עם אייקון ליד הטקסט.</div>
+      <div class="rule do"><span class="ms">check</span>כל צבע נלקח ממשתנה (<code>var(--…)</code>). לא כותבים קוד צבע ישירות ברכיב.</div>
+    </div>
+    <div class="rules">
+      <div class="rule dont"><span class="ms">close</span>אין טקסט לבן על קורל, צהוב או תכלת בהיר.</div>
+      <div class="rule dont"><span class="ms">close</span>אין רקעים כחולים או אפורים קרים בתוך מערכת שכולה חמה.</div>
+      <div class="rule dont"><span class="ms">close</span>לא מבחינים בין מצבים רק לפי צבע. תמיד מוסיפים אייקון או מילה.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. TYPOGRAPHY ============ -->
+<section class="block" id="type">
+  <h2><span class="num">3</span>טיפוגרפיה</h2>
+  <p class="lead">גופן אחד בלבד, Heebo, בשלושה משקלים: 400 לטקסט, 500 לממשק ו־700 לכותרות. יש 7 גדלים קבועים במקום 26 הגדלים שבקוד היום.</p>
+  <div class="panel">
+    <div class="type-row"><span class="lbl">3xl · 40/1.15 · 700<br>דף הבית בלבד</span><span style="font-size:2.5rem;font-weight:700;line-height:1.15">הבית המקצועי של מטפלי CBT</span></div>
+    <div class="type-row"><span class="lbl">2xl · 28/1.25 · 700<br>כותרת דף (h1)</span><span style="font-size:1.75rem;font-weight:700">ספריית חומרים</span></div>
+    <div class="type-row"><span class="lbl">xl · 22/1.3 · 700<br>כותרת אזור (h2)</span><span style="font-size:1.375rem;font-weight:700">ממתינים לטיפול</span></div>
+    <div class="type-row"><span class="lbl">lg · 18/1.4 · 700<br>כותרת כרטיס</span><span style="font-size:1.125rem;font-weight:700">דף עבודה: יומן רגשות לילדים</span></div>
+    <div class="type-row"><span class="lbl">md · 16/1.6 · 400<br>טקסט רגיל</span><span>דף עבודה פשוט לתיעוד רגשות בהמשך השבוע, מותאם לגילאי 8–12.</span></div>
+    <div class="type-row"><span class="lbl">sm · 14/1.5 · 500<br>ממשק, טבלאות ופרטים</span><span style="font-size:.875rem;font-weight:500">פורסם ע״י שירה · 6 באוק׳ 2026</span></div>
+    <div class="type-row"><span class="lbl">xs · 12/1.4 · 500<br>תגיות ותוויות</span><span style="font-size:.75rem;font-weight:500">ממתין לאישור</span></div>
+  </div>
+</section>
+
+<!-- ============ 4. SHAPE ============ -->
+<section class="block" id="shape">
+  <h2><span class="num">4</span>ריווח, פינות וצללים</h2>
+  <p class="lead">יש 4 גדלים של פינות מעוגלות במקום כ־20, 3 רמות של צל, וכל הריווחים מבוססים על כפולות של 4px.</p>
+  <div class="grid g3">
+    <div class="panel">
+      <h3 style="margin-top:0">פינות מעוגלות</h3>
+      <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+        <div style="text-align:center"><div style="width:56px;height:56px;background:var(--primary-100);border-radius:6px"></div><small class="mono">sm 6</small></div>
+        <div style="text-align:center"><div style="width:56px;height:56px;background:var(--primary-100);border-radius:10px"></div><small class="mono">md 10</small></div>
+        <div style="text-align:center"><div style="width:56px;height:56px;background:var(--primary-100);border-radius:16px"></div><small class="mono">lg 16</small></div>
+        <div style="text-align:center"><div style="width:56px;height:56px;background:var(--primary-100);border-radius:999px"></div><small class="mono">full</small></div>
+      </div>
+      <p class="note">sm לתגיות סטטוס · md לכפתורים ושדות · lg לכרטיסים ולחלונות קופצים · full לתגיות ולאווטארים</p>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">צללים</h3>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="width:72px;height:56px;border-radius:12px;background:var(--surface);box-shadow:var(--sh-1);display:grid;place-items:center;font-size:12px">sh-1</div>
+        <div style="width:72px;height:56px;border-radius:12px;background:var(--surface);box-shadow:var(--sh-2);display:grid;place-items:center;font-size:12px">sh-2</div>
+        <div style="width:72px;height:56px;border-radius:12px;background:var(--surface);box-shadow:var(--sh-3);display:grid;place-items:center;font-size:12px">sh-3</div>
+      </div>
+      <p class="note">sh-1 לכרטיס במנוחה · sh-2 לריחוף ולתפריט נפתח · sh-3 לחלון קופץ</p>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">ריווח</h3>
+      <div style="display:grid;gap:6px">
+        <div style="display:flex;gap:8px;align-items:center"><span style="width:8px;height:12px;background:var(--primary-500)"></span><small class="mono">8 · בין אייקון לטקסט</small></div>
+        <div style="display:flex;gap:8px;align-items:center"><span style="width:16px;height:12px;background:var(--primary-500)"></span><small class="mono">16 · בין כרטיסים</small></div>
+        <div style="display:flex;gap:8px;align-items:center"><span style="width:24px;height:12px;background:var(--primary-500)"></span><small class="mono">24 · ריווח פנימי של פאנל</small></div>
+        <div style="display:flex;gap:8px;align-items:center"><span style="width:48px;height:12px;background:var(--primary-500)"></span><small class="mono">48 · בין אזורים בדף</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. BRAND ============ -->
+<section class="block" id="brand">
+  <h2><span class="num">5</span>לוגו, סמל לכרטיסייה ורקע</h2>
+  <p class="lead">הלוגו של CBTeam: שלושה עיגולים בזהב, אפרסק וקורל סביב בית. אותו סמל משמש לכרטיסייה בדפדפן, לכותרת האתר ולמסכי ההתחברות. המילה CBTeam כתובה בשלושת הצבעים, בגוונים מעט כהים יותר כדי שיהיה קל לקרוא אותה על רקע בהיר. הלוגו בכותרת נמצא תמיד באותו מקום ובאותו גודל.</p>
+  <div class="grid g3">
+    <div class="panel" style="display:grid;place-items:center;gap:12px">
+      <img src="../public/brand/logo-mark.png" alt="" width="104" height="96" style="display:block">
+      <small class="muted">סמל · <code>src/app/icon.png</code> (favicon)</small>
+    </div>
+    <div class="panel" style="display:grid;place-items:center;gap:12px">
+      <span class="logo">
+        <img src="../public/brand/logo-mark.png" alt="" width="43" height="40" style="display:block">
+        <span><b style="font-size:1.25rem" dir="ltr"><span style="color:#a88a1c">C</span><span style="color:#c9693f">B</span><span style="color:#d4513a">Team</span></b><small>קהילת מטפלי CBT</small></span>
+      </span>
+      <small class="muted">לוגו מלא בכותרת האתר (רוחב קבוע)</small>
+    </div>
+    <div class="panel" style="display:grid;place-items:center;gap:12px;background:#1f2430;border-color:#1f2430">
+      <img src="../public/brand/logo-mark.png" alt="" width="69" height="64" style="display:block">
+      <small style="color:#fff">על רקע כהה</small>
+    </div>
+  </div>
+
+  <h3>רקע</h3>
+  <div class="grid g2">
+    <div class="panel" style="position:relative;overflow:hidden;min-height:160px;background:linear-gradient(180deg,#f3ede4 0%,#f7f6f2 220px)">
+      <div style="position:absolute;width:300px;height:300px;border-radius:50%;inset-inline-end:-80px;top:-140px;background:radial-gradient(circle,rgba(255,128,102,.25),transparent 65%)"></div>
+      <div style="position:absolute;width:260px;height:260px;border-radius:50%;inset-inline-start:-80px;bottom:-150px;background:radial-gradient(circle,rgba(63,107,85,.18),transparent 65%)"></div>
+      <b style="position:relative">אזורים עליונים (דף הבית ולוח הבקרה)</b>
+      <p class="note" style="position:relative">שני כתמי צבע רכים, קורל ומרווה, על מעבר עדין מנייר חם לשמנת. בלי נקודות ובלי זכוכית.</p>
+    </div>
+    <div class="panel" style="min-height:160px;background:linear-gradient(180deg,#f1ece3 0,#f7f6f2 160px)">
+      <b>כל שאר הדפים</b>
+      <p class="note">מעבר עדין בגובה 160px בראש הדף, כדי שהרקע לא ירגיש "ריק". מתחת לזה רקע אחיד, כך שהתוכן נשאר במרכז.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. ICONS ============ -->
+<section class="block" id="icons">
+  <h2><span class="num">6</span>אייקונים</h2>
+  <p class="lead">ספריית האייקונים היא Material Symbols Outlined, שכבר נטענת באתר. הגודל הוא 20px בממשק ו־24px באריחים, במשקל 400. אייקון מלא (FILL 1) משמש רק במצב פעיל, למשל כוכב שדורג או פעמון עם התראות. לכל מושג יש אייקון אחד קבוע.</p>
+
+  <h3>מרחבי האתר</h3>
+  <div class="grid g3">
+    <div class="icon-section-tile"><span class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><span class="ms">library_books</span></span><div><b>ספריית חומרים</b><br><code>library_books</code></div></div>
+    <div class="icon-section-tile"><span class="stat-icon" style="background:var(--success-bg);color:var(--success)"><span class="ms">forum</span></span><div><b>פורום</b><br><code>forum</code></div></div>
+    <div class="icon-section-tile"><span class="stat-icon" style="background:var(--warning-bg);color:var(--warning)"><span class="ms">recommend</span></span><div><b>המלצות</b><br><code>recommend</code></div></div>
+    <div class="icon-section-tile"><span class="stat-icon" style="background:var(--info-bg);color:var(--info)"><span class="ms">event</span></span><div><b>אירועים</b><br><code>event</code></div></div>
+    <div class="icon-section-tile"><span class="stat-icon" style="background:#efdcec;color:#6a2f63"><span class="ms">contact_support</span></span><div><b>פניות מקצועיות</b><br><code>contact_support</code></div></div>
+    <div class="icon-section-tile"><span class="stat-icon" style="background:var(--surface-3);color:var(--ink-2)"><span class="ms">admin_panel_settings</span></span><div><b>ניהול</b><br><code>admin_panel_settings</code></div></div>
+  </div>
+
+  <h3>סוגי חומרים</h3>
+  <div class="grid g4">
+    <div class="icon-cell"><span class="ms">description</span><b>דף עבודה</b><code>description</code></div>
+    <div class="icon-cell"><span class="ms">video_library</span><b>וידאו</b><code>video_library</code></div>
+    <div class="icon-cell"><span class="ms">slideshow</span><b>מצגת</b><code>slideshow</code></div>
+    <div class="icon-cell"><span class="ms">extension</span><b>משחק</b><code>extension</code></div>
+    <div class="icon-cell"><span class="ms">auto_stories</span><b>קריאה</b><code>auto_stories</code></div>
+    <div class="icon-cell"><span class="ms">fact_check</span><b>תוכנית טיפול</b><code>fact_check</code></div>
+  </div>
+
+  <h3>פעולות ומצבים</h3>
+  <div class="grid g4">
+    <div class="icon-cell"><span class="ms">add</span><b>חדש</b><code>add</code></div>
+    <div class="icon-cell"><span class="ms">upload</span><b>העלאה</b><code>upload</code></div>
+    <div class="icon-cell"><span class="ms">download</span><b>הורדה</b><code>download</code></div>
+    <div class="icon-cell"><span class="ms">edit</span><b>עריכה</b><code>edit</code></div>
+    <div class="icon-cell"><span class="ms">delete</span><b>מחיקה</b><code>delete</code></div>
+    <div class="icon-cell"><span class="ms">visibility_off</span><b>הסתרה</b><code>visibility_off</code></div>
+    <div class="icon-cell"><span class="ms">restore</span><b>שחזור</b><code>restore</code></div>
+    <div class="icon-cell"><span class="ms">search</span><b>חיפוש</b><code>search</code></div>
+    <div class="icon-cell"><span class="ms">tune</span><b>סינון</b><code>tune</code></div>
+    <div class="icon-cell"><span class="ms">flag</span><b>דיווח</b><code>flag</code></div>
+    <div class="icon-cell"><span class="ms">notifications</span><b>התראות</b><code>notifications</code></div>
+    <div class="icon-cell"><span class="ms">logout</span><b>התנתקות</b><code>logout</code></div>
+    <div class="icon-cell"><span class="ms">hourglass_top</span><b>ממתין</b><code>hourglass_top</code></div>
+    <div class="icon-cell"><span class="ms">check_circle</span><b>אושר</b><code>check_circle</code></div>
+    <div class="icon-cell"><span class="ms">cancel</span><b>נדחה</b><code>cancel</code></div>
+    <div class="icon-cell"><span class="ms">sell</span><b>תגית</b><code>sell</code></div>
+    <div class="icon-cell"><span class="ms">group</span><b>משתמשים</b><code>group</code></div>
+    <div class="icon-cell"><span class="ms">workspace_premium</span><b>מומחים</b><code>workspace_premium</code></div>
+    <div class="icon-cell"><span class="ms">category</span><b>קטגוריות</b><code>category</code></div>
+    <div class="icon-cell"><span class="ms">chat_bubble</span><b>תגובות</b><code>chat_bubble</code></div>
+  </div>
+  <p class="note">חץ "קדימה" בכיוון ימין לשמאל הוא <code>arrow_back</code>, כלומר חץ שמצביע שמאלה. כדאי להגדיר את זה במקום אחד בקוד, כדי שכל רכיב לא יחליט בעצמו.</p>
+</section>
+
+<!-- ============ 7. BUTTONS ============ -->
+<section class="block" id="buttons">
+  <h2><span class="num">7</span>כפתורים</h2>
+  <p class="lead">יש חמישה סוגי כפתורים, שלושה גדלים וחמישה מצבים. גובה ברירת המחדל הוא 40px, והפינות 10px. התמונה החיה למטה מראה כל מצב (רחף מעל הכפתורים ונסה מקש Tab).</p>
+
+  <div class="table-scroll" style="padding:20px">
+    <div class="state-grid">
+      <span class="h">סוג</span><span class="h">רגיל</span><span class="h">ריחוף</span><span class="h">לחיצה</span><span class="h">פוקוס מקלדת</span><span class="h">לא פעיל</span><span class="h">טוען</span>
+
+      <span class="r">ראשי<br><small class="muted">פעולה אחת בכל מסך</small></span>
+      <span><button class="btn btn-primary"><span class="ms">add</span>פנייה חדשה</button></span>
+      <span><button class="btn btn-primary is-hover"><span class="ms">add</span>פנייה חדשה</button></span>
+      <span><button class="btn btn-primary is-active"><span class="ms">add</span>פנייה חדשה</button></span>
+      <span><button class="btn btn-primary is-focus"><span class="ms">add</span>פנייה חדשה</button></span>
+      <span><button class="btn btn-primary" disabled><span class="ms">add</span>פנייה חדשה</button></span>
+      <span><button class="btn btn-primary" aria-busy="true"><span class="spinner"></span>שומר…</button></span>
+
+      <span class="r">משני<br><small class="muted">פעולה חלופית</small></span>
+      <span><button class="btn btn-secondary"><span class="ms">help</span>בקשת חומר</button></span>
+      <span><button class="btn btn-secondary is-hover"><span class="ms">help</span>בקשת חומר</button></span>
+      <span><button class="btn btn-secondary is-active"><span class="ms">help</span>בקשת חומר</button></span>
+      <span><button class="btn btn-secondary is-focus"><span class="ms">help</span>בקשת חומר</button></span>
+      <span><button class="btn btn-secondary" disabled><span class="ms">help</span>בקשת חומר</button></span>
+      <span></span>
+
+      <span class="r">שקוף<br><small class="muted">ביטול ופעולות בשורה</small></span>
+      <span><button class="btn btn-ghost">ביטול</button></span>
+      <span><button class="btn btn-ghost is-hover">ביטול</button></span>
+      <span><button class="btn btn-ghost is-active">ביטול</button></span>
+      <span><button class="btn btn-ghost is-focus">ביטול</button></span>
+      <span><button class="btn btn-ghost" disabled>ביטול</button></span>
+      <span></span>
+
+      <span class="r">סכנה<br><small class="muted">רק בתוך חלון אישור</small></span>
+      <span><button class="btn btn-danger"><span class="ms">delete</span>מחיקה</button></span>
+      <span><button class="btn btn-danger is-hover"><span class="ms">delete</span>מחיקה</button></span>
+      <span><button class="btn btn-danger is-active"><span class="ms">delete</span>מחיקה</button></span>
+      <span><button class="btn btn-danger is-focus"><span class="ms">delete</span>מחיקה</button></span>
+      <span><button class="btn btn-danger" disabled><span class="ms">delete</span>מחיקה</button></span>
+      <span></span>
+
+      <span class="r">סכנה שקטה<br><small class="muted">מחיקה בשורת טבלה</small></span>
+      <span><button class="btn btn-danger-quiet btn-icon" aria-label="מחיקה"><span class="ms">delete</span></button></span>
+      <span><button class="btn btn-danger-quiet btn-icon is-hover" aria-label="מחיקה"><span class="ms">delete</span></button></span>
+      <span><button class="btn btn-danger-quiet btn-icon is-active" aria-label="מחיקה"><span class="ms">delete</span></button></span>
+      <span><button class="btn btn-danger-quiet btn-icon is-focus" aria-label="מחיקה"><span class="ms">delete</span></button></span>
+      <span><button class="btn btn-danger-quiet btn-icon" disabled aria-label="מחיקה"><span class="ms">delete</span></button></span>
+      <span></span>
+    </div>
+  </div>
+
+  <h3>גדלים</h3>
+  <div class="panel" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <button class="btn btn-primary sm">קטן 32</button>
+    <button class="btn btn-primary">רגיל 40</button>
+    <button class="btn btn-primary lg">גדול 48</button>
+    <button class="btn btn-secondary btn-icon" aria-label="סינון"><span class="ms">tune</span></button>
+    <button class="btn btn-ghost btn-icon" aria-label="התראות"><span class="ms">notifications</span></button>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="rules">
+      <div class="rule do"><span class="ms">check</span>כשיש כפתור ראשי ומשני זה לצד זה, הראשי תמיד בצד ימין, שהוא תחילת השורה בעברית.</div>
+      <div class="rule do"><span class="ms">check</span>כפתור עם אייקון בלבד חייב <code>aria-label</code> וחלונית הסבר שמופיעה בריחוף.</div>
+    </div>
+    <div class="rules">
+      <div class="rule dont"><span class="ms">close</span>לא שמים כפתור מחיקה אדום ומלא בכל שורה בטבלה. מחיקה בשורה היא אייקון שקט, ואחריה חלון אישור.</div>
+      <div class="rule dont"><span class="ms">close</span>לא מגדילים כפתור בריחוף (<code>scale</code>). זה גורם לתוכן מסביב לזוז.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. FORMS ============ -->
+<section class="block" id="forms">
+  <h2><span class="num">8</span>שדות טופס</h2>
+  <p class="lead">גובה השדה הוא 44px, עם מסגרת שרואים בבירור ורקע בהיר. מצב פוקוס מסומן במסגרת בטרקוטה ובהילה, כדי שאפשר יהיה לזהות אותו בלי להסתמך רק על הצבע.</p>
+  <div class="grid g3 panel">
+    <div class="field"><label for="f1">כתובת אימייל</label><input id="f1" class="input" placeholder="name@example.com"><span class="hint">רגיל</span></div>
+    <div class="field"><label for="f2">כתובת אימייל</label><input id="f2" class="input is-hover" value="shira@"><span class="hint">ריחוף</span></div>
+    <div class="field"><label for="f3">כתובת אימייל</label><input id="f3" class="input is-focus" value="shira@clinic.co.il"><span class="hint">פוקוס</span></div>
+    <div class="field"><label for="f4">קוד מומחה מפנה</label><input id="f4" class="input is-error" value="#D909"><span class="err"><span class="ms" style="font-size:14px">error</span>הקוד צריך להיות 8 תווים, לדוגמה ‎#D90963D6</span></div>
+    <div class="field"><label for="f5">תפקיד</label><input id="f5" class="input" value="מטפל/ת" disabled><span class="hint">לא פעיל</span></div>
+    <div class="field"><label for="f6">חיפוש</label><div class="search"><span class="ms">search</span><input id="f6" class="input" placeholder="חיפוש בספריית החומרים…"></div></div>
+    <div class="field" style="grid-column:1/-1"><label for="f7">תיאור</label><textarea id="f7" class="input" placeholder="תארו את הפנייה בכמה משפטים…"></textarea><span class="hint">טקסט עזר מופיע מתחת לשדה, ולא בתוך שדה ריק.</span></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;grid-column:1/-1">
+      <label class="check"><input type="checkbox" checked> שליחת התראות במייל</label>
+      <label class="check"><input type="checkbox"> הצגה בפרופיל הציבורי</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. TAGS ============ -->
+<section class="block" id="tags">
+  <h2><span class="num">9</span>תגיות, סטטוסים ומסננים</h2>
+  <p class="lead">יש שלושה רכיבים שונים, ולכל אחד צורה משלו: <b>תגית תוכן</b> (מעוגלת לגמרי, בצבע שבוחרים), <b>סטטוס</b> (פינות קטנות, צבע סמנטי ואייקון) ו<b>מסנן</b> (מעוגל עם מסגרת, ונצבע כשהוא נבחר).</p>
+
+  <h3>צבעים לתגיות (נבחרים לפי שם)</h3>
+  <div class="panel">
+    <div class="field" style="max-width:none">
+      <label id="tagc">צבע התגית</label>
+      <div class="tag-picker" role="radiogroup" aria-labelledby="tagc" id="picker"></div>
+      <span class="hint">כך זה ייראה בלשונית התגיות בניהול: דוגמאות צבע עם שמות בעברית, בלי רשימה נפתחת של קודים. רקע בהיר וטקסט כהה מאותו גוון, וכל השילובים עומדים בניגודיות של 5.6:1 ומעלה.</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap">
+      <span class="muted" style="font-size:14px">תצוגה מקדימה:</span>
+      <span class="tag" id="preview">חרדה</span>
+    </div>
+  </div>
+
+  <h3>סטטוסים</h3>
+  <div class="panel" style="display:flex;gap:10px;flex-wrap:wrap">
+    <span class="badge b-pending"><span class="ms">hourglass_top</span>ממתין לאישור</span>
+    <span class="badge b-approved"><span class="ms">check_circle</span>אושר</span>
+    <span class="badge b-rejected"><span class="ms">cancel</span>נדחה</span>
+    <span class="badge b-info"><span class="ms">pending</span>בטיפול</span>
+    <span class="badge b-neutral"><span class="ms">visibility_off</span>מוסתר</span>
+    <span class="badge b-approved"><span class="ms">task_alt</span>נענה</span>
+    <span class="badge b-new">חדש</span>
+  </div>
+
+  <h3>מסננים</h3>
+  <div class="panel" style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="filter-chip" aria-pressed="true">כל החומרים <span class="count" style="background:rgba(255,255,255,.25);color:#fff">11</span></button>
+    <button class="filter-chip" aria-pressed="false"><span class="ms">description</span>דף עבודה <span class="count">3</span></button>
+    <button class="filter-chip" aria-pressed="false"><span class="ms">video_library</span>וידאו <span class="count">1</span></button>
+    <button class="filter-chip" aria-pressed="false"><span class="ms">extension</span>משחק <span class="count">3</span></button>
+  </div>
+</section>
+
+<!-- ============ 10. CARDS ============ -->
+<section class="block" id="cards">
+  <h2><span class="num">10</span>כרטיסים</h2>
+  <p class="lead">כל הכרטיס לחיץ, לא רק הכותרת. בכרטיס של פריט ברשימה תמיד יש אווטאר של הכותב, סטטוס אם יש כזה, ושורת פרטים קבועה. בריחוף הכרטיס עולה מעט והצל מתחזק.</p>
+  <div class="grid g2">
+    <article class="card clickable">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span class="avatar" style="background:var(--primary-100);color:var(--primary-700)">שי</span>
+        <div style="flex:1;min-width:0;display:grid;gap:6px">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h4 class="card-title">מי מכיר מטפלת עם ניסיון בטראומה באזור חיפה?</h4><span class="badge b-new">חדש</span></div>
+          <p style="margin:0;color:var(--ink-2);font-size:15px">עדיפות לניסיון עם ילדים ונוער, אפשרות לטיפול גם בזום.</p>
+          <div class="card-meta"><span>שירה</span><span><span class="ms">schedule</span>לפני שעתיים</span><span><span class="ms">chat_bubble</span>תגובה אחת</span></div>
+        </div>
+      </div>
+    </article>
+    <article class="card clickable">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><span class="ms">description</span></span>
+        <div style="flex:1;min-width:0;display:grid;gap:8px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><h4 class="card-title">דף עבודה: יומן רגשות לילדים</h4><span style="display:inline-flex;align-items:center;gap:2px;font-weight:700;font-size:14px"><span class="ms fill" style="color:#c88a00;font-size:18px">star</span>4.5</span></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" style="background:#dcebe2;color:#2f5a45">ילדים</span><span class="tag" style="background:#f8e1da;color:#8a2f1d">רגשות</span></div>
+          <div class="card-meta"><span><span class="ms">person</span>נועה כהן</span><span><span class="ms">calendar_today</span>6 באוק׳ 2026</span><span style="margin-inline-start:auto;color:var(--primary-600);font-weight:500">צפייה <span class="ms">arrow_back</span></span></div>
+        </div>
+      </div>
+    </article>
+    <div class="card empty">
+      <span class="ico"><span class="ms">inbox</span></span>
+      <h4 class="card-title">אין חומרים שממתינים לאישור</h4>
+      <p class="muted" style="margin:4px 0 16px;font-size:14px">כל החומרים שהועלו כבר טופלו. כאן יופיעו חומרים חדשים.</p>
+      <button class="btn btn-secondary sm">לחומרים שאושרו</button>
+    </div>
+    <div class="card" style="display:grid;gap:10px">
+      <b>מבנה קבוע של כרטיס</b>
+      <ol style="margin:0;padding-inline-start:20px;color:var(--ink-2);font-size:14px;display:grid;gap:4px">
+        <li>אייקון של סוג התוכן, או אווטאר של הכותב, בצד ימין</li>
+        <li>כותרת בגודל 18 ובמשקל 700, ולצידה תגית סטטוס</li>
+        <li>תקציר של עד 2 שורות</li>
+        <li>תגיות תוכן</li>
+        <li>שורת פרטים: כותב, תאריך, מספר תגובות ודירוג</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. NAV ============ -->
+<section class="block" id="nav">
+  <h2><span class="num">11</span>ניווט ולשוניות</h2>
+  <p class="lead">בכותרת האתר יש לוגו בגודל קבוע, חמישה מרחבים, ובצד פעמון ותפריט משתמש. הפריט הפעיל לא משנה את המשקל שלו, ולכן שום דבר בכותרת לא זז.</p>
+  <div class="panel" style="padding:0;overflow:hidden">
+    <div class="mock-header">
+      <a class="logo" href="#nav">
+        <img src="../public/brand/logo-mark.png" alt="" width="39" height="36" style="display:block">
+        <span><b>קהילת מטפלי CBT</b></span>
+      </a>
+      <nav class="mock-nav" aria-label="דוגמה">
+        <a href="#nav" aria-current="page">ספריית חומרים</a><a href="#nav">פורום</a><a href="#nav">המלצות</a><a href="#nav">אירועים</a><a href="#nav">פניות מקצועיות</a>
+      </nav>
+      <button class="btn btn-ghost btn-icon" aria-label="התראות" style="position:relative"><span class="ms">notifications</span><span style="position:absolute;top:6px;inset-inline-end:6px;width:8px;height:8px;border-radius:50%;background:var(--primary-600)"></span></button>
+      <span class="user-pill"><span class="avatar" style="width:28px;height:28px;font-size:12px;background:var(--primary-100);color:var(--primary-700)">שי</span>שירה<span class="ms">expand_more</span></span>
+    </div>
+    <div style="padding:16px 20px;font-size:14px;color:var(--ink-2)">בתפריט המשתמש: הפרופיל שלי · אישור חומרים (3) · ניהול · התנתקות</div>
+  </div>
+
+  <h3>לשוניות עם מספרים (אישור חומרים)</h3>
+  <div class="panel">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true"><span class="ms">hourglass_top</span>ממתינים <span class="count">3</span></button>
+      <button role="tab" aria-selected="false"><span class="ms">check_circle</span>אושרו <span class="count">11</span></button>
+      <button role="tab" aria-selected="false"><span class="ms">cancel</span>נדחו <span class="count">2</span></button>
+    </div>
+    <p class="note">בלשוניות שמחליפות דף או אזור יש קו תחתון ומספר. רואים את הכמויות בלי להיכנס לכל לשונית.</p>
+  </div>
+
+  <h3>מתג תצוגה (רשימה או לוח שנה)</h3>
+  <div class="panel">
+    <div class="segmented"><button aria-pressed="true"><span class="ms">view_list</span>רשימה</button><button aria-pressed="false"><span class="ms">calendar_month</span>לוח שנה</button></div>
+    <p class="note">מתג תצוגה משמש רק כשמחליפים בין שתי תצוגות של אותו תוכן. במקומות אחרים משתמשים בלשוניות עם קו תחתון.</p>
+  </div>
+</section>
+
+<!-- ============ 12. ADMIN ============ -->
+<section class="block" id="admin">
+  <h2><span class="num">12</span>ניהול: לוח בקרה ותבנית אחידה</h2>
+  <p class="lead">הכניסה לניהול פותחת לוח בקרה. כל כרטיס בו מוביל ללשונית המתאימה. מתחת יש רשימה של מה שדורש טיפול עכשיו.</p>
+  <div class="grid g3">
+    <a class="card clickable stat-card" href="#admin" style="text-decoration:none;color:inherit"><span class="stat-icon" style="background:var(--warning-bg);color:var(--warning)"><span class="ms">hourglass_top</span></span><div><div class="stat-num">3</div><div class="stat-lbl">משתמשים ממתינים לאישור</div></div><span class="ms go">arrow_back</span></a>
+    <a class="card clickable stat-card" href="#admin" style="text-decoration:none;color:inherit"><span class="stat-icon" style="background:var(--danger-bg);color:var(--danger)"><span class="ms">flag</span></span><div><div class="stat-num">5</div><div class="stat-lbl">דיווחים פתוחים</div></div><span class="ms go">arrow_back</span></a>
+    <a class="card clickable stat-card" href="#admin" style="text-decoration:none;color:inherit"><span class="stat-icon" style="background:var(--primary-50);color:var(--primary-600)"><span class="ms">library_books</span></span><div><div class="stat-num">2</div><div class="stat-lbl">חומרים ממתינים לאישור</div></div><span class="ms go">arrow_back</span></a>
+    <a class="card clickable stat-card" href="#admin" style="text-decoration:none;color:inherit"><span class="stat-icon" style="background:var(--success-bg);color:var(--success)"><span class="ms">group</span></span><div><div class="stat-num">10</div><div class="stat-lbl">משתמשים · 2 חדשים השבוע</div></div><span class="ms go">arrow_back</span></a>
+    <a class="card clickable stat-card" href="#admin" style="text-decoration:none;color:inherit"><span class="stat-icon" style="background:var(--info-bg);color:var(--info)"><span class="ms">workspace_premium</span></span><div><div class="stat-num">1</div><div class="stat-lbl">מומחים פעילים</div></div><span class="ms go">arrow_back</span></a>
+    <a class="card clickable stat-card" href="#admin" style="text-decoration:none;color:inherit"><span class="stat-icon" style="background:var(--surface-3);color:var(--ink-2)"><span class="ms">sell</span></span><div><div class="stat-num">8 · 6</div><div class="stat-lbl">תגיות · קטגוריות</div></div><span class="ms go">arrow_back</span></a>
+  </div>
+
+  <h3>תבנית אחידה ללשוניות הניהול</h3>
+  <div class="panel" style="padding:0;overflow:hidden">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line)">
+      <b style="font-size:18px">דיווחים</b>
+      <div class="segmented" style="margin-inline-start:12px"><button aria-pressed="true">הכל</button><button aria-pressed="false">פתוח <span class="count">5</span></button><button aria-pressed="false">בטיפול</button><button aria-pressed="false">טופל</button></div>
+      <div class="search" style="margin-inline-start:auto;width:240px"><span class="ms">search</span><input class="input" style="height:36px" placeholder="חיפוש…" aria-label="חיפוש"></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="dtable">
+      <thead><tr><th>סוג תוכן</th><th>סיבה</th><th>דווח ע״י</th><th>תאריך</th><th>סטטוס</th><th style="text-align:end">פעולות</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge b-neutral"><span class="ms">recommend</span>המלצה</span></td><td>הסדנא מעוררת לא תואם את כללי האתר</td><td>שירה</td><td>12 באוק׳ 2026</td><td><span class="badge b-rejected"><span class="ms">flag</span>פתוח</span></td>
+          <td><div class="row-actions"><button class="btn btn-ghost btn-icon sm" aria-label="הסתרה" title="הסתרה"><span class="ms">visibility_off</span></button><button class="btn btn-ghost btn-icon sm" aria-label="סימון כטופל" title="סימון כטופל"><span class="ms">task_alt</span></button><button class="btn btn-danger-quiet btn-icon sm" aria-label="מחיקה" title="מחיקה"><span class="ms">delete</span></button></div></td></tr>
+        <tr><td><span class="badge b-neutral"><span class="ms">forum</span>שאלה בפורום</span></td><td>לא מקצועי</td><td>שירה</td><td>11 באוק׳ 2026</td><td><span class="badge b-info"><span class="ms">pending</span>בטיפול</span></td>
+          <td><div class="row-actions"><button class="btn btn-ghost btn-icon sm" aria-label="הסתרה" title="הסתרה"><span class="ms">visibility_off</span></button><button class="btn btn-ghost btn-icon sm" aria-label="סימון כטופל" title="סימון כטופל"><span class="ms">task_alt</span></button><button class="btn btn-danger-quiet btn-icon sm" aria-label="מחיקה" title="מחיקה"><span class="ms">delete</span></button></div></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <p class="note">הסדר בכל לשונית ניהול זהה: כותרת, מסננים, חיפוש בצד ואז טבלה. הסטטוס מוצג כתגית ולא כרשימה נפתחת בתוך הטבלה, ואפשר לשנות אותו מתפריט הפעולות.</p>
+</section>
+
+<!-- ============ 13. HOME ============ -->
+<section class="block" id="home">
+  <h2><span class="num">13</span>דף הבית: אזור עליון נקי ומלא תוכן</h2>
+  <p class="lead">בלי ריבוע הקורל, בלי הנקודות ובלי הזכוכית. בצד אחד כותרת וכפתור ראשי אחד, ובצד השני מה שקורה עכשיו בקהילה. ככה האזור לא ריק, וגם לא עמוס בקישוטים.</p>
+  <div class="hero-mock">
+    <div>
+      <span class="badge b-info" style="margin-bottom:14px">שלום שירה 👋</span>
+      <h4>הבית המקצועי של <em>מטפלי CBT</em></h4>
+      <p style="color:var(--ink-2);margin:0 0 22px;max-width:420px">חומרים, התייעצויות ואירועים במקום אחד, מעמיתים שעוסקים באותו תחום.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary lg"><span class="ms">library_books</span>לספריית החומרים</button>
+        <button class="btn btn-secondary lg"><span class="ms">forum</span>שאלה בפורום</button>
+      </div>
+    </div>
+    <div class="feed" aria-label="פעילות אחרונה">
+      <div class="item"><span class="ms">description</span><div><b>יומן רגשות לילדים</b><small>חומר חדש · נועה כהן · היום</small></div></div>
+      <div class="item"><span class="ms">forum</span><div><b>טיפול בחרדה חברתית במתבגרים</b><small>3 תשובות חדשות בפורום</small></div></div>
+      <div class="item"><span class="ms">event</span><div><b>מפגש למידה: אתגרים בטיפול משפחתי</b><small>14 באוק׳ · 18:00</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14. TOKENS ============ -->
+<section class="block" id="tokens">
+  <h2><span class="num">14</span>קובץ המשתנים לקוד</h2>
+  <p class="lead">אלה המשתנים שייכנסו ל־<code>src/app/globals.css</code> ויחליפו את כל המשתנים הקיימים. כל קובץ CSS אחר משתמש רק בהם.</p>
+<pre class="code">:root {
+  /* brand */
+  --primary-50:#fbefeb; --primary-100:#f8e1da; --primary-600:#a43c28;
+  --primary-700:#842513; --primary-800:#6e1e0f; --accent:#ff8066;
+  /* neutrals */
+  --bg:#f7f6f2; --surface:#fdfcf8; --surface-2:#f1efe8; --surface-3:#e8e5dc;
+  --line:#e6dad4; --line-strong:#988680;
+  --ink:#1f2430; --ink-2:#5b4a45; --ink-3:#7a6862;
+  --disabled-bg:#ecebe6; --disabled-fg:#9b8f8a;
+  /* semantic */
+  --success:#3f6b55; --success-bg:#dcebe2;  --warning:#8a6400; --warning-bg:#fbf1d6;
+  --danger:#b42318;  --danger-bg:#fbe4e1;   --info:#2b5a87;    --info-bg:#e6eef6;
+  /* type */
+  --fs-xs:.75rem; --fs-sm:.875rem; --fs-md:1rem; --fs-lg:1.125rem;
+  --fs-xl:1.375rem; --fs-2xl:1.75rem; --fs-3xl:2.5rem;
+  /* shape */
+  --r-sm:6px; --r-md:10px; --r-lg:16px; --r-full:999px;
+  --sh-1:0 1px 2px rgba(31,36,48,.06); --sh-2:0 4px 14px rgba(31,36,48,.08);
+  --sh-3:0 12px 32px rgba(31,36,48,.14); --focus:0 0 0 3px rgba(164,60,40,.28);
+}
+html { scrollbar-gutter: stable; }   /* stops the header/logo from jumping */
+
+/* tag palette: named, stored as a key (e.g. "sage"), not a hex code */
+terracotta #8a2f1d/#f8e1da · sand #7a5600/#f6ebcc · sage #2f5a45/#dcebe2 · sea #1f5470/#d8e9f2
+plum #6a2f63/#efdcec · rose #8f2c4b/#f7dde5 · olive #4c5418/#e8ebcf · slate #3d4654/#e3e6eb</pre>
+</section>
+
+<!-- ============ 15. PLAN ============ -->
+<section class="block" id="plan">
+  <h2><span class="num">15</span>סדר העבודה בענף <code>design/unified-ui</code></h2>
+  <p class="lead">כל שלב הוא קומיט נפרד. אחרי כל שלב אפשר לבדוק את התוצאה באתר, ורק אחר כך עוברים לשלב הבא.</p>
+  <ol class="roadmap">
+    <li><div><b>משתנים וניקוי</b><p>קובץ משתנים אחד ב־globals.css, והחלפה של כל הקידומות (cc/pp/rc/au/ae/home) בכל קובצי ה־CSS. יחד עם זה מגיע התיקון ללוגו שקופץ.</p></div></li>
+    <li><div><b>לוגו וסמל לכרטיסייה</b><p><code>src/app/icon.svg</code> ולוגו חדש בכותרת. הקובץ הישן <code>public/brand/logo.svg</code> מוחלף בקובץ תקין.</p></div></li>
+    <li><div><b>כפתורים, שדות, תגיות וסטטוסים</b><p>כל רכיבי הבסיס לפי סעיפים 7–9, כולל מצבי פוקוס ומצבים לא פעילים.</p></div></li>
+    <li><div><b>כותרת האתר ותפריט משתמש</b><p>חמישה מרחבים, פעמון ואווטאר. הפרופיל, אישור החומרים, הניהול וההתנתקות עוברים לתפריט שנפתח מהאווטאר.</p></div></li>
+    <li><div><b>כרטיסים ודפי רשימה</b><p>כרטיס לחיץ כולו, עם אווטאר וסטטוס, בפורום, בפניות, באירועים ובחומרים. ההמלצות והפרופיל עוברים לצבע הראשי.</p></div></li>
+    <li><div><b>ניהול</b><p>לוח בקרה, תבנית אחידה לכל הלשוניות, בחירת צבע לתגיות לפי שם ובחירת אייקון לקטגוריות.</p></div></li>
+    <li><div><b>אישור חומרים</b><p>מספרים על הלשוניות: ממתינים, אושרו ונדחו.</p></div></li>
+    <li><div><b>דף הבית והרקע</b><p>אזור עליון חדש עם פעילות אחרונה, כתמי צבע ברקע והסרת הכפתור הצף.</p></div></li>
+  </ol>
+  <p class="note" style="margin-top:16px">נתוני הניסוי בבסיס הנתונים הם משימה נפרדת. היא תתבצע רק אחרי שתאשר רשימה מדויקת של הפריטים למחיקה.</p>
+</section>
+
+</div>
+
+<script>
+  const TAG_COLORS = [
+    { key: "terracotta", name: "טרקוטה", fg: "#8a2f1d", bg: "#f8e1da" },
+    { key: "sand", name: "חול", fg: "#7a5600", bg: "#f6ebcc" },
+    { key: "sage", name: "מרווה", fg: "#2f5a45", bg: "#dcebe2" },
+    { key: "sea", name: "ים", fg: "#1f5470", bg: "#d8e9f2" },
+    { key: "plum", name: "שזיף", fg: "#6a2f63", bg: "#efdcec" },
+    { key: "rose", name: "ורד", fg: "#8f2c4b", bg: "#f7dde5" },
+    { key: "olive", name: "זית", fg: "#4c5418", bg: "#e8ebcf" },
+    { key: "slate", name: "צפחה", fg: "#3d4654", bg: "#e3e6eb" },
+  ];
+  const picker = document.getElementById("picker");
+  const preview = document.getElementById("preview");
+  function select(color) {
+    picker.querySelectorAll(".tag-swatch").forEach((el) => el.setAttribute("aria-checked", String(el.dataset.key === color.key)));
+    preview.style.background = color.bg;
+    preview.style.color = color.fg;
+  }
+  TAG_COLORS.forEach((color, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tag-swatch";
+    b.setAttribute("role", "radio");
+    b.dataset.key = color.key;
+    b.style.background = color.bg;
+    b.style.color = color.fg;
+    b.innerHTML = '<span class="dot"></span>' + color.name;
+    b.addEventListener("click", () => select(color));
+    picker.appendChild(b);
+  });
+  select(TAG_COLORS[2]);
+</script>
+</body>
+</html>

@@ -58,7 +58,7 @@ export function CreateEventForm() {
         <input id="event-time" type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "יוצר..." : "יצירת אירוע"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "יוצר..." : "יצירת אירוע"}</button>
     </form>
   );
 }

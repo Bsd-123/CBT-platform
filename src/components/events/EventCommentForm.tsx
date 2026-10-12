@@ -55,7 +55,7 @@ export function EventCommentForm({ eventId }: EventCommentFormProps) {
         <button
           ref={toggleRef}
           type="button"
-          className="button secondary event-comment-toggle"
+          className="btn btn-secondary event-comment-toggle"
           aria-expanded={false}
           aria-controls="event-comment-panel"
           onClick={openForm}
@@ -85,10 +85,10 @@ export function EventCommentForm({ eventId }: EventCommentFormProps) {
             </div>
             {error && <p className="error">{error}</p>}
             <div className="event-comment-actions">
-              <button type="submit" className="button" disabled={loading}>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? "שולח..." : "פרסום תגובה"}
               </button>
-              <button type="button" className="button secondary" disabled={loading} onClick={closeForm}>
+              <button type="button" className="btn btn-secondary" disabled={loading} onClick={closeForm}>
                 ביטול
               </button>
             </div>

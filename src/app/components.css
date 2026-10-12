@@ -1,0 +1,732 @@
+/* Base components shared by every page. Spec: docs/design-system.html (sections 7–9).
+   Build new UI from these classes instead of page-specific button or badge styles. */
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  --btn-h: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: var(--btn-h);
+  padding: 0 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn .material-symbol {
+  font-size: 1.125rem;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--disabled-bg);
+  border-color: transparent;
+  color: var(--disabled-fg);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  --btn-h: 2rem;
+  padding: 0 0.75rem;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+}
+
+.btn-lg {
+  --btn-h: 3rem;
+  padding: 0 1.375rem;
+  font-size: var(--fs-md);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-icon {
+  width: var(--btn-h);
+  padding: 0;
+}
+
+.btn-primary {
+  background: var(--primary-600);
+  color: var(--on-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-700);
+  color: var(--on-primary);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--primary-800);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--primary-600);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--primary-50);
+  border-color: var(--primary-600);
+  color: var(--primary-700);
+}
+
+.btn-secondary:active:not(:disabled),
+.btn-secondary[aria-pressed="true"] {
+  background: var(--primary-100);
+  border-color: var(--primary-600);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background: var(--surface-3);
+}
+
+.btn-ghost:disabled {
+  background: transparent;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: var(--on-primary);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger-hover);
+  color: var(--on-primary);
+}
+
+/* Destructive action inside a row or list: quiet until hovered, confirmed in a dialog. */
+.btn-danger-quiet {
+  background: transparent;
+  color: var(--danger);
+}
+
+.btn-danger-quiet:hover:not(:disabled) {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.btn-danger-quiet:disabled {
+  background: transparent;
+}
+
+/* Text-only action, e.g. "reply" under a comment. */
+.btn-link {
+  min-height: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--primary-600);
+  font-weight: 500;
+}
+
+.btn-link:hover:not(:disabled) {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+.btn-link:disabled {
+  background: none;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}
+
+/* ---------- Form controls ---------- */
+
+.form-field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.form-field textarea,
+.form-field select,
+.input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder,
+.input::placeholder {
+  color: var(--ink-3);
+}
+
+.form-field input:hover:not(:disabled):not(:focus),
+.form-field textarea:hover:not(:disabled):not(:focus),
+.form-field select:hover:not(:disabled):not(:focus),
+.input:hover:not(:disabled):not(:focus) {
+  border-color: var(--ink-2);
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
+}
+
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"],
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.form-field input:disabled,
+.form-field textarea:disabled,
+.form-field select:disabled,
+.input:disabled {
+  background: var(--disabled-bg);
+  border-color: var(--line);
+  color: var(--disabled-fg);
+}
+
+.form-field textarea,
+textarea.input {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.form-field input[type="checkbox"],
+.form-field input[type="radio"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--primary-600);
+}
+
+.form-hint {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+
+/* ---------- Status badges ---------- */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.375rem;
+  padding: 0 0.5rem;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status .material-symbol,
+.status .material-symbols-outlined {
+  font-size: 0.875rem;
+}
+
+.status-neutral {
+  background: var(--surface-3);
+  color: var(--ink-2);
+}
+
+.status-pending {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.status-approved {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.status-rejected {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.status-info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.status-new {
+  background: var(--primary-600);
+  color: var(--on-primary);
+}
+
+/* ---------- Content tags ---------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.5rem;
+  padding: 0 0.625rem;
+  border-radius: var(--r-full);
+  background: var(--tag-slate-bg);
+  color: var(--tag-slate-fg);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Admin tag color picker: named swatches instead of hex codes */
+.tag-color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-color-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+  border: 2px solid transparent;
+  border-radius: var(--r-full);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tag-color-swatch[aria-checked="true"] {
+  border-color: currentColor;
+  box-shadow: var(--sh-2);
+}
+
+.tag-color-swatch:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.tag-color-dot {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tag-color-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.ui-inline-form .form-field:has(.tag-color-picker) {
+  flex-basis: 100%;
+}
+
+/* ---------- Filter chips and counts ---------- */
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.filter-chip:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.filter-chip:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.filter-chip[aria-pressed="true"],
+.filter-chip[aria-current="true"],
+.filter-chip.is-active {
+  background: var(--primary-600);
+  border-color: var(--primary-600);
+  color: var(--on-primary);
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+  color: var(--ink-2);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.is-active > .count,
+[aria-pressed="true"] > .count,
+[aria-selected="true"] > .count {
+  background: color-mix(in srgb, var(--on-primary) 25%, transparent);
+  color: inherit;
+}
+
+/* ---------- Avatar (initials only; the spec has no profile pictures) ---------- */
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--primary-100);
+  color: var(--primary-700);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.avatar-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: var(--fs-xs);
+}
+
+/* ---------- Keyboard focus for remaining interactive elements ---------- */
+
+a:focus-visible,
+summary:focus-visible,
+[role="tab"]:focus-visible {
+  outline: none;
+  border-radius: var(--r-sm);
+  box-shadow: var(--focus);
+}
+
+/* ---------- Underline tabs (sub-navigation inside a page) ---------- */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem 0.875rem;
+  border: none;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tab .material-symbol {
+  font-size: 1.125rem;
+}
+
+.tab:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.tab.is-active,
+.tab[aria-current="page"],
+.tab[aria-selected="true"] {
+  color: var(--primary-600);
+}
+
+.tab.is-active::after,
+.tab[aria-current="page"]::after,
+.tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.5rem;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--primary-600);
+}
+
+.tab.is-active .count,
+.tab[aria-current="page"] .count {
+  background: var(--primary-600);
+  color: var(--on-primary);
+}
+
+/* ---------- Stat cards (dashboards) ---------- */
+
+.stat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1.125rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+  color: var(--ink);
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+a.stat-card:hover {
+  border-color: color-mix(in srgb, var(--primary-600) 30%, var(--line));
+  box-shadow: var(--sh-2);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.stat-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
+}
+
+.stat-icon .material-symbol {
+  font-size: 1.375rem;
+}
+
+.tone-primary {
+  background: var(--primary-50);
+  color: var(--primary-600);
+}
+
+.tone-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.tone-danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.tone-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.tone-info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.tone-neutral {
+  background: var(--surface-3);
+  color: var(--ink-2);
+}
+
+/* Text fills the row so the arrow always lands on the far edge, whatever the label length. */
+.stat-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-value {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.stat-label {
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.stat-card .stat-go {
+  color: var(--ink-3);
+  transition: transform 0.15s;
+}
+
+a.stat-card:hover .stat-go {
+  color: var(--primary-600);
+  transform: translateX(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.stat-card:hover {
+    transform: none;
+  }
+}
+
+/* ---------- Icon picker ---------- */
+
+.icon-picker {
+  position: relative;
+}
+
+.icon-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.icon-picker-trigger:hover {
+  border-color: var(--ink-2);
+}
+
+.icon-picker-trigger:focus-visible {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: var(--focus);
+}
+
+.icon-picker-trigger .material-symbol:first-child {
+  color: var(--primary-600);
+}
+
+.icon-picker-trigger .material-symbol:last-child {
+  color: var(--ink-3);
+}
+
+.icon-picker-panel {
+  position: fixed;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(6.5rem, 1fr));
+  gap: 0.25rem;
+  width: max-content;
+  max-width: min(24rem, 90vw);
+  padding: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-3);
+}
+
+.icon-picker-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.icon-picker-option .material-symbol {
+  font-size: 1.5rem;
+}
+
+.icon-picker-option:hover {
+  background: var(--surface-2);
+}
+
+.icon-picker-option[aria-checked="true"] {
+  border-color: var(--primary-600);
+  background: var(--primary-50);
+  color: var(--primary-700);
+}
+
+.icon-picker-option:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.ui-th-actions {
+  text-align: end !important;
+}

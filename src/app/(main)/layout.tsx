@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/layout/AppNav";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { UiProvider } from "@/components/ui/UiProvider";
 import { fetchPendingMaterialCount } from "@/lib/data";
 import { canReviewMaterials } from "@/lib/materials/approval";
@@ -41,8 +42,11 @@ export default async function MainLayout({
 
   return (
     <UiProvider>
-      <AppNav profile={auth.profile} pendingMaterials={pendingMaterials} />
-      <main>{children}</main>
+      <div className="app-shell">
+        <AppNav profile={auth.profile} pendingMaterials={pendingMaterials} />
+        <main>{children}</main>
+        <SiteFooter />
+      </div>
     </UiProvider>
   );
 }

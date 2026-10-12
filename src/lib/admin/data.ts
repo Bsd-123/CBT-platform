@@ -15,6 +15,7 @@ import {
   listMaterialTypes,
 } from "@/lib/repositories/material-type.repository";
 import { listMaterialsForAdmin } from "@/lib/repositories/material.repository";
+import { fetchPendingMaterialCount } from "@/lib/data";
 
 export async function loadAdminReports(filter: ListReportsFilter = {}) {
   await assertAdminAccess();
@@ -69,4 +70,29 @@ export async function loadAdminExpertApprovals(filter: ListExpertApprovalsFilter
 export async function loadAdminExpertDirectory() {
   await assertAdminAccess();
   return listExpertDirectory();
+}
+
+/** Everything the admin dashboard needs in one round of parallel queries. */
+export async function loadAdminDashboard() {
+  await assertAdminAccess();
+  const [reports, userStats, experts, tags, materialTypes, pendingApprovals, pendingMaterials] =
+    await Promise.all([
+      listReports(),
+      getAdminUsersPageStats(),
+      listExpertDirectory(),
+      listTags(),
+      listMaterialTypes(),
+      listExpertApprovals({ status: "pending" }),
+      fetchPendingMaterialCount(),
+    ]);
+
+  return {
+    openReports: reports.filter((report) => report.status !== "resolved"),
+    userStats,
+    expertCount: experts.length,
+    tagCount: tags.length,
+    materialTypeCount: materialTypes.length,
+    pendingApprovals,
+    pendingMaterials,
+  };
 }

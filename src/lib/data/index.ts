@@ -75,6 +75,7 @@ import {
   getMaterialById,
   reviewMaterial,
   countPendingMaterials,
+  countMaterialsByApprovalStatus,
   listMaterialsForReview,
   getMaterialRating,
   getMaterialRequestById,
@@ -103,6 +104,7 @@ import {
   listProfessionalRequests,
   countProfessionalRequests,
   listRecommendationComments,
+  countRecommendations,
   listRecommendations,
   listRecommendationsFeed,
   listReports,
@@ -156,6 +158,10 @@ export async function fetchMaterialById(id: string, include_hidden = false) {
 
 export async function fetchPendingMaterialCount() {
   return countPendingMaterials();
+}
+
+export async function fetchMaterialApprovalCounts() {
+  return countMaterialsByApprovalStatus();
 }
 
 export async function fetchMaterialsForReview(
@@ -277,6 +283,10 @@ export async function toggleForumLike(
 }
 
 // Recommendations
+export async function fetchRecommendationCount() {
+  return countRecommendations();
+}
+
 export async function fetchRecommendations() {
   return listRecommendations();
 }

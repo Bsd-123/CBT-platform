@@ -46,7 +46,7 @@ export function ReportForm({ targetType, targetId }: ReportFormProps) {
 
   if (!open) {
     return (
-      <button type="button" className="button secondary" onClick={() => setOpen(true)}>
+      <button type="button" className="btn btn-secondary" onClick={() => setOpen(true)}>
         דווח על תוכן
       </button>
     );
@@ -66,10 +66,10 @@ export function ReportForm({ targetType, targetId }: ReportFormProps) {
       </div>
       {error && <p className="error">{error}</p>}
       <div style={{ display: "flex", gap: "0.5rem" }}>
-        <button type="submit" className="button danger" disabled={loading}>
+        <button type="submit" className="btn btn-danger" disabled={loading}>
           {loading ? "שולח..." : "שליחת דיווח"}
         </button>
-        <button type="button" className="button secondary" onClick={() => setOpen(false)}>
+        <button type="button" className="btn btn-secondary" onClick={() => setOpen(false)}>
           ביטול
         </button>
       </div>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { PublicMaterial } from "@/lib/models/material";
 import type { PublicTag } from "@/lib/models/tag";
 import { TagList } from "@/components/shared/TagList";
-import { getMaterialTypeBadgeVariant } from "@/lib/utils/material-type-ui";
+import { getMaterialTypeBadgeVariant, getMaterialTypeIcon } from "@/lib/utils/material-type-ui";
 import { MaterialIcon } from "@/components/shared/MaterialIcon";
 
 type MaterialCardProps = {
@@ -22,10 +22,10 @@ export function MaterialCard({ material, tags, averageRating }: MaterialCardProp
 
   return (
     <article className="material-card">
-      <div className="material-card-accent" />
       <div className="material-card-body">
         <div className="material-card-header">
           <span className={`material-type-badge ${badgeVariant}`}>
+            <MaterialIcon name={getMaterialTypeIcon(typeKey)} />
             {material.material_type?.label ?? "חומר"}
           </span>
           <div className="material-card-rating">
@@ -35,7 +35,9 @@ export function MaterialCard({ material, tags, averageRating }: MaterialCardProp
         </div>
 
         <h3 className="material-card-title">
-          <Link href={`/materials/${material.id}`}>{material.title}</Link>
+          <Link href={`/materials/${material.id}`} className="material-card-stretch">
+            {material.title}
+          </Link>
         </h3>
 
         <p className="material-card-desc">{material.description}</p>
@@ -51,10 +53,10 @@ export function MaterialCard({ material, tags, averageRating }: MaterialCardProp
             <MaterialIcon name="calendar_today" />
             {formattedDate}
           </span>
-          <Link href={`/materials/${material.id}`} className="material-card-link">
+          <span className="material-card-link" aria-hidden="true">
             צפייה
             <MaterialIcon name="arrow_back" />
-          </Link>
+          </span>
         </div>
       </div>
     </article>

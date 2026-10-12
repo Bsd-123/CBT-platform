@@ -1,41 +1,34 @@
-"use client";
-
-import { useState } from "react";
-import { requestFileDownloadUrl } from "@/lib/actions/auth";
-import { unwrap } from "@/lib/actions/result";
+import { fileDownloadPath, fileNameFromKey } from "@/lib/files/path";
+import { canViewInline } from "@/lib/uploads/file-policy";
 
 type DownloadMaterialButtonProps = {
   fileKey: string;
   label?: string;
 };
 
+/**
+ * A plain link that opens the file in a new tab, on the app's own domain.
+ *
+ * It must be a real navigation, not a script-triggered download: network filters answer an
+ * unknown file with their own HTML page ("this file will be filtered, continue?"). A navigation
+ * shows that page so the member can click through; a forced download tries to save the page as
+ * a file and fails. Viewable types (PDF, images, audio, video, text) open in the tab; the rest
+ * are downloaded once the filter's page is dismissed.
+ */
 export function DownloadMaterialButton({
   fileKey,
   label = "הורדת קובץ",
 }: DownloadMaterialButtonProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleDownload() {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const url = unwrap(await requestFileDownloadUrl(fileKey));
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (downloadError) {
-      setError(downloadError instanceof Error ? downloadError.message : "ההורדה נכשלה");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const inline = canViewInline(fileNameFromKey(fileKey));
 
   return (
-    <div className="stack">
-      <button type="button" className="materials-btn-secondary" disabled={loading} onClick={() => void handleDownload()}>
-        {loading ? "מכין..." : label}
-      </button>
-      {error && <p className="error">{error}</p>}
-    </div>
+    <a
+      className="btn btn-secondary"
+      href={fileDownloadPath(fileKey, { inline })}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {label}
+    </a>
   );
 }

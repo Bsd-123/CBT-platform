@@ -103,14 +103,14 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
   }
 
   return (
-    <section className="admin-experts-table-card">
-      <div style={{ padding: "1.5rem 1.5rem 0" }}>
-        <div className="admin-experts-toolbar">
+    <section className="ui-section ui-section-flush">
+      <div>
+        <div className="panel-head">
           <div>
             <h2>היסטוריית אישורי הרשמה</h2>
             <p>צפייה וניהול בקשות הרשמה דרך מומחים מפנים.</p>
           </div>
-          <label className="admin-experts-search">
+          <label className="search-field">
             <span className="material-symbols-outlined" aria-hidden="true">
               search
             </span>
@@ -126,11 +126,11 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
           </label>
         </div>
 
-        <div className="admin-experts-filters" role="group" aria-label="סינון לפי סטטוס">
+        <div className="filter-row" role="group" aria-label="סינון לפי סטטוס">
           <button
             type="button"
-            className="admin-experts-filter-chip"
-            data-active={statusFilter === "all"}
+            className="filter-chip"
+            aria-pressed={statusFilter === "all"}
             onClick={() => {
               setStatusFilter("all");
               setPage(1);
@@ -142,8 +142,8 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
             <button
               key={status}
               type="button"
-              className="admin-experts-filter-chip"
-              data-active={statusFilter === status}
+              className="filter-chip"
+              aria-pressed={statusFilter === status}
               onClick={() => {
                 setStatusFilter(status);
                 setPage(1);
@@ -158,10 +158,10 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="admin-experts-empty">לא נמצאו בקשות אישור.</p>
+        <p className="panel-empty">לא נמצאו בקשות אישור.</p>
       ) : (
-        <div className="admin-experts-table-wrap">
-          <table className="admin-experts-table">
+        <div className="ui-table-scroll">
+          <table className="ui-table">
             <thead>
               <tr>
                 <th scope="col">משתמש</th>
@@ -169,7 +169,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                 <th scope="col">מומחה מפנה</th>
                 <th scope="col">תאריך הגשה</th>
                 <th scope="col">סטטוס</th>
-                <th scope="col" style={{ textAlign: "end" }}>
+                <th scope="col" className="ui-th-actions">
                   פעולות
                 </th>
               </tr>
@@ -184,31 +184,31 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                 return (
                   <tr key={approval.id}>
                     <td>
-                      <div className="admin-experts-user-cell">
-                        <div className="admin-experts-avatar" aria-hidden="true">
+                      <div className="cell-user">
+                        <div className="avatar avatar-sm" aria-hidden="true">
                           {getInitials(userName)}
                         </div>
                         <div>
-                          <div className="admin-experts-user-name">{userName}</div>
-                          <div className="admin-experts-user-meta">
+                          <div className="cell-strong">{userName}</div>
+                          <div className="cell-muted">
                             {formatShortId(approval.id)}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <div className="admin-experts-request-title">
+                      <div className="cell-strong">
                         {approval.user?.title ?? "ללא תפקיד מקצועי"}
                       </div>
-                      <div className="admin-experts-request-sub">הרשמה דרך הפניה</div>
+                      <div className="cell-muted">הרשמה דרך הפניה</div>
                     </td>
                     <td>
-                      <div className="admin-experts-request-title">{expertName}</div>
+                      <div className="cell-strong">{expertName}</div>
                     </td>
-                    <td className="admin-experts-date">{formatDate(approval.created_at)}</td>
+                    <td className="cell-muted">{formatDate(approval.created_at)}</td>
                     <td>
                       <span
-                        className={`admin-experts-badge admin-experts-badge--${approval.status}`}
+                        className={`status status-${approval.status}`}
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">
                           {approval.status === "pending"
@@ -221,12 +221,12 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                       </span>
                     </td>
                     <td>
-                      <div className="admin-experts-actions">
+                      <div className="ui-table-actions">
                         {approval.status === "pending" ? (
                           <>
                             <button
                               type="button"
-                              className="button"
+                              className="btn btn-primary btn-sm"
                               disabled={isLoading}
                               onClick={() => void handleDecision(approval, "approved")}
                             >
@@ -234,7 +234,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                             </button>
                             <button
                               type="button"
-                              className="button danger"
+                              className="btn btn-danger-quiet btn-sm"
                               disabled={isLoading}
                               onClick={() => void handleDecision(approval, "rejected")}
                             >
@@ -242,7 +242,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
                             </button>
                           </>
                         ) : (
-                          <span className="admin-experts-actions-muted">—</span>
+                          <span className="cell-muted">—</span>
                         )}
                       </div>
                     </td>
@@ -254,16 +254,16 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
         </div>
       )}
 
-      <div className="admin-experts-table-footer">
-        <span className="admin-experts-table-footer-meta">
+      <div className="table-footer">
+        <span className="table-footer-meta">
           {filtered.length === 0
             ? "0 רשומות"
             : `מציג ${rangeStart}–${rangeEnd} מתוך ${filtered.length}`}
         </span>
-        <div className="admin-experts-pagination">
+        <div className="table-pagination">
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary btn-sm"
             disabled={currentPage <= 1}
             onClick={() => setPage((value) => Math.max(1, value - 1))}
           >
@@ -271,7 +271,7 @@ export function AdminExpertsTable({ approvals }: AdminExpertsTableProps) {
           </button>
           <button
             type="button"
-            className="button secondary"
+            className="btn btn-secondary btn-sm"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
           >

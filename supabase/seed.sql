@@ -12,12 +12,12 @@ insert into public.material_types (key, label, icon) values
 on conflict (key) do update set label = excluded.label, icon = excluded.icon;
 
 insert into public.tags (name, color) values
-  ('CBT', '#6366f1'),
-  ('חרדה', '#ec4899'),
-  ('ילדים', '#14b8a6'),
-  ('התנהגות', '#f59e0b'),
-  ('דיכאון', '#8b5cf6'),
-  ('הערכה', '#ef4444'),
-  ('הורים', '#0ea5e9'),
-  ('פגיעות', '#84cc16')
+  ('CBT', 'slate'),
+  ('חרדה', 'rose'),
+  ('ילדים', 'sage'),
+  ('התנהגות', 'sand'),
+  ('דיכאון', 'plum'),
+  ('הערכה', 'terracotta'),
+  ('הורים', 'sea'),
+  ('פגיעות', 'olive')
 on conflict (name) do update set color = excluded.color;

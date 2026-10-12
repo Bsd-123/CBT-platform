@@ -24,7 +24,7 @@ export function TagList({ tags }: TagListProps) {
         return (
           <span
             key={item.id}
-            className="badge tag-badge"
+            className="tag"
             style={getTagBadgeStyle(color)}
           >
             {name}

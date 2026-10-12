@@ -74,7 +74,7 @@ export function MaterialsSidebar({
                 className={`materials-type-btn${currentType === type.key ? " is-active" : ""}`}
               >
                 <span className="materials-type-btn-label">
-                  <MaterialIcon name={getMaterialTypeIcon(type.key)} />
+                  <MaterialIcon name={getMaterialTypeIcon(type.key, type.icon)} />
                   {type.label}
                 </span>
                 <span className="materials-type-count">{typeCounts[type.id] ?? 0}</span>

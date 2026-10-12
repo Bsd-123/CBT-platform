@@ -63,7 +63,7 @@ export function ForumAnswerForm({
       </div>
       {error && <p className="error" role="alert">{error}</p>}
       <div className="fq-form-actions">
-        <button type="submit" className={isReply ? "button secondary" : "button"} disabled={loading}>
+        <button type="submit" className={isReply ? "btn btn-secondary" : "btn btn-primary"} disabled={loading}>
           {loading ? "שולח..." : isReply ? "שליחה" : "פרסום תשובה"}
         </button>
       </div>

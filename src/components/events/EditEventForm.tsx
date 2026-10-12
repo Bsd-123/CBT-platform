@@ -74,7 +74,7 @@ export function EditEventForm({ eventId, initial, canCancel }: EditEventFormProp
         </label>
       )}
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "שומר..." : "שמירת שינויים"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "שומר..." : "שמירת שינויים"}</button>
     </form>
   );
 }

@@ -64,14 +64,14 @@ export function ProfessionalRequestCommentForm({
           aria-label={placeholder}
           onChange={(event) => setContent(event.target.value)}
         />
-        <button type="submit" className="rec-chat-send-btn" disabled={loading} aria-label="שליחה">
+        <button type="submit" className="btn btn-primary btn-icon" disabled={loading} aria-label="שליחה">
           <span className="material-symbols-outlined" aria-hidden="true">
             send
           </span>
         </button>
       </form>
       <div className="rec-chat-reply-form-footer">
-        <button type="button" className="rec-chat-cancel-btn" onClick={onCancel} disabled={loading}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel} disabled={loading}>
           ביטול
         </button>
         {error && <p className="error">{error}</p>}

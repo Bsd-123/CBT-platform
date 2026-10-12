@@ -65,7 +65,7 @@ export function ForgotPasswordForm() {
         </p>
       )}
 
-      <button type="submit" className="button" disabled={loading || success}>
+      <button type="submit" className="btn btn-primary" disabled={loading || success}>
         {loading ? "שולח..." : "שליחת קישור לאיפוס"}
       </button>
 

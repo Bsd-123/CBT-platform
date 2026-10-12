@@ -76,5 +76,8 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // File downloads end in the stored file name (".png", ".jpg"...), which the pattern above
+    // skips; they still need the session refresh and the security headers.
+    "/api/files/:path*",
   ],
 };

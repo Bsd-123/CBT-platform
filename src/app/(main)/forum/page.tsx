@@ -10,7 +10,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { fetchAuthenticatedProfile } from "@/lib/actions/auth";
 import { fetchEntityTagsForEntities, fetchForumQuestionCount, fetchTags, searchForum } from "@/lib/data";
 import { enrichForumQuestionsWithLikes } from "@/lib/services/forum-likes";
-import { countLabel, formatDate } from "@/lib/utils/format";
+import { countLabel, formatDate, isRecent } from "@/lib/utils/format";
 import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
 type ForumPageProps = {
@@ -71,6 +71,14 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
                 excerpt={question.content}
                 author={question.user?.full_name}
                 dateLabel={formatDate(question.created_at)}
+                isNew={isRecent(question.created_at)}
+                badges={
+                  (question.answer_count ?? 0) > 0 ? (
+                    <span className="status status-approved">נענתה</span>
+                  ) : (
+                    <span className="status status-pending">ממתינה לתשובה</span>
+                  )
+                }
                 tags={tagsByQuestion.get(question.id)}
                 stats={[
                   {
