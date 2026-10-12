@@ -77,6 +77,11 @@
   --sh-2: 0 4px 14px rgba(31, 36, 48, 0.08);
   --sh-3: 0 12px 32px rgba(31, 36, 48, 0.14);
   --focus: 0 0 0 3px rgba(164, 60, 40, 0.28);
+
+  /* Logo wordmark (darkened from the logo artwork to stay legible on cream) */
+  --brand-gold: #a88a1c;
+  --brand-peach: #c9693f;
+  --brand-coral: #d4513a;
   --star: #c88a00;
 
   /* Layout */
@@ -153,10 +158,75 @@ main {
 }
 
 .brand {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--primary-600);
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--ink);
   text-decoration: none;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: none;
+  border-radius: var(--r-md);
+  box-shadow: var(--focus);
+}
+
+.brand-mark {
+  display: block;
+  flex: none;
+}
+
+.brand-text {
+  display: grid;
+  line-height: 1.1;
+}
+
+.brand-word {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: start;
+}
+
+.brand-c {
+  color: var(--brand-gold);
+}
+
+.brand-b {
+  color: var(--brand-peach);
+}
+
+.brand-team {
+  color: var(--brand-coral);
+}
+
+.brand-tagline {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.brand-stacked {
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.brand-stacked .brand-text {
+  justify-items: center;
+}
+
+.brand-stacked .brand-word {
+  font-size: 2rem;
+}
+
+.brand-stacked .brand-tagline {
+  font-size: var(--fs-sm);
 }
 
 .nav-links {
@@ -198,7 +268,6 @@ main {
 
   .brand {
     order: 1;
-    font-size: 1.1rem;
   }
 
   .nav-actions-mobile {
@@ -428,9 +497,18 @@ main {
 
 .auth-page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 1.5rem;
+}
+
+.auth-stack {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
 }
 
 .auth-card {

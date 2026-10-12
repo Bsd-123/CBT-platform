@@ -5,7 +5,10 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "קהילת מטפלי CBT",
+  title: {
+    default: "CBTeam · קהילת מטפלי CBT",
+    template: "%s · CBTeam",
+  },
   description: "פלטפורמת קהילה מקצועית למטפלי CBT",
 };
 

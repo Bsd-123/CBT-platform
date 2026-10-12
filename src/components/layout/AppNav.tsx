@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { PublicUser } from "@/lib/models/user";
 import { NotificationsBell } from "@/components/notifications/NotificationsBell";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 const SPACE_LINKS = [
   { href: "/materials", label: "ספריית חומרים" },
@@ -33,9 +34,7 @@ export function AppNav({ profile, pendingMaterials = 0 }: AppNavProps) {
   return (
     <header className="site-header">
       <div className="site-header-inner">
-        <Link href="/" className="brand">
-          קהילת מטפלי CBT
-        </Link>
+        <BrandLogo />
 
         <div className="nav-actions-mobile">
           <NotificationsBell userId={profile.id} />

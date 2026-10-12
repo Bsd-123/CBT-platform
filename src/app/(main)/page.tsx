@@ -157,8 +157,8 @@ export default function HomePage() {
       <footer className="home-footer">
         <div className="home-footer-inner">
           <div>
-            <span className="home-footer-brand">קהילת מטפלי CBT</span>
-            <span className="home-footer-meta"> · פלטפורמה מקצועית לשיתוף ידע</span>
+            <span className="home-footer-brand">CBTeam</span>
+            <span className="home-footer-meta"> · קהילת מטפלי CBT לשיתוף ידע</span>
           </div>
         </div>
       </footer>
