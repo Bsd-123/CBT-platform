@@ -121,7 +121,7 @@ export function ResetPasswordForm() {
 
       {error && <p className="error">{error}</p>}
 
-      <button type="submit" className="button" disabled={loading}>
+      <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? "שומר..." : "שמירת סיסמה חדשה"}
       </button>
 

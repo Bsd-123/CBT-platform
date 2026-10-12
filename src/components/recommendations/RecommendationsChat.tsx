@@ -41,7 +41,7 @@ export function RecommendationsChat({ items }: RecommendationsChatProps) {
             שיחה מקצועית על ספרים, משחקים וסדנאות — תגובות מקושרות להמלצה עם מענה אחד לכל תגובה.
           </p>
         </div>
-        <Link href="/recommendations/new" className="rec-chat-new-btn">
+        <Link href="/recommendations/new" className="btn btn-primary">
           <span className="material-symbols-outlined" aria-hidden="true">
             add
           </span>
@@ -52,7 +52,7 @@ export function RecommendationsChat({ items }: RecommendationsChatProps) {
       {items.length === 0 ? (
         <div className="rec-chat-empty">
           <p>עדיין לא פורסמו המלצות.</p>
-          <Link href="/recommendations/new" className="rec-chat-new-btn">
+          <Link href="/recommendations/new" className="btn btn-primary">
             פרסמו את ההמלצה הראשונה
           </Link>
         </div>

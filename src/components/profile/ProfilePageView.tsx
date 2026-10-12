@@ -169,7 +169,7 @@ export function ProfilePageView({
 
             <button
               type="button"
-              className="profile-edit-btn"
+              className="btn btn-primary btn-block profile-edit-btn"
               onClick={() => {
                 setFullName(profile.full_name);
                 setTitle(profile.title ?? "");
@@ -238,7 +238,7 @@ export function ProfilePageView({
                       <span>{getMaterialMeta(material)}</span>
                       {material.approval_status !== "approved" && (
                         <span
-                          className="ui-badge"
+                          className="status status-neutral"
                           data-kind={material.approval_status === "rejected" ? "danger" : undefined}
                         >
                           {APPROVAL_LABELS[material.approval_status]}
@@ -481,12 +481,12 @@ export function ProfilePageView({
               <div className="profile-edit-actions">
                 <button
                   type="button"
-                  className="button secondary"
+                  className="btn btn-secondary"
                   onClick={() => setShowEditProfile(false)}
                 >
                   ביטול
                 </button>
-                <button type="submit" className="button" disabled={editLoading}>
+                <button type="submit" className="btn btn-primary" disabled={editLoading}>
                   {editLoading ? "שומר..." : "שמירה"}
                 </button>
               </div>

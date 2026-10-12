@@ -5,7 +5,7 @@ import { ModalButton } from "@/components/ui/Modal";
 import { PageHero } from "@/components/ui/PageHero";
 import { Pagination } from "@/components/ui/Pagination";
 import { fetchProfessionalRequestCount, fetchProfessionalRequests } from "@/lib/data";
-import { countLabel, formatDate } from "@/lib/utils/format";
+import { countLabel, formatDate, isRecent } from "@/lib/utils/format";
 import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
 type ProfessionalRequestsPageProps = {
@@ -26,7 +26,7 @@ export default async function ProfessionalRequestsPage({
     <>
       <PageHero
         title="פניות מקצועיות"
-        subtitle="דיון מקצועי פתוח עם שרשורי תגובות מלאים."
+        subtitle="פנו לעמיתים בשאלה מקצועית, בקשת הפניה או התייעצות."
         actions={
           <ModalButton label="פנייה חדשה" icon="add" title="פרסום פנייה מקצועית">
             <PostProfessionalRequestForm />
@@ -50,6 +50,7 @@ export default async function ProfessionalRequestsPage({
                 excerpt={request.description}
                 author={request.user?.full_name}
                 dateLabel={formatDate(request.created_at)}
+                isNew={isRecent(request.created_at)}
                 stats={[
                   {
                     icon: "chat_bubble",

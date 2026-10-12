@@ -48,10 +48,10 @@ export function ExpertReferralCodeBanner({ expertCode }: ExpertReferralCodeBanne
       <div className="admin-experts-code-banner-row">
         <code className="admin-experts-code admin-experts-code--large">{expertCode}</code>
         <div className="admin-experts-actions">
-          <button type="button" className="button secondary" onClick={() => void handleCopyCode()}>
+          <button type="button" className="btn btn-secondary" onClick={() => void handleCopyCode()}>
             {copied === "code" ? "הועתק" : "העתק קוד"}
           </button>
-          <button type="button" className="button secondary" onClick={() => void handleCopyLink()}>
+          <button type="button" className="btn btn-secondary" onClick={() => void handleCopyLink()}>
             {copied === "link" ? "הועתק" : "העתק קישור הרשמה"}
           </button>
         </div>

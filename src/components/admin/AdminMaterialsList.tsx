@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MaterialIcon } from "@/components/shared/MaterialIcon";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -86,11 +87,11 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
                 </td>
                 <td>
                   {material.isHidden ? (
-                    <span className="ui-badge" data-kind="danger">
+                    <span className="status status-rejected">
                       מוסתר
                     </span>
                   ) : (
-                    <span className="ui-badge">גלוי</span>
+                    <span className="status status-approved">גלוי</span>
                   )}
                 </td>
                 <td>{APPROVAL_LABELS[material.approvalStatus]}</td>
@@ -101,30 +102,35 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
                     {material.isHidden ? (
                       <button
                         type="button"
-                        className="materials-btn-secondary"
+                        className="btn btn-ghost btn-icon btn-sm"
+                        aria-label="שחזור"
+                        title="שחזור"
                         disabled={loadingId === material.id}
                         onClick={() => void handleAction("restore", material.id)}
                       >
-                        שחזור
+                        <MaterialIcon name="restore" />
                       </button>
                     ) : (
                       <button
                         type="button"
-                        className="materials-btn-secondary"
+                        className="btn btn-ghost btn-icon btn-sm"
+                        aria-label="הסתרה"
+                        title="הסתרה"
                         disabled={loadingId === material.id}
                         onClick={() => void handleAction("hide", material.id)}
                       >
-                        הסתרה
+                        <MaterialIcon name="visibility_off" />
                       </button>
                     )}
                     <button
                       type="button"
-                      className="materials-btn-primary"
-                      data-danger="true"
+                      className="btn btn-danger-quiet btn-icon btn-sm"
+                      aria-label="מחיקה"
+                      title="מחיקה"
                       disabled={loadingId === material.id}
                       onClick={() => void handleAction("delete", material.id)}
                     >
-                      מחיקה
+                      <MaterialIcon name="delete" />
                     </button>
                   </div>
                 </td>
@@ -137,7 +143,7 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
       {totalPages > 1 && (
         <nav className="ui-pagination" aria-label="עימוד">
           {page > 1 ? (
-            <Link className="materials-btn-secondary" href={`/admin/materials?page=${page - 1}`}>
+            <Link className="btn btn-secondary" href={`/admin/materials?page=${page - 1}`}>
               הקודם
             </Link>
           ) : (
@@ -147,7 +153,7 @@ export function AdminMaterialsList({ materials, total, page, pageSize }: Props) 
             עמוד {page} מתוך {totalPages}
           </span>
           {page < totalPages ? (
-            <Link className="materials-btn-secondary" href={`/admin/materials?page=${page + 1}`}>
+            <Link className="btn btn-secondary" href={`/admin/materials?page=${page + 1}`}>
               הבא
             </Link>
           ) : (

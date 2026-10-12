@@ -41,7 +41,7 @@ export function PostProfessionalRequestForm() {
         <textarea id="pro-description" rows={5} required value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button" disabled={loading}>{loading ? "מפרסם..." : "פרסום פנייה"}</button>
+      <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "מפרסם..." : "פרסום פנייה"}</button>
     </form>
   );
 }

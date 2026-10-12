@@ -65,7 +65,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 leading={event.event_date ? <DateBadge value={event.event_date} /> : undefined}
                 badges={
                   event.is_cancelled ? (
-                    <span className="ui-badge" data-kind="danger">
+                    <span className="status status-rejected">
                       בוטל
                     </span>
                   ) : undefined

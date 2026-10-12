@@ -42,7 +42,7 @@ export function PostMaterialRequestForm() {
         <textarea id="request-description" rows={4} required value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="materials-btn-primary" disabled={loading}>
+      <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? "מפרסם..." : "פרסום בקשה"}
       </button>
     </form>

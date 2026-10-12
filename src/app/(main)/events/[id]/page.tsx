@@ -38,7 +38,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <h1>
           {event.title}{" "}
           {event.is_cancelled && (
-            <span className="ui-badge" data-kind="danger">
+            <span className="status status-rejected">
               בוטל
             </span>
           )}

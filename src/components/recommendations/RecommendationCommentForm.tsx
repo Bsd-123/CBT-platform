@@ -55,7 +55,7 @@ export function RecommendationCommentForm({
         />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button secondary" disabled={loading}>
+      <button type="submit" className="btn btn-secondary" disabled={loading}>
         {loading ? "שולח..." : "שליחה"}
       </button>
     </form>

@@ -39,7 +39,7 @@ export function EventCommentForm({ eventId }: EventCommentFormProps) {
         <textarea id="event-comment" rows={3} required value={content} onChange={(e) => setContent(e.target.value)} />
       </div>
       {error && <p className="error">{error}</p>}
-      <button type="submit" className="button secondary" disabled={loading}>{loading ? "שולח..." : "פרסום עדכון"}</button>
+      <button type="submit" className="btn btn-secondary" disabled={loading}>{loading ? "שולח..." : "פרסום עדכון"}</button>
     </form>
   );
 }

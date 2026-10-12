@@ -88,11 +88,11 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
           <p>גלו ונהלו משאבים טיפוליים לצורך מצוינות קלינית.</p>
         </div>
         <div className="action-buttons">
-          <Link href="/materials/upload" className="materials-btn-primary">
+          <Link href="/materials/upload" className="btn btn-primary">
             <MaterialIcon name="upload" />
             העלאת חומר
           </Link>
-          <Link href="/materials/request" className="materials-btn-secondary">
+          <Link href="/materials/request" className="btn btn-secondary">
             <MaterialIcon name="help" />
             בקשת חומר
           </Link>
@@ -166,7 +166,7 @@ export default async function MaterialsPage({ searchParams }: MaterialsPageProps
             <div className="materials-empty">
               <MaterialIcon name="help_outline" />
               <p>עדיין לא פורסמו בקשות חומרים.</p>
-              <Link href="/materials/request" className="materials-btn-primary">
+              <Link href="/materials/request" className="btn btn-primary">
                 פרסום בקשה ראשונה
               </Link>
             </div>

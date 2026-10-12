@@ -34,7 +34,7 @@ export default async function PendingApprovalPage() {
               : "המומחה המפנה דחה את בקשת ההרשמה שלכם."}{" "}
             הגישה לפלטפורמה חסומה. לפרטים נוספים פנו למומחה.
           </p>
-          <Link href="/login" className="button secondary">
+          <Link href="/login" className="btn btn-secondary">
             חזרה להתחברות
           </Link>
         </section>

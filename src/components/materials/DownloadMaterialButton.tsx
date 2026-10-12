@@ -23,7 +23,7 @@ export function DownloadMaterialButton({
 
   return (
     <a
-      className="materials-btn-secondary"
+      className="btn btn-secondary"
       href={fileDownloadPath(fileKey, { inline })}
       target="_blank"
       rel="noopener noreferrer"

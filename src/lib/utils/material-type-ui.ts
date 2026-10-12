@@ -18,7 +18,12 @@ const TYPE_BADGE_VARIANT: Record<MaterialTypeKey, "secondary" | "tertiary" | "ne
   video: "neutral",
 };
 
-export function getMaterialTypeIcon(key: MaterialTypeKey | undefined): string {
+/** Admin-chosen icon when set, otherwise the built-in icon for the category key. */
+export function getMaterialTypeIcon(
+  key: MaterialTypeKey | undefined,
+  customIcon?: string | null,
+): string {
+  if (customIcon) return customIcon;
   if (!key) return "grid_view";
   return TYPE_ICONS[key] ?? "description";
 }

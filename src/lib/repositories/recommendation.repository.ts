@@ -59,6 +59,13 @@ export async function getRecommendationById(
   return pickPublicRecommendationFields({ ...recommendation, comments: trees(id) });
 }
 
+export async function countRecommendations(include_hidden = false): Promise<number> {
+  const db = await getDb();
+  let query = db.from("recommendations").select("id", { count: "exact", head: true });
+  if (!include_hidden) query = query.eq("is_hidden", false);
+  return countOf(await query);
+}
+
 export async function listRecommendations(include_hidden = false): Promise<PublicRecommendation[]> {
   const db = await getDb();
   let query = db.from("recommendations").select(WITH_AUTHOR).order("created_at", { ascending: false });

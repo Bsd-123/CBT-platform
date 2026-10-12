@@ -20,7 +20,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             ? "לא ניתן להתחבר למסד הנתונים כרגע. בדקו את החיבור לאינטרנט ונסו שוב."
             : "אירעה שגיאה בטעינת אזור הניהול."}
         </p>
-        <button type="button" className="button" onClick={() => reset()}>
+        <button type="button" className="btn btn-primary" onClick={() => reset()}>
           ניסיון חוזר
         </button>
       </section>

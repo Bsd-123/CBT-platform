@@ -126,7 +126,7 @@ export function CompleteProfileForm({
 
       {error && <p className="error">{error}</p>}
 
-      <button type="submit" className="button" disabled={loading}>
+      <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? "שומר..." : "שמירה והמשך"}
       </button>
     </form>

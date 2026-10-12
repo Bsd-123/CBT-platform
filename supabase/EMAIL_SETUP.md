@@ -10,7 +10,7 @@ Email clients require a **public HTTPS URL** for images. Choose one option:
 
 1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **Storage**
 2. Create a bucket named `brand-assets` and set it to **Public**
-3. Upload your logo (PNG ~200px wide is best for email; replace [`public/brand/logo.svg`](../../public/brand/logo.svg) with your own file)
+3. Upload your logo (PNG ~200px wide is best for email; the repo ships [`public/brand/logo.png`](../../public/brand/logo.png))
 4. Copy the public object URL, e.g.  
    `https://<project-ref>.supabase.co/storage/v1/object/public/brand-assets/logo.png`
 
@@ -57,4 +57,4 @@ Without custom SMTP, the sender may still show as Supabase; the HTML template st
 
 ## Replace the placeholder logo
 
-The repo includes a default SVG at [`public/brand/logo.svg`](../../public/brand/logo.svg). Replace it with your brand logo and upload the same file to Supabase Storage (or use `logo.png` after deploy).
+The repo includes the CBTeam logo at [`public/brand/logo.png`](../../public/brand/logo.png). Upload the same file to Supabase Storage, or use its deployed URL.

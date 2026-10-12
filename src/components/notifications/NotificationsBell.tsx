@@ -117,7 +117,7 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
             {unreadCount > 0 && (
               <button
                 type="button"
-                className="button secondary"
+                className="btn btn-secondary"
                 onClick={() => void handleMarkAllRead()}
               >
                 סמן הכל כנקרא
@@ -153,7 +153,7 @@ export function NotificationsBell({ userId }: NotificationsBellProps) {
                     {!item.is_read && (
                       <button
                         type="button"
-                        className="button secondary"
+                        className="btn btn-secondary"
                         onClick={() => void handleMarkRead(item.id)}
                       >
                         סמן כנקרא
