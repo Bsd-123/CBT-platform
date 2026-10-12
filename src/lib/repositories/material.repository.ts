@@ -169,6 +169,25 @@ export async function countPendingMaterials(): Promise<number> {
   );
 }
 
+/** Visible materials per approval status, for the counts on the review tabs. */
+export async function countMaterialsByApprovalStatus(): Promise<
+  Record<MaterialApprovalStatus, number>
+> {
+  const db = await getDb();
+  const count = (status: MaterialApprovalStatus) =>
+    db
+      .from("materials")
+      .select("id", { count: "exact", head: true })
+      .eq("approval_status", status)
+      .eq("is_hidden", false);
+  const [pending, approved, rejected] = await Promise.all([
+    count("pending"),
+    count("approved"),
+    count("rejected"),
+  ]);
+  return { pending: countOf(pending), approved: countOf(approved), rejected: countOf(rejected) };
+}
+
 export type ReviewQueueItem = PublicMaterial & { tags: PublicTag[] };
 
 /** Materials by approval status for the expert review page (oldest pending first). */

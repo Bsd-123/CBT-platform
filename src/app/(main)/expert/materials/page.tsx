@@ -8,7 +8,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Pagination } from "@/components/ui/Pagination";
 import { TabNav } from "@/components/ui/TabNav";
 import { assertReviewerAccess } from "@/lib/auth";
-import { fetchMaterialsForReview } from "@/lib/data";
+import { fetchMaterialApprovalCounts, fetchMaterialsForReview } from "@/lib/data";
 import { formatDate } from "@/lib/utils/format";
 import { pageWindow, parsePage, totalPages } from "@/lib/utils/pagination";
 
@@ -29,7 +29,10 @@ export default async function MaterialReviewPage({ searchParams }: ReviewPagePro
   const status = TABS.find((tab) => tab.status === statusParam)?.status ?? "pending";
   const page = parsePage(pageParam);
 
-  const { items, total } = await fetchMaterialsForReview(status, pageWindow(page));
+  const [{ items, total }, counts] = await Promise.all([
+    fetchMaterialsForReview(status, pageWindow(page)),
+    fetchMaterialApprovalCounts(),
+  ]);
 
   return (
     <>
@@ -40,10 +43,12 @@ export default async function MaterialReviewPage({ searchParams }: ReviewPagePro
 
       <TabNav
         ariaLabel="סינון חומרים לפי סטטוס"
+        variant="underline"
         items={TABS.map((tab) => ({
           href: tab.status === "pending" ? "/expert/materials" : `/expert/materials?status=${tab.status}`,
           label: tab.label,
           icon: tab.icon,
+          count: counts[tab.status],
           active: tab.status === status,
         }))}
       />

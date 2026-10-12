@@ -72,6 +72,7 @@ import {
   getMaterialById,
   reviewMaterial,
   countPendingMaterials,
+  countMaterialsByApprovalStatus,
   listMaterialsForReview,
   getMaterialRating,
   getMaterialRequestById,
@@ -153,6 +154,10 @@ export async function fetchMaterialById(id: string) {
 
 export async function fetchPendingMaterialCount() {
   return countPendingMaterials();
+}
+
+export async function fetchMaterialApprovalCounts() {
+  return countMaterialsByApprovalStatus();
 }
 
 export async function fetchMaterialsForReview(
