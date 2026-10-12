@@ -259,31 +259,3 @@ main:has(> .home-page) {
     transform: none;
   }
 }
-
-/* ---------- Footer ---------- */
-
-.home-footer {
-  padding: 1.5rem var(--home-gutter);
-  border-top: 1px solid var(--line);
-  background: var(--surface-2);
-}
-
-.home-footer-inner {
-  max-width: var(--container);
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.home-footer-brand {
-  font-weight: 700;
-  color: var(--primary-600);
-}
-
-.home-footer-meta {
-  font-size: var(--fs-sm);
-  color: var(--ink-2);
-}

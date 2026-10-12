@@ -157,12 +157,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <footer className="home-footer">
-        <div className="home-footer-inner">
-          <span className="home-footer-brand">CBTeam</span>
-          <span className="home-footer-meta">קהילת מטפלי CBT לשיתוף ידע</span>
-        </div>
-      </footer>
     </div>
   );
 }
