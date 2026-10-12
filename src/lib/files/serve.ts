@@ -63,6 +63,12 @@ export async function serveFile(request: Request, key: string, head: boolean): P
     if (error instanceof AuthError) return fail(401, "יש להתחבר מחדש כדי להמשיך.");
     if (error instanceof RateLimitError) return fail(429, error.message);
     if (error instanceof FileNotFoundError) return fail(404, "הקובץ לא נמצא.");
+    // 418 is what network filters answer when they block the storage host itself: the server
+    // cannot reach R2 from this network, which no change to the download URL can fix.
+    if ((error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode === 418) {
+      logger.error("storage host blocked by the network (HTTP 418)", error, { route: "/api/files" });
+      return fail(502, "שירות האחסון חסום ברשת שבה רץ השרת. יש לאשר אותו במסנן או להריץ את האתר ברשת אחרת.");
+    }
     logger.error("file download failed", error, { route: "/api/files" });
     return fail(500, "ההורדה נכשלה. נסו שוב.");
   }

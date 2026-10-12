@@ -159,3 +159,13 @@ describe("refusals", () => {
     expect(JSON.stringify(await response.json())).not.toContain("R2 secret");
   });
 });
+
+describe("blocked storage host", () => {
+  it("explains a filter block (HTTP 418 from R2) instead of a generic failure", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    mocks.getObject.mockRejectedValue(Object.assign(new Error("UnknownError"), { $metadata: { httpStatusCode: 418 } }));
+    const response = await serveFile(request(), KEY, false);
+    expect(response.status).toBe(502);
+    expect((await response.json()).error).toContain("חסום");
+  });
+});
