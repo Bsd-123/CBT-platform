@@ -788,7 +788,8 @@
   color: var(--primary-600);
 }
 
-.material-symbol {
+.material-symbol,
+.material-symbols-outlined {
   font-family: "Material Symbols Outlined", sans-serif;
   font-weight: normal;
   font-style: normal;
@@ -797,6 +798,11 @@
   letter-spacing: normal;
   text-transform: none;
   display: inline-block;
+  /* Reserve a square box so ligature names never show or push layout while the font loads. */
+  flex: none;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;

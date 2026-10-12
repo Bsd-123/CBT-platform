@@ -15,7 +15,7 @@
   gap: 1.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .profile-page {
     flex-direction: row;
     padding: 2rem 3rem;
@@ -31,7 +31,7 @@
   flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .profile-sidebar {
     width: 20rem;
   }
@@ -174,7 +174,8 @@
 
 .profile-tabs {
   display: flex;
-  gap: 2rem;
+  flex-wrap: wrap;
+  gap: 0.25rem;
   border-bottom: 1px solid var(--line);
   margin-bottom: 1rem;
   overflow-x: auto;
@@ -185,18 +186,20 @@
   display: none;
 }
 
+/* Same look as the shared underline .tab (components.css). */
 .profile-tab {
-  padding-block: 0 1rem;
+  flex: none;
+  padding: 0.75rem 0.875rem;
   border: none;
   background: transparent;
   font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--fs-sm);
+  font-weight: 500;
   line-height: 1.2;
   color: var(--ink-2);
   cursor: pointer;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   margin-bottom: -1px;
   transition: color 0.15s, border-color 0.15s;
 }
@@ -207,7 +210,13 @@
 
 .profile-tab[data-active="true"] {
   color: var(--primary-600);
-  border-bottom-color: var(--primary-600);
+  border-bottom: 3px solid var(--primary-600);
+}
+
+.profile-tab:focus-visible {
+  outline: none;
+  border-radius: var(--r-sm);
+  box-shadow: var(--focus);
 }
 
 .profile-materials-grid {

@@ -286,11 +286,13 @@ main {
   background: var(--primary-600);
 }
 
+/* Always pinned to the far (left) edge, whether or not the nav is visible. */
 .nav-actions {
   display: flex;
   flex: none;
   align-items: center;
   gap: 0.5rem;
+  margin-inline-start: auto;
 }
 
 .nav-toggle {
